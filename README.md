@@ -55,12 +55,14 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 The easiest way to get started is using the VS Code Dev Container, which provides a pre-configured development environment with all tools installed.
 
 #### Prerequisites
+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - [VS Code](https://code.visualstudio.com/)
 - [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 - [1Password CLI](https://developer.1password.com/docs/cli) (for secret management)
 
 #### Quick Start
+
 1. Clone the repository
 2. Generate `.env` file on your host:
    ```bash
@@ -72,6 +74,7 @@ The easiest way to get started is using the VS Code Dev Container, which provide
 6. Start coding! All dependencies and tools are pre-installed.
 
 #### What's Included
+
 - Node.js LTS, TypeScript, ESLint, Prettier
 - 1Password CLI for secure secret management
 - Claude Code AI assistant
@@ -84,12 +87,15 @@ See [.devcontainer/README.md](.devcontainer/README.md) for detailed configuratio
 ## Docker Deployment
 
 ### Development Container
+
 The dev container is optimized for cross-platform development with:
+
 - **Security**: Pinned base image (`ubuntu-24.04`), version-locked packages, GPG verification
 - **Performance**: Volume mounts for node_modules (prevents cross-platform binary issues)
 - **Tooling**: Pre-configured VS Code extensions and CLI tools
 
 ### Production Container
+
 Deploy to any container orchestrator with the production-ready Dockerfile:
 
 ```bash
@@ -106,12 +112,14 @@ docker run -d \
 ```
 
 #### Production Features
+
 - **Multi-stage build**: Optimized image size (~150MB with Alpine Linux)
 - **Security**: Non-root user, minimal attack surface
 - **Health checks**: Built-in endpoint at `/api/health`
 - **Orchestration ready**: Works with Kubernetes, ECS, Docker Compose
 
 See [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) for comprehensive deployment guide including:
+
 - Container registry setup
 - Kubernetes manifests
 - AWS ECS task definitions
@@ -120,7 +128,9 @@ See [docs/PRODUCTION_DEPLOYMENT.md](docs/PRODUCTION_DEPLOYMENT.md) for comprehen
 - Monitoring and troubleshooting
 
 ### Security Scanning
+
 Automated security scanning runs on every PR and weekly via GitHub Actions:
+
 - **Trivy**: Vulnerability scanning for container images
 - **Hadolint**: Dockerfile best practices linting
 - Results integrated with GitHub Security tab
@@ -169,12 +179,12 @@ npm test -- --testPathPattern="__tests__/integration"
 
 ### Test Structure
 
-| Type | Location | Description |
-|------|----------|-------------|
-| Unit | `__tests__/unit/` | Hooks, utilities, pure functions |
-| Component | `__tests__/unit/components/` | React component rendering & interactions |
-| Integration | `__tests__/integration/api/` | API endpoint tests with mocked database |
-| E2E | `__tests__/e2e/` | Browser automation tests |
+| Type        | Location                     | Description                              |
+| ----------- | ---------------------------- | ---------------------------------------- |
+| Unit        | `__tests__/unit/`            | Hooks, utilities, pure functions         |
+| Component   | `__tests__/unit/components/` | React component rendering & interactions |
+| Integration | `__tests__/integration/api/` | API endpoint tests with mocked database  |
+| E2E         | `__tests__/e2e/`             | Browser automation tests                 |
 
 ### Test Configuration
 
@@ -193,6 +203,7 @@ npm test -- --testPathPattern="__tests__/integration"
 ### Visual Regression Baselines
 
 Visual baselines for responsive design testing are stored in:
+
 - `.claude/qa/baselines/desktop/` - Desktop (1280x720)
 - `.claude/qa/baselines/tablet/` - Tablet (768x1024)
 - `.claude/qa/baselines/mobile/` - Mobile (375x667)

@@ -3,7 +3,7 @@ name: Dependency Update
 on:
   schedule:
     # Run weekly on Monday at 9:00 AM UTC
-    - cron: '0 9 * * 1'
+    - cron: "0 9 * * 1"
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -21,9 +21,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
 
       - name: Install npm-check-updates
         run: npm install -g npm-check-updates
@@ -49,8 +49,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: Update dependencies'
-          title: 'chore: Weekly dependency updates'
+          commit-message: "chore: Update dependencies"
+          title: "chore: Weekly dependency updates"
           body: |
             ## Automated Dependency Updates
 

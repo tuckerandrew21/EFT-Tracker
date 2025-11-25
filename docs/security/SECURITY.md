@@ -44,21 +44,21 @@ Please provide as much information as possible:
 
 ### Severity Levels
 
-| Severity | Description | Response Time |
-|----------|-------------|---------------|
-| **Critical** | Allows arbitrary code execution, data breach, or full system compromise | 24-48 hours |
-| **High** | Significant security impact, but requires specific conditions | 3-7 days |
-| **Medium** | Limited security impact or requires user interaction | 14-30 days |
-| **Low** | Minimal security impact or theoretical vulnerability | 30-90 days |
+| Severity     | Description                                                             | Response Time |
+| ------------ | ----------------------------------------------------------------------- | ------------- |
+| **Critical** | Allows arbitrary code execution, data breach, or full system compromise | 24-48 hours   |
+| **High**     | Significant security impact, but requires specific conditions           | 3-7 days      |
+| **Medium**   | Limited security impact or requires user interaction                    | 14-30 days    |
+| **Low**      | Minimal security impact or theoretical vulnerability                    | 30-90 days    |
 
 ## Supported Versions
 
 This template repository is continuously updated. Security fixes are applied to:
 
-| Version | Supported |
-|---------|-----------|
-| Latest (main branch) | ✅ Yes |
-| Previous releases | ❌ No (update to latest) |
+| Version              | Supported                |
+| -------------------- | ------------------------ |
+| Latest (main branch) | ✅ Yes                   |
+| Previous releases    | ❌ No (update to latest) |
 
 **Recommendation:** Always use the latest version of this template when creating new projects.
 
@@ -69,6 +69,7 @@ When using this template for your projects, follow these security guidelines:
 ### 1. Environment Variables & Secrets
 
 **❌ Never commit secrets to version control:**
+
 ```bash
 # Bad - secrets in code
 const API_KEY = "sk-1234567890abcdef";
@@ -76,6 +77,7 @@ const DB_PASSWORD = "supersecret123";
 ```
 
 **✅ Use environment variables:**
+
 ```bash
 # Good - reference environment variables
 const API_KEY = process.env.API_KEY;
@@ -83,6 +85,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 ```
 
 **Verify `.env` is in `.gitignore`:**
+
 ```gitignore
 # Environment variables
 .env
@@ -101,6 +104,7 @@ Thumbs.db
 ### 2. Dependency Management
 
 **Regular updates:**
+
 ```bash
 # Check for vulnerabilities
 npm audit
@@ -114,11 +118,13 @@ npm update
 ```
 
 **Use lock files:**
+
 - Commit `package-lock.json` (npm)
 - Commit `pnpm-lock.yaml` (pnpm)
 - Commit `yarn.lock` (yarn)
 
 **Pin critical dependencies:**
+
 ```json
 {
   "dependencies": {
@@ -131,14 +137,19 @@ npm update
 ### 3. Input Validation
 
 **Always validate user input:**
+
 ```typescript
 // Good - using Zod for validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const userSchema = z.object({
   email: z.string().email(),
   age: z.number().min(0).max(120),
-  username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_]+$/)
+  username: z
+    .string()
+    .min(3)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_]+$/),
 });
 
 function createUser(data: unknown) {
@@ -150,6 +161,7 @@ function createUser(data: unknown) {
 ### 4. SQL Injection Prevention
 
 **❌ Never concatenate user input into SQL:**
+
 ```typescript
 // Bad - vulnerable to SQL injection
 const query = `SELECT * FROM users WHERE id = ${userId}`;
@@ -157,9 +169,10 @@ db.query(query);
 ```
 
 **✅ Use parameterized queries:**
+
 ```typescript
 // Good - safe from SQL injection
-const query = 'SELECT * FROM users WHERE id = ?';
+const query = "SELECT * FROM users WHERE id = ?";
 db.query(query, [userId]);
 
 // Or with Drizzle ORM
@@ -169,6 +182,7 @@ const user = await db.select().from(users).where(eq(users.id, userId));
 ### 5. XSS Prevention
 
 **Sanitize HTML output:**
+
 ```typescript
 // Bad - vulnerable to XSS
 element.innerHTML = userInput;
@@ -177,11 +191,12 @@ element.innerHTML = userInput;
 element.textContent = userInput;
 
 // Good - using a library for HTML
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 element.innerHTML = DOMPurify.sanitize(userInput);
 ```
 
 **React/JSX (safe by default):**
+
 ```jsx
 // Safe - React escapes by default
 <div>{userInput}</div>
@@ -193,8 +208,9 @@ element.innerHTML = DOMPurify.sanitize(userInput);
 ### 6. Authentication & Authorization
 
 **Password hashing:**
+
 ```typescript
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 // Good - hash passwords with salt
 const saltRounds = 10;
@@ -205,14 +221,15 @@ const isValid = await bcrypt.compare(password, hashedPassword);
 ```
 
 **JWT best practices:**
+
 ```typescript
 // Good - short expiration, secure secret
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 const token = jwt.sign(
   { userId: user.id, role: user.role },
   process.env.JWT_SECRET, // Strong secret from env
-  { expiresIn: '15m' } // Short expiration
+  { expiresIn: "15m" } // Short expiration
 );
 
 // Verify tokens
@@ -224,54 +241,62 @@ try {
 ```
 
 **Session management:**
+
 ```typescript
 // Good - secure session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true, // HTTPS only
-    httpOnly: true, // No JavaScript access
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'strict' // CSRF protection
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true, // HTTPS only
+      httpOnly: true, // No JavaScript access
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: "strict", // CSRF protection
+    },
+  })
+);
 ```
 
 ### 7. API Security
 
 **Rate limiting:**
+
 ```typescript
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests, please try again later.'
+  message: "Too many requests, please try again later.",
 });
 
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 ```
 
 **CORS configuration:**
+
 ```typescript
-import cors from 'cors';
+import cors from "cors";
 
 // Good - specific origin
-app.use(cors({
-  origin: 'https://yourdomain.com',
-  credentials: true,
-  optionsSuccessStatus: 200
-}));
+app.use(
+  cors({
+    origin: "https://yourdomain.com",
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 
 // Bad - allows all origins
-app.use(cors({ origin: '*' })); // Only for public APIs
+app.use(cors({ origin: "*" })); // Only for public APIs
 ```
 
 **Security headers:**
+
 ```typescript
-import helmet from 'helmet';
+import helmet from "helmet";
 
 // Good - security headers
 app.use(helmet());
@@ -280,40 +305,43 @@ app.use(helmet());
 ### 8. File Upload Security
 
 **Validate file types:**
+
 ```typescript
-const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
 const maxSize = 5 * 1024 * 1024; // 5MB
 
 function validateFile(file: File) {
   if (!allowedTypes.includes(file.type)) {
-    throw new Error('Invalid file type');
+    throw new Error("Invalid file type");
   }
   if (file.size > maxSize) {
-    throw new Error('File too large');
+    throw new Error("File too large");
   }
 }
 ```
 
 **Store files securely:**
+
 ```typescript
 // Good - rename files, store outside web root
-import { randomBytes } from 'crypto';
-import path from 'path';
+import { randomBytes } from "crypto";
+import path from "path";
 
-const filename = `${randomBytes(16).toString('hex')}${path.extname(originalName)}`;
-const uploadPath = path.join(__dirname, '../../uploads', filename);
+const filename = `${randomBytes(16).toString("hex")}${path.extname(originalName)}`;
+const uploadPath = path.join(__dirname, "../../uploads", filename);
 ```
 
 ### 9. Error Handling
 
 **Don't expose stack traces in production:**
+
 ```typescript
 // Good - safe error responses
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log for debugging
 
-  if (process.env.NODE_ENV === 'production') {
-    res.status(500).json({ error: 'Internal server error' });
+  if (process.env.NODE_ENV === "production") {
+    res.status(500).json({ error: "Internal server error" });
   } else {
     res.status(500).json({ error: err.message, stack: err.stack });
   }
@@ -323,11 +351,15 @@ app.use((err, req, res, next) => {
 ### 10. HTTPS & Transport Security
 
 **Enforce HTTPS in production:**
+
 ```typescript
 // Redirect HTTP to HTTPS
 app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-    res.redirect(`https://${req.header('host')}${req.url}`);
+  if (
+    req.header("x-forwarded-proto") !== "https" &&
+    process.env.NODE_ENV === "production"
+  ) {
+    res.redirect(`https://${req.header("host")}${req.url}`);
   } else {
     next();
   }
@@ -335,12 +367,15 @@ app.use((req, res, next) => {
 ```
 
 **Use HSTS header:**
+
 ```typescript
-app.use(helmet.hsts({
-  maxAge: 31536000, // 1 year
-  includeSubDomains: true,
-  preload: true
-}));
+app.use(
+  helmet.hsts({
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true,
+  })
+);
 ```
 
 ## MCP Server Security
@@ -348,6 +383,7 @@ app.use(helmet.hsts({
 When using Model Context Protocol (MCP) servers with Claude Code:
 
 **See [MCP_SECURITY.md](MCP_SECURITY.md) for comprehensive guidelines:**
+
 - Threat model and attack vectors
 - Server evaluation checklist
 - Configuration best practices
@@ -355,6 +391,7 @@ When using Model Context Protocol (MCP) servers with Claude Code:
 - Incident response procedures
 
 **Quick checklist:**
+
 - [ ] Only use MCP servers from trusted sources
 - [ ] Review server source code before approval
 - [ ] Pin server versions in `.mcp.json`
@@ -369,6 +406,7 @@ When using Model Context Protocol (MCP) servers with Claude Code:
 ### Pre-Commit Hooks
 
 This template includes pre-commit hooks that:
+
 - Block direct commits to `main` branch
 - Enforce feature branch workflow
 - Ensure code review process
@@ -378,6 +416,7 @@ This template includes pre-commit hooks that:
 ### Branch Protection Rules
 
 Configure in GitHub Settings → Branches:
+
 - [ ] Require pull request reviews before merging
 - [ ] Require status checks to pass before merging
 - [ ] Require conversation resolution before merging
@@ -388,6 +427,7 @@ Configure in GitHub Settings → Branches:
 ### Commit Signing (Optional but Recommended)
 
 **GPG signature verification:**
+
 ```bash
 # Generate GPG key
 gpg --gen-key
@@ -409,6 +449,7 @@ gpg --armor --export YOUR_KEY_ID
 ### Enable Security Alerts
 
 In repository settings:
+
 - [ ] **Dependabot alerts** - Notifies of vulnerable dependencies
 - [ ] **Dependabot security updates** - Auto-creates PRs for security fixes
 - [ ] **Code scanning** - Automated security analysis (if available)
@@ -425,6 +466,7 @@ In repository settings:
 When creating a new project from this template:
 
 ### Initial Setup
+
 - [ ] Review and customize `.gitignore`
 - [ ] Create `.env.example` with all required variables
 - [ ] Verify `.env` is in `.gitignore`
@@ -434,6 +476,7 @@ When creating a new project from this template:
 - [ ] Install pre-commit hooks
 
 ### Code Security
+
 - [ ] Implement input validation (Zod, Joi, Yup)
 - [ ] Use parameterized queries or ORM
 - [ ] Hash passwords with bcrypt (10+ rounds)
@@ -444,6 +487,7 @@ When creating a new project from this template:
 - [ ] Validate file uploads
 
 ### Authentication & Authorization
+
 - [ ] Implement secure authentication (JWT, sessions, OAuth)
 - [ ] Use HTTPS only in production
 - [ ] Set secure cookie flags
@@ -452,6 +496,7 @@ When creating a new project from this template:
 - [ ] Log security events (login attempts, permission changes)
 
 ### Dependency Security
+
 - [ ] Run `npm audit` and fix vulnerabilities
 - [ ] Use lock files (commit to version control)
 - [ ] Set up automated dependency updates (Dependabot)
@@ -459,6 +504,7 @@ When creating a new project from this template:
 - [ ] Pin versions for critical packages
 
 ### MCP Security (if using Claude Code)
+
 - [ ] Review all MCP servers in `.mcp.json`
 - [ ] Pin MCP server versions
 - [ ] Scope filesystem access to project only
@@ -467,6 +513,7 @@ When creating a new project from this template:
 - [ ] Read [MCP_SECURITY.md](MCP_SECURITY.md) thoroughly
 
 ### Deployment Security
+
 - [ ] Use HTTPS/TLS certificates
 - [ ] Set secure environment variables
 - [ ] Configure firewall rules
@@ -476,6 +523,7 @@ When creating a new project from this template:
 - [ ] Document incident response procedures
 
 ### Documentation
+
 - [ ] Document security architecture
 - [ ] Create runbook for common security issues
 - [ ] Maintain list of third-party services and credentials
@@ -515,6 +563,7 @@ When creating a new project from this template:
 ### Scanning & Analysis
 
 **Dependency scanning:**
+
 ```bash
 # npm
 npm audit
@@ -529,12 +578,14 @@ npx socket-npm audit
 ```
 
 **Code scanning:**
+
 ```bash
 # ESLint security plugin
 npm install --save-dev eslint-plugin-security
 ```
 
 **Secret scanning:**
+
 ```bash
 # git-secrets (prevent committing secrets)
 brew install git-secrets
@@ -548,6 +599,7 @@ docker run --rm -v "$(pwd):/pwd" trufflesecurity/trufflehog:latest github --repo
 ### Testing
 
 **Security testing tools:**
+
 - **OWASP ZAP** - Web application security scanner
 - **Burp Suite** - Web security testing
 - **npm audit** - Dependency vulnerabilities
@@ -557,6 +609,7 @@ docker run --rm -v "$(pwd):/pwd" trufflesecurity/trufflehog:latest github --repo
 ## Resources
 
 ### Documentation
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
 - [CWE Top 25](https://cwe.mitre.org/top25/archive/2023/2023_top25_list.html)
@@ -564,16 +617,19 @@ docker run --rm -v "$(pwd):/pwd" trufflesecurity/trufflehog:latest github --repo
 - [Express Security Best Practices](https://expressjs.com/en/advanced/best-practice-security.html)
 
 ### Template-Specific Guides
+
 - [MCP_SECURITY.md](MCP_SECURITY.md) - MCP server security
 - [CODING_STANDARDS.md](CODING_STANDARDS.md) - Code quality and security patterns
 - [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md) - Git workflow and protection
 
 ### Security Training
+
 - [OWASP WebGoat](https://owasp.org/www-project-webgoat/) - Security learning platform
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security) - Free security training
 - [HackerOne CTF](https://www.hackerone.com/hackers/hacker101) - Capture the flag challenges
 
 ### Stay Updated
+
 - [GitHub Security Lab](https://securitylab.github.com/)
 - [NIST National Vulnerability Database](https://nvd.nist.gov/)
 - [CVE Details](https://www.cvedetails.com/)
@@ -595,6 +651,7 @@ We follow coordinated (responsible) disclosure:
 ### Public Disclosure
 
 After the fix is released:
+
 - Security advisory published on GitHub
 - CVE assigned (if applicable)
 - Credit given to researcher (if desired)
@@ -603,11 +660,13 @@ After the fix is released:
 ## Contact
 
 For security concerns:
+
 - **GitHub Security Advisories**: Repository Security tab
 - **Email**: [Maintainer email from README]
 - **Response Time**: Within 48 hours for acknowledgment
 
 For general questions about security features of this template:
+
 - Open a GitHub Discussion (not an issue)
 - Reference relevant security documentation
 

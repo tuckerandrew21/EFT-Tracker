@@ -73,7 +73,11 @@ async function seedTestData() {
   console.log(`Found ${quests.length} quests. Creating sample progress...`);
 
   // Create progress with variety of states
-  const progressData: { userId: string; questId: string; status: QuestStatus }[] = [];
+  const progressData: {
+    userId: string;
+    questId: string;
+    status: QuestStatus;
+  }[] = [];
 
   quests.forEach((quest, index) => {
     let status: QuestStatus;

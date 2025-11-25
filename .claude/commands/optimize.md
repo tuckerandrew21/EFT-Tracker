@@ -5,6 +5,7 @@ Analyze and optimize code for better performance.
 ## Instructions
 
 Ask the user for:
+
 1. Area to optimize (frontend, backend, database, build)
 2. Current performance metrics (if available)
 3. Target metrics or pain points
@@ -17,6 +18,7 @@ Then analyze and provide optimization recommendations.
 ### 1. React Optimization
 
 **Unnecessary Re-renders:**
+
 ```typescript
 // ❌ Component re-renders on every parent update
 function ExpensiveComponent({ data }: Props) {
@@ -40,6 +42,7 @@ function ExpensiveComponent({ data }: Props) {
 ```
 
 **Expensive Callbacks:**
+
 ```typescript
 // ❌ New function on every render
 function Component() {
@@ -59,6 +62,7 @@ function Component() {
 ```
 
 **Code Splitting:**
+
 ```typescript
 // ❌ All components loaded upfront
 import { HeavyComponent } from './HeavyComponent';
@@ -219,8 +223,8 @@ async function getUsersWithPosts() {
 async function getUsersWithPosts() {
   return await db.query.users.findMany({
     with: {
-      posts: true
-    }
+      posts: true,
+    },
   });
 }
 ```
@@ -229,15 +233,15 @@ async function getUsersWithPosts() {
 
 ```typescript
 // ❌ No caching
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const user = await db.select().from(users).where(eq(users.id, req.params.id));
   res.json(user);
 });
 
 // ✅ With Redis cache
-import { redis } from './redis';
+import { redis } from "./redis";
 
-app.get('/api/users/:id', async (req, res) => {
+app.get("/api/users/:id", async (req, res) => {
   const cached = await redis.get(`user:${req.params.id}`);
 
   if (cached) {
@@ -267,7 +271,7 @@ async function queryDatabase(sql: string) {
 }
 
 // ✅ Connection pool
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 const pool = new Pool({
   max: 20,
@@ -289,13 +293,13 @@ async function queryDatabase(sql: string) {
 
 ```typescript
 // ❌ Loading all records
-app.get('/api/users', async (req, res) => {
+app.get("/api/users", async (req, res) => {
   const users = await db.select().from(users); // Could be millions!
   res.json(users);
 });
 
 // ✅ Cursor-based pagination
-app.get('/api/users', async (req, res) => {
+app.get("/api/users", async (req, res) => {
   const { cursor, limit = 20 } = req.query;
 
   const users = await db
@@ -311,7 +315,7 @@ app.get('/api/users', async (req, res) => {
   res.json({
     data: results,
     nextCursor,
-    hasMore
+    hasMore,
   });
 });
 ```
@@ -320,7 +324,7 @@ app.get('/api/users', async (req, res) => {
 
 ```typescript
 // ❌ Slow synchronous processing
-app.post('/api/orders', async (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const order = await createOrder(req.body);
   await sendEmail(order); // Blocks response
   await updateInventory(order); // Blocks response
@@ -329,15 +333,15 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // ✅ Background job queue
-import { queue } from './queue';
+import { queue } from "./queue";
 
-app.post('/api/orders', async (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const order = await createOrder(req.body);
 
   // Queue background tasks
-  await queue.add('send-email', { orderId: order.id });
-  await queue.add('update-inventory', { orderId: order.id });
-  await queue.add('notify-warehouse', { orderId: order.id });
+  await queue.add("send-email", { orderId: order.id });
+  await queue.add("update-inventory", { orderId: order.id });
+  await queue.add("notify-warehouse", { orderId: order.id });
 
   res.json(order); // Fast response
 });
@@ -359,11 +363,11 @@ npm install --save-dev webpack-bundle-analyzer
 
 ```typescript
 // ❌ Imports entire library
-import _ from 'lodash';
+import _ from "lodash";
 const result = _.uniq(array);
 
 // ✅ Import only what's needed
-import uniq from 'lodash/uniq';
+import uniq from "lodash/uniq";
 const result = uniq(array);
 
 // Or use modern alternative
@@ -379,13 +383,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          charts: ['recharts'],
-          utils: ['lodash', 'date-fns']
-        }
-      }
-    }
-  }
+          vendor: ["react", "react-dom"],
+          charts: ["recharts"],
+          utils: ["lodash", "date-fns"],
+        },
+      },
+    },
+  },
 });
 ```
 
@@ -394,11 +398,11 @@ export default defineConfig({
 ### 1. Web Vitals
 
 ```typescript
-import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from "web-vitals";
 
 function sendToAnalytics(metric: Metric) {
   const body = JSON.stringify(metric);
-  navigator.sendBeacon('/analytics', body);
+  navigator.sendBeacon("/analytics", body);
 }
 
 onCLS(sendToAnalytics);
@@ -429,6 +433,7 @@ function onRenderCallback(
 ## Performance Checklist
 
 ### Frontend
+
 - [ ] Components memoized where appropriate
 - [ ] Expensive calculations memoized
 - [ ] Code splitting for large bundles
@@ -438,6 +443,7 @@ function onRenderCallback(
 - [ ] Service worker for caching
 
 ### Backend
+
 - [ ] Database queries optimized (no N+1)
 - [ ] Indexes on frequently queried columns
 - [ ] Caching strategy implemented
@@ -447,6 +453,7 @@ function onRenderCallback(
 - [ ] Response compression enabled
 
 ### Build
+
 - [ ] Bundle size analyzed
 - [ ] Tree shaking enabled
 - [ ] Code splitting configured
@@ -459,6 +466,7 @@ function onRenderCallback(
 # Performance Optimization Report
 
 ## Current Metrics
+
 - Bundle size: Xmb
 - LCP: Xms
 - FID: Xms
@@ -468,6 +476,7 @@ function onRenderCallback(
 ## Issues Found
 
 ### 1. [Issue Title]
+
 **Impact:** High/Medium/Low
 **Area:** Frontend/Backend/Database
 **Description:** [What's slow]
@@ -476,6 +485,7 @@ function onRenderCallback(
 ## Optimizations Applied
 
 ### 1. [Optimization]
+
 **Before:** [Metric]
 **After:** [Metric]
 **Improvement:** X%
@@ -496,6 +506,7 @@ function onRenderCallback(
 ## Confirm with User
 
 After optimization:
+
 - Show performance improvements with metrics
 - Run benchmarks to verify gains
 - Check for regressions in functionality

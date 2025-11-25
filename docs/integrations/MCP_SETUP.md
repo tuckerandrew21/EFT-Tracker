@@ -81,6 +81,7 @@ You can also use the `/mcp` slash command within Claude Code to check server sta
 This template includes sixteen MCP servers for enhanced development capabilities:
 
 #### 1. Playwright MCP Server
+
 - **Purpose:** Browser automation and automated testing
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-playwright`
@@ -93,6 +94,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Multi-browser compatibility testing
 
 #### 2. Filesystem MCP Server
+
 - **Purpose:** Secure file system operations
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-filesystem ${PROJECT_ROOT}`
@@ -105,6 +107,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Safe file manipulation within project boundaries
 
 #### 3. Git MCP Server
+
 - **Purpose:** Git repository operations
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-git`
@@ -117,6 +120,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Git configuration management
 
 #### 4. Memory MCP Server
+
 - **Purpose:** Knowledge graph-based persistent memory
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-memory`
@@ -129,6 +133,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Query stored knowledge
 
 #### 5. Context7 MCP Server
+
 - **Purpose:** Web scraping and content extraction
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @context7/mcp`
@@ -141,6 +146,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Useful for research, documentation, and data gathering
 
 #### 6. Slack MCP Server
+
 - **Purpose:** Slack workspace integration
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-slack`
@@ -156,6 +162,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Automated notifications and updates
 
 #### 7. GitHub MCP Server
+
 - **Purpose:** GitHub repository management and automation
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-github`
@@ -171,6 +178,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - **Note:** Complements GitHub CLI with direct API access for Claude
 
 #### 8. Sequential Thinking MCP Server
+
 - **Purpose:** Enhanced reasoning and problem-solving
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-sequential-thinking`
@@ -183,6 +191,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Better handling of ambiguous problems
 
 #### 9. Puppeteer MCP Server
+
 - **Purpose:** Alternative browser automation (Chrome/Chromium focused)
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-puppeteer`
@@ -195,6 +204,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Complementary to Playwright for Chrome-specific tasks
 
 #### 10. PostgreSQL MCP Server
+
 - **Purpose:** PostgreSQL database operations
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-postgres`
@@ -209,6 +219,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Database migrations and debugging
 
 #### 11. SQLite MCP Server
+
 - **Purpose:** SQLite database operations
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-sqlite`
@@ -221,6 +232,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - No configuration required for local .db files
 
 #### 12. Brave Search MCP Server
+
 - **Purpose:** Web search for research and documentation
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-brave-search`
@@ -235,6 +247,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Privacy-focused search results
 
 #### 13. Everything MCP Server
+
 - **Purpose:** Fast file search across entire system
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-everything`
@@ -247,6 +260,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Complements filesystem server with broader scope
 
 #### 14. Docker MCP Server
+
 - **Purpose:** Docker container management and inspection
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-docker`
@@ -262,6 +276,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - Inspect test container state (e.g., `wiseloan-core-core-1`)
 
 #### 15. Sentry MCP Server
+
 - **Purpose:** Error tracking and monitoring integration
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-sentry`
@@ -280,6 +295,7 @@ This template includes sixteen MCP servers for enhanced development capabilities
   - **Note:** Only configure if using Sentry for error tracking
 
 #### 16. AWS Knowledge Base MCP Server
+
 - **Purpose:** AWS Knowledge Base integration for retrieval
 - **Transport:** stdio (local process)
 - **Command:** `npx -y @modelcontextprotocol/server-aws-kb-retrieval-server`
@@ -313,7 +329,11 @@ The `.mcp.json` file in the repository root contains:
     "filesystem": {
       "transport": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${PROJECT_ROOT}"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${PROJECT_ROOT}"
+      ],
       "env": {
         "PROJECT_ROOT": "${PWD}"
       }
@@ -425,6 +445,7 @@ The `.mcp.json` file in the repository root contains:
 ```
 
 **Configuration Notes:**
+
 - `-y` flag automatically installs packages without prompting
 - `${PROJECT_ROOT}` and `${PWD}` are environment variables expanded at runtime
 - Each server runs as a separate process via `stdio` transport
@@ -496,11 +517,13 @@ To use the GitHub MCP server, you need a Personal Access Token (PAT):
 To use the PostgreSQL MCP server, configure your database connection:
 
 1. **Set Connection String:**
+
    ```bash
    export POSTGRES_CONNECTION_STRING="postgresql://username:password@localhost:5432/dbname"
    ```
 
 2. **Connection String Format:**
+
    ```
    postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
    ```
@@ -521,6 +544,7 @@ To use the Brave Search MCP server, you need a Brave Search API key:
    - Navigate to your dashboard and copy your API key
 
 2. **Set Environment Variable:**
+
    ```bash
    export BRAVE_API_KEY="your-brave-api-key-here"
    ```
@@ -557,9 +581,11 @@ The Docker MCP server works with your local Docker installation:
    - No additional configuration required
 
 2. **Verify Docker is Running:**
+
    ```bash
    docker ps
    ```
+
    If this command works, the MCP server will work too.
 
 3. **Use Cases for Testing Template:**
@@ -599,6 +625,7 @@ To use the Sentry MCP server, configure your Sentry integration:
    - Project slug: Found in project settings or URL `https://sentry.io/organizations/{org-slug}/projects/{project-slug}/`
 
 3. **Set Environment Variables:**
+
    ```bash
    export SENTRY_AUTH_TOKEN="your-auth-token"
    export SENTRY_ORG="your-org-slug"
@@ -629,14 +656,13 @@ To use the AWS Knowledge Base MCP server:
      ```json
      {
        "Version": "2012-10-17",
-       "Statement": [{
-         "Effect": "Allow",
-         "Action": [
-           "bedrock:Retrieve",
-           "bedrock:RetrieveAndGenerate"
-         ],
-         "Resource": "*"
-       }]
+       "Statement": [
+         {
+           "Effect": "Allow",
+           "Action": ["bedrock:Retrieve", "bedrock:RetrieveAndGenerate"],
+           "Resource": "*"
+         }
+       ]
      }
      ```
    - Generate access keys (Access Key ID + Secret Access Key)
@@ -647,6 +673,7 @@ To use the AWS Knowledge Base MCP server:
    - Copy your Knowledge Base ID
 
 4. **Set Environment Variables:**
+
    ```bash
    export AWS_ACCESS_KEY_ID="your-access-key-id"
    export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
@@ -672,21 +699,25 @@ Once configured, you can ask Claude Code to use these servers:
 #### Playwright Server
 
 **1. Test a web application:**
+
 ```
 Open the staging site and test the login flow
 ```
 
 **2. Capture screenshots:**
+
 ```
 Navigate to the homepage and take a screenshot of the hero section
 ```
 
 **3. Run automated tests:**
+
 ```
 Use Playwright to test the checkout process and verify all validation works
 ```
 
 **4. Debug UI issues:**
+
 ```
 Open the app in multiple browsers and compare how the navbar renders
 ```
@@ -694,16 +725,19 @@ Open the app in multiple browsers and compare how the navbar renders
 #### Filesystem Server
 
 **1. Search project files:**
+
 ```
 Search for all files containing "authentication" logic
 ```
 
 **2. Analyze directory structure:**
+
 ```
 Show me the directory structure of the src/components folder
 ```
 
 **3. Safe file operations:**
+
 ```
 Create a new component file following the project structure
 ```
@@ -711,21 +745,25 @@ Create a new component file following the project structure
 #### Git Server
 
 **1. View repository status:**
+
 ```
 Show me the current git status and recent commit history
 ```
 
 **2. Branch operations:**
+
 ```
 Create a new feature branch for user authentication
 ```
 
 **3. Review changes:**
+
 ```
 Show me the diff between my current changes and main branch
 ```
 
 **4. Commit history:**
+
 ```
 Find all commits related to the payment processing feature
 ```
@@ -733,21 +771,25 @@ Find all commits related to the payment processing feature
 #### Memory Server
 
 **1. Remember project context:**
+
 ```
 Remember that this project uses Zod for validation and Drizzle for database
 ```
 
 **2. Recall preferences:**
+
 ```
 What were the coding conventions we established for this project?
 ```
 
 **3. Track decisions:**
+
 ```
 Remember that we decided to use JWT tokens with 7-day expiration
 ```
 
 **4. Build knowledge graph:**
+
 ```
 What relationships exist between the User, Post, and Comment entities?
 ```
@@ -872,15 +914,15 @@ Precedence: local > project > user
 Create a `playwright.config.ts` in the repository root for custom browser settings:
 
 ```typescript
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: "./tests",
   timeout: 30000,
   use: {
-    baseURL: 'http://localhost:3000',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    baseURL: "http://localhost:3000",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
   },
 });
 ```
@@ -920,6 +962,7 @@ export default defineConfig({
 ## Changelog
 
 ### 2025-11-21
+
 - Initial MCP setup documentation
 - Added Playwright MCP server configuration
 - Created team onboarding guide

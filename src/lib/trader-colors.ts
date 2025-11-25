@@ -16,7 +16,12 @@ export const TRADER_COLORS: Record<string, TraderColor> = {
 };
 
 export function getTraderColor(traderId: string): TraderColor {
-  return TRADER_COLORS[traderId.toLowerCase()] || { primary: "#6B7280", bg: "#E5E7EB" };
+  return (
+    TRADER_COLORS[traderId.toLowerCase()] || {
+      primary: "#6B7280",
+      bg: "#E5E7EB",
+    }
+  );
 }
 
 // Status colors for quest progress

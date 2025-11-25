@@ -53,6 +53,7 @@ The container uses Docker volumes for performance and cross-platform compatibili
 Secrets are managed using 1Password CLI with secret references:
 
 1. **On Host (Windows)**: Generate `.env` before opening container
+
    ```powershell
    op inject -i .env.template -o .env
    ```
@@ -68,6 +69,7 @@ Secrets are managed using 1Password CLI with secret references:
 ## Port Forwarding
 
 The following ports are automatically forwarded:
+
 - `3000` - Next.js development server
 - `5000` - Alternative dev server
 - `8000` - API/backend services
@@ -102,6 +104,7 @@ See [.env.template](.env.template) for the complete list with 1Password referenc
 **Cause**: Windows binaries from host mounted into Linux container
 
 **Fix**: Already resolved by the `node_modules` volume mount. If you see this error:
+
 1. Rebuild the container to apply the volume mount
 2. The setup script will reinstall dependencies with Linux binaries
 
@@ -110,6 +113,7 @@ See [.env.template](.env.template) for the complete list with 1Password referenc
 **Cause**: 1Password desktop integration doesn't work in containers
 
 **Fix**: Either:
+
 - Generate `.env` on your Windows host before opening the container
 - Or, sign in manually with `op signin` and use `refresh-secrets`
 
@@ -122,6 +126,7 @@ See [.env.template](.env.template) for the complete list with 1Password referenc
 ## Performance Optimization
 
 The container is optimized for:
+
 - ✅ Fast source code editing (bind mount to host)
 - ✅ Linux-compatible builds (isolated node_modules)
 - ✅ Persistent bash history
@@ -140,6 +145,7 @@ To rebuild with a clean slate:
 ```
 
 **Note**: Named volumes persist across rebuilds, so you won't lose:
+
 - Bash history
 - Node modules (unless you delete the volume)
 

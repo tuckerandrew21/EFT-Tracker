@@ -64,6 +64,7 @@ Perform a comprehensive security review of the codebase.
 # Security Review Report
 
 ## Summary
+
 - Critical Issues: X
 - High Priority: X
 - Medium Priority: X
@@ -72,6 +73,7 @@ Perform a comprehensive security review of the codebase.
 ## Critical Issues
 
 ### 1. [Issue Title]
+
 **Severity:** Critical
 **Location:** `path/to/file.ts:123`
 **Description:** [Detailed description]

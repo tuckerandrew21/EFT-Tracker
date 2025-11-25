@@ -7,10 +7,12 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 ### 🔄 CI Workflow (`ci.yml`)
 
 **Triggers:**
+
 - Push to `main`, `master`, or `develop` branches
 - Pull requests to these branches
 
 **Jobs:**
+
 1. **Lint & Format** - ESLint, Prettier, TypeScript checks
 2. **Test** - Unit and integration tests (Node 18 & 20)
 3. **Security Audit** - npm audit, TruffleHog secret scanning
@@ -20,6 +22,7 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 7. **CI Success** - Required status check for branch protection
 
 **Features:**
+
 - Runs jobs in parallel for speed
 - Uploads coverage to Codecov
 - Caches dependencies
@@ -29,11 +32,13 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 ### 🔒 CodeQL Security Scan (`codeql.yml`)
 
 **Triggers:**
+
 - Push to `main`, `master`, or `develop` branches
 - Pull requests
 - Weekly schedule (Monday 6:00 AM UTC)
 
 **Features:**
+
 - Scans JavaScript and TypeScript code
 - Detects security vulnerabilities
 - Identifies code quality issues
@@ -41,6 +46,7 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 - Results visible in Security tab
 
 **Security Checks:**
+
 - SQL injection
 - XSS vulnerabilities
 - Path traversal
@@ -51,16 +57,19 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 ### 📦 Dependency Update (`dependency-update.yml`)
 
 **Triggers:**
+
 - Weekly schedule (Monday 9:00 AM UTC)
 - Manual workflow dispatch
 
 **Process:**
+
 1. Updates dependencies to latest minor versions
 2. Runs tests to verify compatibility
 3. Creates PR with changes
 4. Auto-labels as `dependencies`
 
 **Features:**
+
 - Uses `npm-check-updates` for smart updates
 - Respects semver ranges
 - Includes test results in PR
@@ -70,9 +79,11 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 ### ✅ PR Checks (`pr-checks.yml`)
 
 **Triggers:**
+
 - Pull request opened, synchronized, reopened, or edited
 
 **Checks:**
+
 1. **PR Title** - Validates conventional commit format
 2. **PR Size** - Warns on large PRs (>500 lines)
 3. **Merge Conflicts** - Detects conflicts with base branch
@@ -82,6 +93,7 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 7. **Auto Label** - Labels PR based on changed files
 
 **Validation Rules:**
+
 - PR titles must follow conventional commits (`feat:`, `fix:`, etc.)
 - Branch names must use prefixes (`feature/`, `bugfix/`, etc.)
 - No `.env` files allowed
@@ -90,9 +102,11 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 ### 🚀 Release Workflow (`release.yml`)
 
 **Triggers:**
+
 - Tags pushed matching `v*.*.*` pattern (e.g., `v1.0.0`)
 
 **Process:**
+
 1. Runs tests and build
 2. Generates changelog from commits
 3. Creates GitHub Release
@@ -100,6 +114,7 @@ Automated CI/CD workflows for continuous integration, security scanning, and rel
 5. Publishes to npm (if configured)
 
 **Features:**
+
 - Automatic changelog generation
 - Prerelease detection (versions with `-`)
 - Artifact checksums
@@ -130,12 +145,14 @@ Branch name pattern: main
 **Settings → Secrets and variables → Actions:**
 
 **Optional Secrets:**
+
 - `CODECOV_TOKEN` - For code coverage uploads
 - `NPM_TOKEN` - For npm package publishing
 
 ### 4. Enable Security Features
 
 **Settings → Security:**
+
 - ☑ Dependabot alerts
 - ☑ Dependabot security updates
 - ☑ CodeQL analysis
@@ -146,6 +163,7 @@ Branch name pattern: main
 The `.github/labeler.yml` file defines label rules.
 
 **Default Labels:**
+
 - `type: documentation` - Markdown/docs changes
 - `area: frontend` - Component/UI changes
 - `area: backend` - Server/API changes
@@ -160,6 +178,7 @@ The `.github/labeler.yml` file defines label rules.
 - `templates` - Template changes
 
 Create these labels using:
+
 ```bash
 bash setup-labels.sh
 ```
@@ -169,29 +188,32 @@ bash setup-labels.sh
 ### Modify Node Versions
 
 Edit `ci.yml`:
+
 ```yaml
 strategy:
   matrix:
-    node-version: [18, 20, 22]  # Add/remove versions
+    node-version: [18, 20, 22] # Add/remove versions
 ```
 
 ### Change Test Commands
 
 Update commands in workflow files:
+
 ```yaml
 - name: Run tests
-  run: npm test              # Change to your test command
+  run: npm test # Change to your test command
 
 - name: Run E2E tests
-  run: npm run test:e2e      # Change to your e2e command
+  run: npm run test:e2e # Change to your e2e command
 ```
 
 ### Adjust Schedules
 
 Use [crontab.guru](https://crontab.guru/) to customize:
+
 ```yaml
 schedule:
-  - cron: '0 9 * * 1'  # Every Monday at 9 AM UTC
+  - cron: "0 9 * * 1" # Every Monday at 9 AM UTC
 ```
 
 ### Add Environment Variables
@@ -205,8 +227,9 @@ env:
 ### Modify PR Size Threshold
 
 Edit `pr-checks.yml`:
+
 ```yaml
-if [ $TOTAL -gt 500 ]; then  # Change 500 to your threshold
+if [ $TOTAL -gt 500 ]; then # Change 500 to your threshold
 ```
 
 ## Common Tasks
@@ -223,6 +246,7 @@ Some workflows support manual triggering:
 ### Skip CI for Commits
 
 Add to commit message:
+
 ```bash
 git commit -m "docs: Update README [skip ci]"
 ```
@@ -287,6 +311,7 @@ Add badges to README.md:
 **Issue:** Fork PRs can't access secrets
 
 **Solution:**
+
 ```yaml
 if: github.event.pull_request.head.repo.full_name == github.repository
 ```
@@ -294,6 +319,7 @@ if: github.event.pull_request.head.repo.full_name == github.repository
 ### Workflow Not Triggering
 
 **Check:**
+
 - YAML syntax (use [yamllint.com](https://www.yamllint.com/))
 - Trigger conditions match event
 - Workflow file is in `.github/workflows/`
@@ -302,13 +328,15 @@ if: github.event.pull_request.head.repo.full_name == github.repository
 ### CodeQL Fails
 
 **Common causes:**
+
 - Missing dependencies
 - Build failures
 - Timeout (increase with `timeout-minutes`)
 
 **Fix:**
+
 ```yaml
-timeout-minutes: 45  # Increase if needed
+timeout-minutes: 45 # Increase if needed
 ```
 
 ### Permission Errors
@@ -316,6 +344,7 @@ timeout-minutes: 45  # Increase if needed
 **Issue:** Job needs additional permissions
 
 **Solution:**
+
 ```yaml
 permissions:
   contents: write
@@ -326,11 +355,13 @@ permissions:
 ## Resources
 
 ### Documentation
+
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Workflow Syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
 - [Security Hardening](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions)
 
 ### Actions Used
+
 - [actions/checkout](https://github.com/actions/checkout)
 - [actions/setup-node](https://github.com/actions/setup-node)
 - [github/codeql-action](https://github.com/github/codeql-action)
@@ -338,6 +369,7 @@ permissions:
 - [softprops/action-gh-release](https://github.com/softprops/action-gh-release)
 
 ### Tools
+
 - [act](https://github.com/nektos/act) - Run GitHub Actions locally
 - [actionlint](https://github.com/rhysd/actionlint) - Lint workflow files
 - [Crontab Guru](https://crontab.guru/) - Cron schedule expression editor

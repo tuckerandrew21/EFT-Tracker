@@ -1,8 +1,15 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ReactFlowProvider } from "@xyflow/react";
-import { QuestNode, QUEST_NODE_WIDTH, QUEST_NODE_HEIGHT } from "@/components/quest-tree/QuestNode";
-import { createQuestWithProgress, mockQuests } from "../../../test/fixtures/quests";
+import {
+  QuestNode,
+  QUEST_NODE_WIDTH,
+  QUEST_NODE_HEIGHT,
+} from "@/components/quest-tree/QuestNode";
+import {
+  createQuestWithProgress,
+  mockQuests,
+} from "../../../test/fixtures/quests";
 import type { QuestNodeData, QuestStatus, QuestWithProgress } from "@/types";
 
 // Wrapper to provide React Flow context
@@ -78,7 +85,9 @@ describe("QuestNode", () => {
 
       renderWithReactFlow(<QuestNode {...props} />);
 
-      expect(screen.getByText(`Lv. ${quest.levelRequired}`)).toBeInTheDocument();
+      expect(
+        screen.getByText(`Lv. ${quest.levelRequired}`)
+      ).toBeInTheDocument();
     });
 
     it("should render trader name", () => {

@@ -36,7 +36,12 @@ export const mockQuests: Quest[] = [
     traderId: "trader_prapor",
     trader: mockTraders[0],
     objectives: [
-      createObjective("obj_2", "Find the bronze pocket watch", "Customs", "quest_checking"),
+      createObjective(
+        "obj_2",
+        "Find the bronze pocket watch",
+        "Customs",
+        "quest_checking"
+      ),
     ],
     dependsOn: [{ requiredQuest: {} as Quest }], // Will be filled in later
     dependedOnBy: [],
@@ -50,7 +55,12 @@ export const mockQuests: Quest[] = [
     traderId: "trader_therapist",
     trader: mockTraders[1],
     objectives: [
-      createObjective("obj_3", "Find Salewa first aid kits", null, "quest_shortage"),
+      createObjective(
+        "obj_3",
+        "Find Salewa first aid kits",
+        null,
+        "quest_shortage"
+      ),
     ],
     dependsOn: [],
     dependedOnBy: [],
@@ -64,8 +74,18 @@ export const mockQuests: Quest[] = [
     traderId: "trader_prapor",
     trader: mockTraders[0],
     objectives: [
-      createObjective("obj_4", "Pick up package in Customs", "Customs", "quest_delivery"),
-      createObjective("obj_5", "Place package in Factory", "Factory", "quest_delivery"),
+      createObjective(
+        "obj_4",
+        "Pick up package in Customs",
+        "Customs",
+        "quest_delivery"
+      ),
+      createObjective(
+        "obj_5",
+        "Place package in Factory",
+        "Factory",
+        "quest_delivery"
+      ),
     ],
     dependsOn: [],
     dependedOnBy: [],
@@ -79,7 +99,12 @@ export const mockQuests: Quest[] = [
     traderId: "trader_prapor",
     trader: mockTraders[0],
     objectives: [
-      createObjective("obj_6", "Destroy fuel tanks", "Customs", "quest_bp_depot"),
+      createObjective(
+        "obj_6",
+        "Destroy fuel tanks",
+        "Customs",
+        "quest_bp_depot"
+      ),
     ],
     dependsOn: [],
     dependedOnBy: [],
@@ -121,7 +146,9 @@ export const mockQuestsWithProgress: QuestWithProgress[] = [
 ];
 
 // Helper to create quest set with specific statuses
-export function createMockQuestSet(statuses: Record<string, QuestStatus>): QuestWithProgress[] {
+export function createMockQuestSet(
+  statuses: Record<string, QuestStatus>
+): QuestWithProgress[] {
   return mockQuests.map((quest) => {
     const status = statuses[quest.id] || "locked";
     return createQuestWithProgress(quest, status);

@@ -1,6 +1,14 @@
 import dagre from "dagre";
-import type { QuestWithProgress, QuestNode, QuestEdge, QuestStatus } from "@/types";
-import { QUEST_NODE_WIDTH, QUEST_NODE_HEIGHT } from "@/components/quest-tree/QuestNode";
+import type {
+  QuestWithProgress,
+  QuestNode,
+  QuestEdge,
+  QuestStatus,
+} from "@/types";
+import {
+  QUEST_NODE_WIDTH,
+  QUEST_NODE_HEIGHT,
+} from "@/components/quest-tree/QuestNode";
 
 const LAYOUT_CONFIG = {
   rankdir: "LR" as const, // Left-to-right layout
@@ -73,7 +81,14 @@ export function buildQuestGraph(
   quests: QuestWithProgress[],
   options: BuildQuestGraphOptions
 ): QuestGraph {
-  const { onStatusChange, onClick, onFocus, selectedQuestId, focusedQuestId, focusChain } = options;
+  const {
+    onStatusChange,
+    onClick,
+    onFocus,
+    selectedQuestId,
+    focusedQuestId,
+    focusChain,
+  } = options;
   const hasFocusMode = focusedQuestId !== null && focusedQuestId !== undefined;
 
   // Create a map for quick quest lookup
@@ -100,7 +115,8 @@ export function buildQuestGraph(
         g.setEdge(dep.requiredQuest.id, quest.id);
 
         // Check if this edge is part of the focus chain
-        const isEdgeInFocusChain = focusChain?.has(quest.id) && focusChain?.has(dep.requiredQuest.id);
+        const isEdgeInFocusChain =
+          focusChain?.has(quest.id) && focusChain?.has(dep.requiredQuest.id);
         const shouldDimEdge = hasFocusMode && !isEdgeInFocusChain;
 
         edges.push({
@@ -119,8 +135,12 @@ export function buildQuestGraph(
                   : quest.computedStatus === "locked"
                     ? "#6B7280"
                     : "#9CA3AF",
-            strokeWidth: isEdgeInFocusChain ? 3 : (quest.kappaRequired ? 3 : 2),
-            opacity: shouldDimEdge ? 0.2 : (quest.computedStatus === "locked" ? 0.4 : 1),
+            strokeWidth: isEdgeInFocusChain ? 3 : quest.kappaRequired ? 3 : 2,
+            opacity: shouldDimEdge
+              ? 0.2
+              : quest.computedStatus === "locked"
+                ? 0.4
+                : 1,
           },
           data: {
             sourceStatus: requiredQuest.computedStatus,

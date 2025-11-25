@@ -9,6 +9,7 @@ A template repository is a special type of GitHub repository that serves as a st
 ## What's Included in This Template
 
 ### 📋 Project Management Infrastructure
+
 - GitHub issue templates (bug reports, features, epics)
 - Pull request templates
 - Project board setup guides
@@ -16,12 +17,14 @@ A template repository is a special type of GitHub repository that serves as a st
 - Complete project management workflows
 
 ### 📚 Documentation & Guidelines
+
 - [CODING_STANDARDS.md](CODING_STANDARDS.md) - TypeScript, React, security best practices
 - [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md) - Git workflow, branch naming, commit conventions
 - [DOCUMENTATION_GUIDELINES.md](DOCUMENTATION_GUIDELINES.md) - How to document code and projects
 - [MCP_SETUP.md](MCP_SETUP.md) - Model Context Protocol integration for Claude Code
 
 ### 🔧 Development Tools
+
 - Pre-commit hooks to prevent direct commits to main
 - MCP configuration for automated testing (Playwright)
 - Label creation scripts
@@ -29,6 +32,7 @@ A template repository is a special type of GitHub repository that serves as a st
 - Health check validation scripts
 
 ### 🎯 Project Intake System
+
 - Automated codebase analysis
 - Documentation generation
 - Development environment setup
@@ -49,6 +53,7 @@ A template repository is a special type of GitHub repository that serves as a st
    - Choose "Create repository from template"
 
 4. **Clone your new repository:**
+
    ```bash
    git clone https://github.com/your-username/your-new-repo.git
    cd your-new-repo
@@ -63,12 +68,14 @@ If you prefer to copy files manually:
 1. **Create a new repository** on GitHub or locally with `git init`
 
 2. **Download this template:**
+
    ```bash
    # Download as ZIP or clone
    git clone https://github.com/your-username/project-intake-template.git template-source
    ```
 
 3. **Copy files to your new repository:**
+
    ```bash
    # Copy GitHub configuration
    cp -r template-source/.github your-new-repo/.github
@@ -87,6 +94,7 @@ If you prefer to copy files manually:
    ```
 
 4. **Remove the template source:**
+
    ```bash
    rm -rf template-source
    ```
@@ -145,6 +153,7 @@ See [POST_TEMPLATE_CHECKLIST.md](POST_TEMPLATE_CHECKLIST.md) for a comprehensive
 ### 1. Automated Project Setup
 
 The `.project-intake` system automates:
+
 - Codebase analysis and documentation
 - Git workflow configuration
 - Development environment setup
@@ -156,6 +165,7 @@ The `.project-intake` system automates:
 ### 2. Best Practice Guidelines
 
 Pre-written, comprehensive guides for:
+
 - **Coding Standards** - TypeScript, React, security practices
 - **Branch Strategy** - Git workflow, commit conventions
 - **Documentation** - How to write and maintain docs
@@ -164,6 +174,7 @@ Pre-written, comprehensive guides for:
 ### 3. GitHub Integration
 
 Ready-to-use templates for:
+
 - Bug reports and feature requests
 - Epic planning
 - Pull requests with checklists
@@ -173,6 +184,7 @@ Ready-to-use templates for:
 ### 4. Development Tools
 
 Pre-configured:
+
 - **Pre-commit hooks** - Prevent accidental commits to main
 - **MCP servers** - Playwright for automated testing
 - **GitHub CLI workflows** - Automate common tasks
@@ -181,6 +193,7 @@ Pre-configured:
 ### 5. Quality Assurance
 
 Built-in quality checks:
+
 - Health check validation
 - Config validation
 - Pre-commit protection
@@ -192,6 +205,7 @@ Built-in quality checks:
 ### What Should You Keep?
 
 ✅ **Keep these as-is:**
+
 - Pre-commit hook system
 - Branch naming conventions
 - Commit message standards
@@ -199,6 +213,7 @@ Built-in quality checks:
 - MCP configuration structure
 
 ✅ **Keep but customize:**
+
 - README.md (replace with your project info)
 - CODING_STANDARDS.md (adapt to your tech stack)
 - .project-intake/config.json (fill with your details)
@@ -206,6 +221,7 @@ Built-in quality checks:
 ### What Can You Modify?
 
 🔧 **Safe to modify:**
+
 - Specific coding patterns in CODING_STANDARDS.md
 - Additional branch prefixes in BRANCH_STRATEGY.md
 - Documentation structure in DOCUMENTATION_GUIDELINES.md
@@ -215,6 +231,7 @@ Built-in quality checks:
 ### What Should You Remove?
 
 🗑️ **Consider removing:**
+
 - `.project-intake/` folder (after running intake system)
 - Example status reports in `.github/status-reports/`
 - This TEMPLATE_USAGE.md file (after setup complete)
@@ -225,6 +242,7 @@ Built-in quality checks:
 ### Web Application Projects
 
 **Keep all defaults, add:**
+
 - Environment-specific labels (`env: production`, `env: staging`)
 - Deployment documentation
 - API documentation templates
@@ -233,6 +251,7 @@ Built-in quality checks:
 ### Library/Package Projects
 
 **Customize:**
+
 - Add version labels (`v1.x`, `v2.x`)
 - Include release process documentation
 - Add breaking change labels
@@ -242,6 +261,7 @@ Built-in quality checks:
 ### Mobile App Projects
 
 **Customize:**
+
 - Add platform labels (`platform: ios`, `platform: android`)
 - Include device testing guidelines
 - Add app store deployment guides
@@ -250,6 +270,7 @@ Built-in quality checks:
 ### Full-Stack Projects
 
 **Keep everything, add:**
+
 - Backend-specific coding standards
 - Database migration guidelines
 - API versioning strategy
@@ -325,6 +346,7 @@ When new team members join:
 ### Pre-commit Hook Not Working
 
 **Solution:**
+
 ```bash
 # Reinstall hooks
 bash .project-intake/scripts/setup-hooks.sh
@@ -339,6 +361,7 @@ git commit -m "test"  # Should be blocked
 ### MCP Server Not Working
 
 **Solution:**
+
 ```bash
 # Verify npx is available
 npx --version
@@ -353,6 +376,7 @@ claude mcp list
 ### Config Validation Failing
 
 **Solution:**
+
 ```bash
 # Run validator to see specific errors
 node .project-intake/scripts/validate-config.cjs
@@ -394,6 +418,7 @@ If you make improvements that would benefit the template:
 ## Support and Resources
 
 ### Documentation
+
 - [CODING_STANDARDS.md](CODING_STANDARDS.md) - Code quality guidelines
 - [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md) - Git workflow
 - [DOCUMENTATION_GUIDELINES.md](DOCUMENTATION_GUIDELINES.md) - How to document
@@ -401,12 +426,14 @@ If you make improvements that would benefit the template:
 - [POST_TEMPLATE_CHECKLIST.md](POST_TEMPLATE_CHECKLIST.md) - Setup checklist
 
 ### Getting Help
+
 - Check documentation first
 - Review existing issues
 - Open a new issue with details
 - Ask in team discussions
 
 ### Contributing to Template
+
 - Report bugs or issues
 - Suggest improvements
 - Submit pull requests

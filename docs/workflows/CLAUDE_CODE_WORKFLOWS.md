@@ -27,6 +27,7 @@ This guide documents effective workflows and usage patterns for Claude Code base
 ### First-Time Setup
 
 1. **Start Claude Code** in your project directory:
+
    ```bash
    cd your-project
    claude
@@ -45,6 +46,7 @@ This guide documents effective workflows and usage patterns for Claude Code base
 This is the **recommended workflow** for most development tasks.
 
 #### Phase 1: Explore
+
 Request information without making changes:
 
 ```
@@ -54,12 +56,14 @@ Request information without making changes:
 ```
 
 **Why:** Gather context before making changes. Claude Code has access to:
+
 - File system (via Read tool)
 - Git history
 - Project documentation (CLAUDE.md)
 - Code search (via Grep/Glob)
 
 #### Phase 2: Plan
+
 Ask Claude to create an implementation plan:
 
 ```
@@ -69,6 +73,7 @@ Ask Claude to create an implementation plan:
 ```
 
 **Use "think" for extended analysis:**
+
 ```
 "Think deeply about the best approach for implementing real-time notifications"
 ```
@@ -76,6 +81,7 @@ Ask Claude to create an implementation plan:
 **Why:** Planning before coding leads to better architecture decisions and catches edge cases early.
 
 #### Phase 3: Code
+
 Implement the solution:
 
 ```
@@ -87,6 +93,7 @@ Implement the solution:
 **Why:** With a plan in place, implementation is faster and more focused.
 
 #### Phase 4: Commit
+
 Review and commit changes:
 
 ```
@@ -97,6 +104,7 @@ Review and commit changes:
 **Why:** Structured commits with clear messages improve project history.
 
 **Complete Example:**
+
 ```markdown
 User: "Read src/auth/login.ts and explain the authentication flow"
 Claude: [Reads file and explains]
@@ -116,6 +124,7 @@ Claude: [Creates commit and PR with proper formatting]
 Write tests first, then implement features.
 
 #### Step 1: Write Tests
+
 ```
 "Create unit tests for a user registration function that:
 - Validates email format
@@ -125,21 +134,25 @@ Write tests first, then implement features.
 ```
 
 #### Step 2: Confirm Failures
+
 ```
 "Run the tests and confirm they fail"
 ```
 
 #### Step 3: Commit Tests
+
 ```
 "Commit the tests with message: 'test: Add user registration validation tests'"
 ```
 
 #### Step 4: Implement Feature
+
 ```
 "Now implement the user registration function to make these tests pass"
 ```
 
 #### Step 5: Iterative Development
+
 ```
 "Run the tests again"
 [If failures] "Fix the failing tests"
@@ -147,11 +160,13 @@ Write tests first, then implement features.
 ```
 
 #### Step 6: Final Commit
+
 ```
 "Commit the implementation with message: 'feat: Add user registration with validation'"
 ```
 
 **Benefits:**
+
 - Tests serve as specifications
 - Confidence in implementation correctness
 - Clear definition of "done"
@@ -162,6 +177,7 @@ Write tests first, then implement features.
 For UI development with immediate visual feedback.
 
 #### Step 1: Initial Implementation
+
 ```
 "Create a user profile card component with:
 - Avatar image
@@ -171,6 +187,7 @@ For UI development with immediate visual feedback.
 ```
 
 #### Step 2: Visual Review
+
 Take a screenshot or run the app and describe what you see:
 
 ```
@@ -179,6 +196,7 @@ Increase padding and add more space between elements"
 ```
 
 #### Step 3: Iterative Refinement
+
 ```
 "Make the avatar larger and circular"
 "Add a subtle shadow to make it stand out"
@@ -186,6 +204,7 @@ Increase padding and add more space between elements"
 ```
 
 #### Step 4: Accessibility Check
+
 ```
 "Review this component for accessibility issues"
 "Add ARIA labels where needed"
@@ -198,6 +217,7 @@ Increase padding and add more space between elements"
 Systematic approach to fixing bugs.
 
 #### Step 1: Reproduce
+
 ```
 "Help me debug this issue: [describe the bug]
 Here's what I'm seeing: [error message or behavior]
@@ -205,6 +225,7 @@ Steps to reproduce: [numbered steps]"
 ```
 
 #### Step 2: Investigate
+
 ```
 "Read the relevant files and identify potential causes"
 "Check the git history for recent changes to this code"
@@ -212,22 +233,26 @@ Steps to reproduce: [numbered steps]"
 ```
 
 #### Step 3: Hypothesis
+
 ```
 "Based on your investigation, what do you think is causing this?"
 ```
 
 #### Step 4: Fix
+
 ```
 "Implement a fix for the identified issue"
 ```
 
 #### Step 5: Verify
+
 ```
 "Add a test that would have caught this bug"
 "Verify the fix resolves the issue"
 ```
 
 #### Step 6: Document
+
 ```
 "Add a comment explaining why this fix was necessary"
 "Update documentation if this reveals a gotcha"
@@ -240,11 +265,13 @@ Steps to reproduce: [numbered steps]"
 Place a `CLAUDE.md` file in your repository root to provide project context.
 
 **File locations (in priority order):**
+
 1. `./CLAUDE.md` or `./.claude/CLAUDE.md` - Project root
 2. Per-directory CLAUDE.md files - Directory-specific guidance
 3. `~/.claude/CLAUDE.md` - User's home directory (personal preferences)
 
 **What to include:**
+
 - **Tech stack** - Frameworks, tools, versions
 - **Project structure** - Key directories and their purposes
 - **Commands** - Build, test, lint, deploy scripts
@@ -257,6 +284,7 @@ Place a `CLAUDE.md` file in your repository root to provide project context.
 ### Settings Files
 
 **Project-scoped** (`.claude/settings.json`):
+
 ```json
 {
   "permissions": {
@@ -268,6 +296,7 @@ Place a `CLAUDE.md` file in your repository root to provide project context.
 ```
 
 **User-scoped** (`~/.claude/settings.json`):
+
 ```json
 {
   "permissions": {
@@ -288,6 +317,7 @@ Place a `CLAUDE.md` file in your repository root to provide project context.
 ```
 
 **Local overrides** (`.claude/settings.local.json`):
+
 - Not committed to git
 - Machine-specific settings
 - Highest priority in the configuration hierarchy
@@ -318,6 +348,7 @@ Place a `CLAUDE.md` file in your repository root to provide project context.
 ### Recommended Permission Sets
 
 **Minimal (safest):**
+
 ```json
 {
   "allow": ["Read", "Grep", "Glob"],
@@ -326,17 +357,24 @@ Place a `CLAUDE.md` file in your repository root to provide project context.
 ```
 
 **Standard (balanced):**
+
 ```json
 {
   "allow": [
-    "Read", "Edit", "Grep", "Glob",
-    "Bash(git:*)", "Bash(npm:*)", "Bash(gh:*)"
+    "Read",
+    "Edit",
+    "Grep",
+    "Glob",
+    "Bash(git:*)",
+    "Bash(npm:*)",
+    "Bash(gh:*)"
   ],
   "ask": ["Write", "Bash"]
 }
 ```
 
 **Permissive (convenience):**
+
 ```json
 {
   "allow": ["Bash(*)", "Read(*)", "Edit(*)", "Write(*)", "Grep(*)", "Glob(*)"],
@@ -376,11 +414,13 @@ Slash commands are stored in `.claude/commands/` and provide reusable workflows.
 ---
 description: Create a new feature with tests and documentation
 ---
+
 # New Feature Setup
 
 Create a complete feature structure for: $ARGUMENTS
 
 Steps to execute:
+
 1. Create feature branch: `git checkout -b feature/$ARGUMENTS`
 2. Create feature directory with proper structure
 3. Create test file with basic test structure
@@ -389,6 +429,7 @@ Steps to execute:
 6. Create initial commit with structure
 
 Follow project conventions for:
+
 - File naming (see CLAUDE.md)
 - Component structure
 - Test patterns
@@ -430,6 +471,7 @@ Follow project conventions for:
 ### Provide Context
 
 **Good prompt structure:**
+
 ```
 Context: [What you're working on]
 Goal: [What you want to achieve]
@@ -440,6 +482,7 @@ Request: [Specific action]
 ```
 
 **Example:**
+
 ```
 Context: I'm building a user profile editing feature
 Goal: Allow users to update their name, email, and avatar
@@ -457,6 +500,7 @@ Request: Implement the profile editing functionality with proper validation
 ❌ **Too broad:** "Build a complete authentication system"
 
 ✅ **Broken down:**
+
 ```
 Step 1: "Create user registration with email/password"
 Step 2: "Add login functionality with JWT tokens"
@@ -572,11 +616,13 @@ Implement their suggestion and explain the changes"
 ### Claude Isn't Seeing Project Context
 
 **Check:**
+
 1. Is `CLAUDE.md` in the repository root?
 2. Is Claude Code running in the correct directory?
 3. Try restarting Claude Code
 
 **Solution:**
+
 ```bash
 cd /path/to/your/project
 claude
@@ -585,16 +631,19 @@ claude
 ### Permission Denials
 
 **Check current permissions:**
+
 ```
 /permissions
 ```
 
 **Add missing tool:**
+
 ```
 /permissions add Edit
 ```
 
 **Or edit settings file:**
+
 ```bash
 # Edit project settings
 nano .claude/settings.json
@@ -606,16 +655,19 @@ nano ~/.claude/settings.json
 ### MCP Server Not Working
 
 **Check server status:**
+
 ```
 /mcp
 ```
 
 **List configured servers:**
+
 ```bash
 claude mcp list
 ```
 
 **Reset approvals:**
+
 ```bash
 claude mcp reset-project-choices
 ```
@@ -623,15 +675,18 @@ claude mcp reset-project-choices
 ### Commands Not Working
 
 **Check git status:**
+
 ```bash
 git status
 ```
 
 **Verify tool access:**
+
 - Claude needs `Bash` permission for git commands
 - Check `.claude/settings.json` for restrictions
 
 **Common issues:**
+
 - Not in a git repository → `git init`
 - Permission denied → Add `"Bash(git:*)"` to permissions
 - Command not found → Install required tool
@@ -720,15 +775,18 @@ git status
 ## Additional Resources
 
 ### Official Documentation
+
 - [Claude Code Documentation](https://code.claude.com/docs)
 - [Anthropic Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
 - [Model Context Protocol](https://modelcontextprotocol.io)
 
 ### Community Resources
+
 - [Awesome Claude Code](https://github.com/hesreallyhim/awesome-claude-code) - 148+ slash commands
 - [Claude Command Suite](https://github.com/qdhenry/Claude-Command-Suite) - Professional commands
 
 ### Related Documentation
+
 - [CODING_STANDARDS.md](CODING_STANDARDS.md) - Code quality guidelines
 - [BRANCH_STRATEGY.md](BRANCH_STRATEGY.md) - Git workflow
 - [MCP_SETUP.md](MCP_SETUP.md) - MCP server configuration
@@ -737,18 +795,21 @@ git status
 ## Tips for Team Collaboration
 
 ### Sharing Context
+
 - Commit `CLAUDE.md` to version control
 - Use project-scoped permissions in `.claude/settings.json`
 - Document team-specific slash commands
 - Share effective prompts in team documentation
 
 ### Consistency
+
 - Follow established patterns in CLAUDE.md
 - Use the same slash commands across team
 - Maintain consistent commit message format
 - Review each other's Claude Code interactions
 
 ### Onboarding
+
 - Point new members to CLAUDE.md first
 - Share this workflow guide
 - Demonstrate effective prompting techniques
@@ -757,6 +818,7 @@ git status
 ## Feedback & Improvements
 
 Found an issue or have suggestions?
+
 - Open an issue in the repository
 - Update this guide with learnings
 - Share effective patterns with the team

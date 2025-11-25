@@ -65,8 +65,7 @@ describe("quest-layout", () => {
 
       // We have one dependency: Checking depends on Debut
       const debutToCheckingEdge = graph.edges.find(
-        (e) =>
-          e.source === QUEST_IDS.DEBUT && e.target === QUEST_IDS.CHECKING
+        (e) => e.source === QUEST_IDS.DEBUT && e.target === QUEST_IDS.CHECKING
       );
 
       expect(debutToCheckingEdge).toBeDefined();

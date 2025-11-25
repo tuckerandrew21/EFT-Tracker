@@ -16,7 +16,5 @@ export const getTraderById = (id: string): Trader | undefined => {
 };
 
 export const getTraderByName = (name: string): Trader | undefined => {
-  return mockTraders.find(
-    (t) => t.name.toLowerCase() === name.toLowerCase()
-  );
+  return mockTraders.find((t) => t.name.toLowerCase() === name.toLowerCase());
 };

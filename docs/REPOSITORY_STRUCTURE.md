@@ -101,21 +101,27 @@ project-intake-template/
 ## Key Directories
 
 ### `.claude/`
+
 Claude Code configuration including custom slash commands and MCP server settings.
 
 ### `.github/`
+
 GitHub-specific files including issue/PR templates, workflows, and project management guides.
 
 ### `.project-intake/`
+
 Automated system for onboarding existing codebases (not needed for new projects).
 
 ### `testing-template-packet/`
+
 Complete Django/Docker testing infrastructure template.
 
 ### `docs/`
+
 All documentation organized by category (getting-started, guides, workflows, security, integrations).
 
 ### `scripts/`
+
 Automation scripts for setup and maintenance tasks.
 
 ## Configuration Files

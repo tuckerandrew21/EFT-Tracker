@@ -11,6 +11,7 @@ Standalone templates for common project configurations.
 Modern Python project configuration template following PEP 621, 518, and 660 standards.
 
 **Features:**
+
 - Build system configuration (setuptools, hatchling, poetry)
 - Project metadata and dependencies
 - Optional dependencies (dev, docs, test)
@@ -19,6 +20,7 @@ Modern Python project configuration template following PEP 621, 518, and 660 sta
 - Comprehensive comments and examples
 
 **Usage:**
+
 ```bash
 # Copy to your Python project
 cp templates/pyproject.toml.template pyproject.toml
@@ -34,6 +36,7 @@ nano pyproject.toml
 ### General Process
 
 1. **Copy template to your project:**
+
    ```bash
    cp templates/[template-name] your-project/[target-name]
    ```
@@ -45,6 +48,7 @@ nano pyproject.toml
    - Remove unused sections
 
 3. **Validate configuration:**
+
    ```bash
    # For Python projects
    pip install --editable .
@@ -56,6 +60,7 @@ nano pyproject.toml
 ### Template Customization Guide
 
 **pyproject.toml.template:**
+
 - Replace `your-project-name` with actual project name
 - Update `version`, `description`, `authors`
 - Add/remove dependencies as needed
@@ -65,12 +70,14 @@ nano pyproject.toml
 ## 📚 Related Resources
 
 ### Python Configuration
+
 - [PEP 621 - Project Metadata](https://peps.python.org/pep-0621/)
 - [PEP 518 - Build System](https://peps.python.org/pep-0518/)
 - [Setuptools Documentation](https://setuptools.pypa.io/)
 - [Poetry Documentation](https://python-poetry.org/docs/)
 
 ### Additional Templates
+
 - **MCP Servers:** See [.mcp-templates/](../.mcp-templates/) for Node.js and Python MCP server templates
 - **Testing:** See [testing-template-packet/](../testing-template-packet/) for Django/Docker testing templates
 - **Documentation:** See [.project-intake/templates/](../.project-intake/templates/) for documentation templates
@@ -86,6 +93,7 @@ Have a useful template to add?
 5. Submit a pull request
 
 **Good templates include:**
+
 - Clear purpose and use case
 - Comprehensive comments
 - Sensible defaults

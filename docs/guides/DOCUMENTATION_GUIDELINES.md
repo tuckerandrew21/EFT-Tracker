@@ -26,6 +26,7 @@ This document outlines best practices for creating and maintaining project docum
 ### When to Document
 
 ✅ **Always document:**
+
 - Public APIs and interfaces
 - Complex algorithms or business logic
 - Non-obvious decisions and trade-offs
@@ -35,6 +36,7 @@ This document outlines best practices for creating and maintaining project docum
 - Breaking changes
 
 ❌ **Don't document:**
+
 - Self-explanatory code
 - Temporary workarounds (fix them instead)
 - Implementation details that might change
@@ -47,6 +49,7 @@ This document outlines best practices for creating and maintaining project docum
 **Purpose:** First impression, quick start, essential information
 
 **Must include:**
+
 - Project name and description
 - Key features
 - Tech stack
@@ -56,28 +59,35 @@ This document outlines best practices for creating and maintaining project docum
 - Links to other documentation
 
 **Example structure:**
+
 ```markdown
 # Project Name
 
 Brief description in one sentence.
 
 ## Features
+
 - Feature 1
 - Feature 2
 
 ## Tech Stack
+
 List main technologies
 
 ## Installation
+
 Step-by-step setup
 
 ## Usage
+
 How to run and use
 
 ## Documentation
+
 Links to other docs
 
 ## Contributing
+
 Link to CONTRIBUTING.md
 ```
 
@@ -86,6 +96,7 @@ Link to CONTRIBUTING.md
 **Purpose:** Help others contribute effectively
 
 **Should include:**
+
 - How to set up development environment
 - Coding standards and style guide
 - Branch naming conventions
@@ -99,6 +110,7 @@ Link to CONTRIBUTING.md
 **Purpose:** Explain high-level system design and decisions
 
 **Should include:**
+
 - System overview and diagram
 - Folder structure explanation
 - Key architectural decisions
@@ -112,6 +124,7 @@ Link to CONTRIBUTING.md
 **Purpose:** Help developers use your APIs
 
 **Should include:**
+
 - Endpoint descriptions
 - Request/response formats
 - Authentication requirements
@@ -124,6 +137,7 @@ Link to CONTRIBUTING.md
 **Purpose:** Explain complex or non-obvious code
 
 **When to use:**
+
 - Complex algorithms
 - Business logic
 - Workarounds for bugs
@@ -146,11 +160,13 @@ List key capabilities
 ## 🚀 Tech Stack
 
 ### Frontend
+
 - Framework: [React/Vue/etc]
 - Build: [Vite/Webpack]
 - Styling: [Tailwind/CSS]
 
 ### Backend (if applicable)
+
 - Framework: [Express/etc]
 - Database: [PostgreSQL/etc]
 - ORM: [Drizzle/Prisma]
@@ -164,23 +180,29 @@ List key capabilities
 ## 🔧 Installation
 
 ### 1. Clone repository
+
 \`\`\`bash
 git clone [url]
 cd [project]
 \`\`\`
 
 ### 2. Install dependencies
+
 \`\`\`bash
 npm install
 \`\`\`
 
 ### 3. Set up environment
+
 \`\`\`bash
 cp .env.example .env
+
 # Edit .env with your settings
+
 \`\`\`
 
 ### 4. Start development
+
 \`\`\`bash
 npm run dev
 \`\`\`
@@ -188,19 +210,20 @@ npm run dev
 ## 📝 Usage
 
 ### Development Commands
+
 \`\`\`bash
-npm run dev      # Start dev server
-npm run build    # Build for production
-npm test         # Run tests
+npm run dev # Start dev server
+npm run build # Build for production
+npm test # Run tests
 \`\`\`
 
 ## 📁 Project Structure
 
 \`\`\`
 project/
-├── src/           # Source code
-├── tests/         # Test files
-└── docs/          # Documentation
+├── src/ # Source code
+├── tests/ # Test files
+└── docs/ # Documentation
 \`\`\`
 
 ## 🧪 Testing
@@ -231,6 +254,7 @@ How to get help
 ### README Do's and Don'ts
 
 ✅ **Do:**
+
 - Use emojis sparingly for visual scanning
 - Include badges (build status, version, license)
 - Add screenshots for UI projects
@@ -239,6 +263,7 @@ How to get help
 - Update after major changes
 
 ❌ **Don't:**
+
 - Write walls of text
 - Include entire API documentation
 - Leave placeholder text
@@ -252,7 +277,7 @@ How to get help
 
 Use JSDoc for functions, classes, and complex types:
 
-```typescript
+````typescript
 /**
  * Calculates the total price including tax and discount.
  *
@@ -275,13 +300,13 @@ function calculateTotal(
   const discounted = basePrice * (1 - discountPercent / 100);
   return discounted * (1 + taxRate);
 }
-```
+````
 
 ### Component Documentation
 
 Document React components with clear descriptions:
 
-```typescript
+````typescript
 /**
  * UserCard displays user information in a card format.
  *
@@ -302,7 +327,7 @@ Document React components with clear descriptions:
 export function UserCard({ user, onClick }: UserCardProps) {
   // Implementation
 }
-```
+````
 
 ### Inline Comments
 
@@ -317,9 +342,10 @@ setTimeout(() => setIsOpen(true), 0);
 // ✅ Good: Explains non-obvious business logic
 // Users with role 'admin' can see all projects, but 'manager' role
 // can only see projects from their department
-const visibleProjects = user.role === 'admin'
-  ? allProjects
-  : allProjects.filter(p => p.departmentId === user.departmentId);
+const visibleProjects =
+  user.role === "admin"
+    ? allProjects
+    : allProjects.filter((p) => p.departmentId === user.departmentId);
 
 // ❌ Bad: States the obvious
 // Set count to 0
@@ -364,15 +390,16 @@ POST /api/users
 \`\`\`
 
 **Headers:**
+
 - `Content-Type: application/json`
 - `Authorization: Bearer {token}`
 
 **Body:**
 \`\`\`json
 {
-  "email": "user@example.com",
-  "name": "John Doe",
-  "role": "user"
+"email": "user@example.com",
+"name": "John Doe",
+"role": "user"
 }
 \`\`\`
 
@@ -381,21 +408,21 @@ POST /api/users
 **Success (201 Created):**
 \`\`\`json
 {
-  "id": "user_123",
-  "email": "user@example.com",
-  "name": "John Doe",
-  "role": "user",
-  "createdAt": "2024-01-15T10:30:00Z"
+"id": "user_123",
+"email": "user@example.com",
+"name": "John Doe",
+"role": "user",
+"createdAt": "2024-01-15T10:30:00Z"
 }
 \`\`\`
 
 **Error (400 Bad Request):**
 \`\`\`json
 {
-  "error": {
-    "message": "Email already exists",
-    "code": "DUPLICATE_EMAIL"
-  }
+"error": {
+"message": "Email already exists",
+"code": "DUPLICATE_EMAIL"
+}
 }
 \`\`\`
 
@@ -403,16 +430,16 @@ POST /api/users
 
 \`\`\`typescript
 const response = await fetch('/api/users', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify({
-    email: 'user@example.com',
-    name: 'John Doe',
-    role: 'user'
-  })
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': `Bearer ${token}`
+},
+body: JSON.stringify({
+email: 'user@example.com',
+name: 'John Doe',
+role: 'user'
+})
 });
 
 const user = await response.json();
@@ -422,6 +449,7 @@ const user = await response.json();
 ### API Documentation Tools
 
 Consider using:
+
 - **OpenAPI/Swagger** - Standard API documentation format
 - **Postman Collections** - Shareable API examples
 - **API Blueprint** - Markdown-based API documentation
@@ -441,6 +469,7 @@ Consider using:
 ### Formatting Guidelines
 
 **Code blocks:**
+
 ````markdown
 ```typescript
 // Always specify language for syntax highlighting
@@ -449,17 +478,22 @@ const example = "code";
 ````
 
 **File paths:**
+
 ```markdown
 Use code formatting for file paths: `src/components/Button.tsx`
 ```
 
 **Commands:**
-```markdown
+
+````markdown
 Show commands in code blocks with language:
+
 ```bash
 npm install
 ```
-```
+````
+
+````
 
 **Lists:**
 ```markdown
@@ -470,9 +504,10 @@ npm install
 1. Use numbers for ordered lists
 2. When sequence matters
 3. For step-by-step instructions
-```
+````
 
 **Links:**
+
 ```markdown
 Use descriptive link text: [Installation Guide](./INSTALL.md)
 Not: [Click here](./INSTALL.md)
@@ -491,6 +526,7 @@ Not: [Click here](./INSTALL.md)
 ### When to Update Documentation
 
 Update docs when:
+
 - Adding new features
 - Changing APIs or interfaces
 - Fixing bugs that affect usage
@@ -501,6 +537,7 @@ Update docs when:
 ### Documentation in Pull Requests
 
 **PR checklist should include:**
+
 - [ ] Updated README if public API changed
 - [ ] Updated inline documentation
 - [ ] Added/updated examples
@@ -511,6 +548,7 @@ Update docs when:
 ### Documentation Review
 
 **When reviewing documentation:**
+
 - Test all examples and commands
 - Check that links work
 - Verify accuracy against code
@@ -521,6 +559,7 @@ Update docs when:
 ### Documentation Maintenance
 
 **Quarterly review:**
+
 - Review all major documentation files
 - Test installation instructions from scratch
 - Update screenshots if UI changed
@@ -533,6 +572,7 @@ Update docs when:
 Use this checklist for new projects or major updates:
 
 ### Essential Documentation
+
 - [ ] README.md with complete setup instructions
 - [ ] CONTRIBUTING.md with contribution guidelines
 - [ ] CODE_OF_CONDUCT.md (if open source)
@@ -541,6 +581,7 @@ Use this checklist for new projects or major updates:
 - [ ] CHANGELOG.md (for versioned projects)
 
 ### Code Documentation
+
 - [ ] JSDoc comments on public functions/classes
 - [ ] Component documentation with examples
 - [ ] Inline comments for complex logic
@@ -548,6 +589,7 @@ Use this checklist for new projects or major updates:
 - [ ] Type definitions with descriptions
 
 ### Developer Resources
+
 - [ ] ARCHITECTURE.md explaining system design
 - [ ] Development setup guide
 - [ ] Testing guide
@@ -555,6 +597,7 @@ Use this checklist for new projects or major updates:
 - [ ] Troubleshooting guide
 
 ### User Documentation (if applicable)
+
 - [ ] User guide or manual
 - [ ] FAQ
 - [ ] Tutorial or quick start
@@ -592,15 +635,15 @@ First, register or log in to receive a token:
 
 \`\`\`bash
 curl -X POST https://api.example.com/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "secret"}'
+ -H "Content-Type: application/json" \
+ -d '{"email": "user@example.com", "password": "secret"}'
 \`\`\`
 
 Response:
 \`\`\`json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "expiresIn": "7d"
+"token": "eyJhbGciOiJIUzI1NiIs...",
+"expiresIn": "7d"
 }
 \`\`\`
 
@@ -610,7 +653,7 @@ Include the token in subsequent requests:
 
 \`\`\`bash
 curl https://api.example.com/users \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+ -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
 \`\`\`
 
 **Security Note:** Store tokens securely. Never commit tokens to version control.
@@ -619,6 +662,7 @@ curl https://api.example.com/users \
 ## Questions or Improvements?
 
 If you have suggestions for improving documentation:
+
 - Open an issue for discussion
 - Submit a PR with improvements
 - Bring it up in team meetings

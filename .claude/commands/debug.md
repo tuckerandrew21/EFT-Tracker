@@ -5,6 +5,7 @@ Help debug issues in the codebase using systematic troubleshooting.
 ## Instructions
 
 Ask the user for:
+
 1. Description of the problem/bug
 2. Steps to reproduce
 3. Expected vs actual behavior
@@ -25,6 +26,7 @@ Then follow the debugging workflow.
 ### 2. Gather Information
 
 **Check error logs:**
+
 ```bash
 # Browser console (F12)
 # Check for JavaScript errors, network failures, warnings
@@ -38,6 +40,7 @@ npm run dev # Check terminal output
 ```
 
 **Review recent changes:**
+
 ```bash
 # Git history
 git log --oneline -10
@@ -48,6 +51,7 @@ git show [commit-hash]
 ```
 
 **Check environment:**
+
 - Node version: `node --version`
 - Package versions: Check `package.json`
 - Environment variables: Verify `.env` values
@@ -56,11 +60,13 @@ git show [commit-hash]
 ### 3. Isolate the Problem
 
 **Use binary search approach:**
+
 1. Identify the last working state
 2. Identify the first broken state
 3. Find commits between them: `git bisect`
 
 **Narrow down scope:**
+
 - Is it frontend or backend?
 - Is it a specific component/function?
 - Does it happen on all data or specific cases?
@@ -69,21 +75,23 @@ git show [commit-hash]
 ### 4. Add Debugging Output
 
 **Console logging:**
+
 ```typescript
 // Log function entry and arguments
-console.log('fetchUser called with:', userId);
+console.log("fetchUser called with:", userId);
 
 // Log intermediate values
-console.log('Query result:', result);
+console.log("Query result:", result);
 
 // Log control flow
-console.log('Taking branch A');
+console.log("Taking branch A");
 
 // Log before errors
-console.log('About to call risky operation');
+console.log("About to call risky operation");
 ```
 
 **Debugger statements:**
+
 ```typescript
 function problematicFunction(data: Data) {
   debugger; // Execution will pause here in dev tools
@@ -97,11 +105,13 @@ function problematicFunction(data: Data) {
 ```
 
 **React DevTools:**
+
 - Inspect component props and state
 - Track re-renders
 - Check component hierarchy
 
 **Network tab:**
+
 - Check API request/response
 - Verify headers, status codes
 - Look for failed requests
@@ -109,6 +119,7 @@ function problematicFunction(data: Data) {
 ### 5. Common Issue Patterns
 
 **Async/Promise Issues:**
+
 ```typescript
 // ❌ Forgotten await
 const user = getUserAsync(); // Returns Promise
@@ -122,12 +133,13 @@ console.log(user.name); // Works!
 asyncFunction(); // Error silently swallowed
 
 // ✅ Fixed
-asyncFunction().catch(error => {
-  console.error('Error:', error);
+asyncFunction().catch((error) => {
+  console.error("Error:", error);
 });
 ```
 
 **State/Closure Issues:**
+
 ```typescript
 // ❌ Stale closure
 function Component() {
@@ -142,17 +154,18 @@ function Component() {
   // ✅ Fixed
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount(c => c + 1); // Use functional update
+      setCount((c) => c + 1); // Use functional update
     }, 1000);
   }, []);
 }
 ```
 
 **Race Conditions:**
+
 ```typescript
 // ❌ Race condition
 function SearchComponent() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
 
   useEffect(() => {
@@ -165,8 +178,8 @@ function SearchComponent() {
 
     fetchResults(query, controller.signal)
       .then(setResults)
-      .catch(err => {
-        if (err.name !== 'AbortError') throw err;
+      .catch((err) => {
+        if (err.name !== "AbortError") throw err;
       });
 
     return () => controller.abort();
@@ -175,6 +188,7 @@ function SearchComponent() {
 ```
 
 **Type Errors:**
+
 ```typescript
 // ❌ Type mismatch
 interface User {
@@ -186,11 +200,11 @@ const user = JSON.parse(jsonString); // type is 'any'
 console.log(user.name); // No type checking!
 
 // ✅ Fixed with validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const UserSchema = z.object({
   id: z.string(),
-  name: z.string()
+  name: z.string(),
 });
 
 const user = UserSchema.parse(JSON.parse(jsonString));
@@ -198,20 +212,22 @@ console.log(user.name); // Type-safe!
 ```
 
 **Null/Undefined:**
+
 ```typescript
 // ❌ Unchecked null
-const user = users.find(u => u.id === userId);
+const user = users.find((u) => u.id === userId);
 console.log(user.name); // Error if not found!
 
 // ✅ Fixed
-const user = users.find(u => u.id === userId);
+const user = users.find((u) => u.id === userId);
 if (!user) {
-  throw new Error('User not found');
+  throw new Error("User not found");
 }
 console.log(user.name); // Safe
 ```
 
 **Infinite Loops:**
+
 ```typescript
 // ❌ Infinite re-render
 function Component() {
@@ -223,7 +239,7 @@ function Component() {
 
   // ✅ Fixed
   useEffect(() => {
-    setData(current => [...current, newItem]); // Functional update
+    setData((current) => [...current, newItem]); // Functional update
   }, []); // Only run once
 }
 ```
@@ -231,6 +247,7 @@ function Component() {
 ### 6. Test Hypothesis
 
 **Create minimal reproduction:**
+
 ```typescript
 // Isolate the problematic code
 // Remove unrelated functionality
@@ -239,6 +256,7 @@ function Component() {
 ```
 
 **Test fixes:**
+
 ```typescript
 // Apply potential fix
 // Run automated tests
@@ -249,6 +267,7 @@ function Component() {
 ### 7. Root Cause Analysis
 
 Ask "Why?" five times:
+
 1. Why did the error occur?
 2. Why did that condition exist?
 3. Why wasn't it handled?
@@ -258,6 +277,7 @@ Ask "Why?" five times:
 ## Debugging Tools
 
 **Browser DevTools:**
+
 - Console: Errors, warnings, logs
 - Debugger: Breakpoints, step through
 - Network: API calls, timing
@@ -265,12 +285,14 @@ Ask "Why?" five times:
 - Redux DevTools: State changes
 
 **Server-Side:**
+
 - Node debugger: `node --inspect`
 - VS Code debugger: Launch config
 - Logging: Winston, Pino
 - APM tools: New Relic, DataDog
 
 **Database:**
+
 - Query profiling
 - Slow query logs
 - Database GUI tools
@@ -295,17 +317,21 @@ Ask "Why?" five times:
 # Debug Report
 
 ## Issue Description
+
 [What was wrong]
 
 ## Root Cause
+
 [Why it happened]
 
 ## Steps to Reproduce
+
 1. Step 1
 2. Step 2
 3. Observe issue
 
 ## Fix Applied
+
 [Description of the fix]
 
 **Code changes:**
@@ -318,17 +344,20 @@ Ask "Why?" five times:
 \`\`\`
 
 ## Testing
+
 - [x] Manual verification
 - [x] Automated tests added
 - [x] Regression testing
 
 ## Prevention
+
 [How to avoid similar issues in the future]
 ```
 
 ## Confirm with User
 
 After debugging:
+
 - Explain the root cause clearly
 - Show the fix
 - Ask if issue is resolved

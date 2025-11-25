@@ -7,7 +7,9 @@ Custom slash commands for Claude Code to streamline common development tasks.
 ### Code Review & Quality
 
 #### `/review-security`
+
 Perform comprehensive security review of the codebase
+
 - Checks for hardcoded secrets and credentials
 - Reviews input validation and SQL injection prevention
 - Analyzes authentication and authorization
@@ -16,7 +18,9 @@ Perform comprehensive security review of the codebase
 - Generates prioritized report with fixes
 
 #### `/review-code`
+
 Comprehensive code review following project standards
+
 - Checks coding standards compliance
 - Reviews TypeScript quality and type safety
 - Identifies code duplication and performance issues
@@ -27,7 +31,9 @@ Comprehensive code review following project standards
 ### Code Generation
 
 #### `/create-component`
+
 Create new React component following project standards
+
 - Interactive prompts for component details
 - Generates component with proper structure
 - Creates test file automatically
@@ -35,7 +41,9 @@ Create new React component following project standards
 - Follows project conventions
 
 #### `/create-api-route`
+
 Create new API endpoint with full CRUD operations
+
 - Generates Express route handlers
 - Includes request validation (Zod)
 - Adds authentication middleware
@@ -44,7 +52,9 @@ Create new API endpoint with full CRUD operations
 - Follows REST conventions
 
 #### `/add-test`
+
 Generate tests for existing code
+
 - Supports unit, integration, and e2e tests
 - Uses project's test framework (Vitest/Jest/Playwright)
 - Includes edge cases and error scenarios
@@ -54,7 +64,9 @@ Generate tests for existing code
 ### Code Improvement
 
 #### `/refactor`
+
 Refactor code following best practices
+
 - Extracts functions to reduce complexity
 - Eliminates code duplication
 - Improves type safety
@@ -63,7 +75,9 @@ Refactor code following best practices
 - Generates metrics on improvements
 
 #### `/optimize`
+
 Analyze and optimize code for performance
+
 - Frontend optimization (React, images, bundling)
 - Backend optimization (queries, caching, async)
 - Database optimization (N+1, indexes, pagination)
@@ -71,7 +85,9 @@ Analyze and optimize code for performance
 - Provides before/after metrics
 
 #### `/debug`
+
 Systematic debugging assistance
+
 - Reproduces issues
 - Isolates problem area
 - Adds debugging output
@@ -156,7 +172,9 @@ Brief description of what this command does.
 ## Output Format
 
 \`\`\`markdown
+
 # Report Title
+
 [What to include]
 \`\`\`
 
@@ -197,16 +215,19 @@ Add your command to this README.
 ## Command Categories
 
 ### 🔍 Analysis
+
 - `/review-security` - Security audit
 - `/review-code` - Code quality review
 - `/debug` - Troubleshooting
 
 ### 🏗️ Generation
+
 - `/create-component` - New React component
 - `/create-api-route` - New API endpoint
 - `/add-test` - Test generation
 
 ### ⚡ Optimization
+
 - `/refactor` - Code improvement
 - `/optimize` - Performance tuning
 
@@ -281,24 +302,28 @@ npm test
 ### Common Workflows
 
 **New Feature:**
+
 1. `/create-component` - Generate component
 2. `/create-api-route` - Create backend
 3. `/add-test` - Add tests
 4. `/review-code` - Review quality
 
 **Bug Fix:**
+
 1. `/debug` - Troubleshoot issue
 2. Fix the bug
 3. `/add-test` - Prevent regression
 4. `/review-security` - Check for vulnerabilities
 
 **Performance Issue:**
+
 1. `/review-code` - Find inefficiencies
 2. `/optimize` - Apply optimizations
 3. `/add-test` - Verify functionality
 4. Measure improvements
 
 **Code Cleanup:**
+
 1. `/review-code` - Identify issues
 2. `/refactor` - Clean up code
 3. `/add-test` - Ensure coverage

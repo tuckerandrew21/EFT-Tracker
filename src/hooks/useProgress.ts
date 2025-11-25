@@ -55,7 +55,10 @@ export function useProgress(): UseProgressReturn {
       const progressMap = new Map<string, QuestStatus>();
 
       for (const entry of data.progress as ProgressEntry[]) {
-        progressMap.set(entry.questId, entry.status.toLowerCase() as QuestStatus);
+        progressMap.set(
+          entry.questId,
+          entry.status.toLowerCase() as QuestStatus
+        );
       }
 
       setProgress(progressMap);

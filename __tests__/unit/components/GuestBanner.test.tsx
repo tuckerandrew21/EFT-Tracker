@@ -25,7 +25,9 @@ describe("GuestBanner", () => {
 
       render(<GuestBanner />);
 
-      expect(screen.getByText("Sign up to save your progress!")).toBeInTheDocument();
+      expect(
+        screen.getByText("Sign up to save your progress!")
+      ).toBeInTheDocument();
     });
 
     it("should hide banner when authenticated", () => {
@@ -40,7 +42,9 @@ describe("GuestBanner", () => {
 
       render(<GuestBanner />);
 
-      expect(screen.queryByText("Sign up to save your progress!")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Sign up to save your progress!")
+      ).not.toBeInTheDocument();
     });
 
     it("should hide banner when loading", () => {
@@ -52,7 +56,9 @@ describe("GuestBanner", () => {
 
       render(<GuestBanner />);
 
-      expect(screen.queryByText("Sign up to save your progress!")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Sign up to save your progress!")
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -69,7 +75,9 @@ describe("GuestBanner", () => {
       render(<GuestBanner />);
 
       // This text is hidden on small screens but present in DOM
-      expect(screen.getByText(/You're browsing as a guest\./)).toBeInTheDocument();
+      expect(
+        screen.getByText(/You're browsing as a guest\./)
+      ).toBeInTheDocument();
     });
 
     it("should render Sign Up button", () => {
@@ -83,7 +91,9 @@ describe("GuestBanner", () => {
     it("should render dismiss button", () => {
       render(<GuestBanner />);
 
-      expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Dismiss" })
+      ).toBeInTheDocument();
     });
   });
 
@@ -100,14 +110,18 @@ describe("GuestBanner", () => {
       render(<GuestBanner />);
 
       // Banner should be visible initially
-      expect(screen.getByText("Sign up to save your progress!")).toBeInTheDocument();
+      expect(
+        screen.getByText("Sign up to save your progress!")
+      ).toBeInTheDocument();
 
       // Click dismiss button
       const dismissButton = screen.getByRole("button", { name: "Dismiss" });
       fireEvent.click(dismissButton);
 
       // Banner should be hidden
-      expect(screen.queryByText("Sign up to save your progress!")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Sign up to save your progress!")
+      ).not.toBeInTheDocument();
     });
   });
 });

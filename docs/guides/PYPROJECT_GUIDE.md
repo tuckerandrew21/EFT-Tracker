@@ -5,6 +5,7 @@ This guide explains how to use the [pyproject.toml.template](pyproject.toml.temp
 ## Quick Start
 
 1. **Copy the template:**
+
    ```bash
    cp pyproject.toml.template pyproject.toml
    ```
@@ -15,6 +16,7 @@ This guide explains how to use the [pyproject.toml.template](pyproject.toml.temp
    - Add your dependencies
 
 3. **Install in development mode:**
+
    ```bash
    # Create virtual environment
    python -m venv venv
@@ -27,6 +29,7 @@ This guide explains how to use the [pyproject.toml.template](pyproject.toml.temp
 ## What is pyproject.toml?
 
 `pyproject.toml` is the modern standard for Python project configuration (PEP 518, 621, 660). It replaces:
+
 - `setup.py` - Package installation
 - `setup.cfg` - Package metadata
 - `requirements.txt` - Dependencies
@@ -47,6 +50,7 @@ license = {text = "MIT"}
 ```
 
 **Semantic Versioning:**
+
 - `0.1.0` - Initial development
 - `1.0.0` - First stable release
 - `1.1.0` - New features (backwards compatible)
@@ -81,6 +85,7 @@ classifiers = [
 ```
 
 **Development Status:**
+
 - `1 - Planning` - Project is in planning stage
 - `2 - Pre-Alpha` - Very early development
 - `3 - Alpha` - Feature incomplete, likely unstable
@@ -104,6 +109,7 @@ dependencies = [
 ```
 
 **Version Specifiers:**
+
 - `>=2.31.0` - Version 2.31.0 or higher
 - `>=2.0.0,<3.0.0` - Version 2.x only (not 3.0)
 - `~=2.31.0` - Compatible release (>=2.31.0, <2.32.0)
@@ -140,6 +146,7 @@ all = ["my-project[dev,postgres,api]"]
 ```
 
 **Installation:**
+
 ```bash
 pip install my-project[dev]           # Install with dev dependencies
 pip install my-project[postgres,api]  # Install multiple groups
@@ -159,6 +166,7 @@ process-data = "my_package.processing:process_command"
 ```
 
 After installation, users can run:
+
 ```bash
 my-cli --help
 process-data input.csv
@@ -178,6 +186,7 @@ my-app = "my_package.gui:main"
 ### Source Layout
 
 **Recommended: `src/` layout**
+
 ```
 my-project/
 ├── src/
@@ -190,6 +199,7 @@ my-project/
 ```
 
 Configuration:
+
 ```toml
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -198,6 +208,7 @@ exclude = ["tests*"]
 ```
 
 **Alternative: Flat layout**
+
 ```
 my-project/
 ├── my_package/
@@ -209,6 +220,7 @@ my-project/
 ```
 
 Configuration:
+
 ```toml
 [tool.setuptools.packages.find]
 where = ["."]
@@ -227,6 +239,7 @@ target-version = ["py310", "py311", "py312"]
 ```
 
 **Usage:**
+
 ```bash
 black .                # Format all files
 black --check .        # Check without modifying
@@ -243,6 +256,7 @@ ignore = ["E501"]  # Line too long
 ```
 
 **Rule Sets:**
+
 - `E` - pycodestyle errors
 - `F` - pyflakes (undefined names, unused imports)
 - `I` - isort (import sorting)
@@ -251,6 +265,7 @@ ignore = ["E501"]  # Line too long
 - `B` - bugbear (common bugs)
 
 **Usage:**
+
 ```bash
 ruff check .           # Check all files
 ruff check --fix .     # Auto-fix issues
@@ -268,6 +283,7 @@ disallow_untyped_defs = true
 ```
 
 **Usage:**
+
 ```bash
 mypy src/              # Type check source
 mypy --strict src/     # Strictest checking
@@ -290,6 +306,7 @@ markers = [
 ```
 
 **Usage:**
+
 ```bash
 pytest                     # Run all tests
 pytest -v                  # Verbose output
@@ -313,6 +330,7 @@ exclude_lines = [
 ```
 
 **Usage:**
+
 ```bash
 pytest --cov=src --cov-report=html  # Generate HTML report
 open htmlcov/index.html             # View report

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { QuestWithProgress, Trader, QuestFilters, QuestStatus } from "@/types";
+import type {
+  QuestWithProgress,
+  Trader,
+  QuestFilters,
+  QuestStatus,
+} from "@/types";
 
 interface UseQuestsReturn {
   quests: QuestWithProgress[];

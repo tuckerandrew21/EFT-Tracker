@@ -13,7 +13,17 @@ export const QUEST_NODE_WIDTH_MOBILE = 160;
 export const QUEST_NODE_HEIGHT_MOBILE = 60;
 
 function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
-  const { quest, onStatusChange, onClick, onFocus, isRoot, isLeaf, isFocused, isInFocusChain, hasFocusMode } = data;
+  const {
+    quest,
+    onStatusChange,
+    onClick,
+    onFocus,
+    isRoot,
+    isLeaf,
+    isFocused,
+    isInFocusChain,
+    hasFocusMode,
+  } = data;
   const traderColor = getTraderColor(quest.traderId);
   const statusColor = STATUS_COLORS[quest.computedStatus];
   const [isClicked, setIsClicked] = useState(false);
@@ -60,10 +70,16 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           "hover:shadow-md active:scale-95",
           isClicked && "scale-105",
           selected && "ring-2 ring-offset-2 ring-blue-500",
-          quest.computedStatus === "locked" && !isDimmed && "opacity-50 cursor-not-allowed",
+          quest.computedStatus === "locked" &&
+            !isDimmed &&
+            "opacity-50 cursor-not-allowed",
           quest.computedStatus === "completed" && !isDimmed && "opacity-60",
-          quest.computedStatus === "in_progress" && !isDimmed && "ring-2 ring-amber-400",
-          quest.computedStatus === "available" && !isDimmed && "shadow-sm hover:shadow-lg",
+          quest.computedStatus === "in_progress" &&
+            !isDimmed &&
+            "ring-2 ring-amber-400",
+          quest.computedStatus === "available" &&
+            !isDimmed &&
+            "shadow-sm hover:shadow-lg",
           // Visual hierarchy indicators (only when not dimmed)
           isRoot && !isDimmed && "border-l-4 border-l-emerald-500",
           isLeaf && !isDimmed && "border-r-4 border-r-violet-500",

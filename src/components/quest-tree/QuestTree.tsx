@@ -95,7 +95,15 @@ function QuestTreeInner({
       initialNodes: graph.nodes,
       initialEdges: graph.edges,
     };
-  }, [quests, selectedQuestId, focusedQuestId, focusChain, onStatusChange, onQuestSelect, handleFocus]);
+  }, [
+    quests,
+    selectedQuestId,
+    focusedQuestId,
+    focusChain,
+    onStatusChange,
+    onQuestSelect,
+    handleFocus,
+  ]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -129,13 +137,16 @@ function QuestTreeInner({
   }, [focusedQuestId]);
 
   // MiniMap node color based on trader
-  const getNodeColor = useCallback((node: { data: Record<string, unknown> }) => {
-    const data = node.data as QuestNodeData | undefined;
-    if (data?.quest) {
-      return getTraderColor(data.quest.traderId).primary;
-    }
-    return "#6B7280";
-  }, []);
+  const getNodeColor = useCallback(
+    (node: { data: Record<string, unknown> }) => {
+      const data = node.data as QuestNodeData | undefined;
+      if (data?.quest) {
+        return getTraderColor(data.quest.traderId).primary;
+      }
+      return "#6B7280";
+    },
+    []
+  );
 
   return (
     <div className="w-full h-full touch-pan-x touch-pan-y relative">
@@ -148,8 +159,18 @@ function QuestTreeInner({
             className="hover:bg-blue-600 rounded-full p-0.5"
             title="Exit focus mode (ESC)"
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>

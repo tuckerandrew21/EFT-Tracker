@@ -5,6 +5,7 @@ Templates for creating custom Model Context Protocol (MCP) servers in Node.js/Ty
 ## What are MCP Servers?
 
 MCP servers extend Claude Code's capabilities by providing:
+
 - **Tools**: Functions Claude can call (APIs, databases, commands)
 - **Resources**: Data Claude can read (files, configs, documentation)
 - **Prompts**: Templates for common tasks (code review, testing)
@@ -12,9 +13,11 @@ MCP servers extend Claude Code's capabilities by providing:
 ## Available Templates
 
 ### Node.js / TypeScript
+
 **Location:** `nodejs/`
 
 **Features:**
+
 - Full TypeScript support
 - MCP SDK integration
 - Example tools, resources, and prompts
@@ -22,6 +25,7 @@ MCP servers extend Claude Code's capabilities by providing:
 - Testing setup
 
 **Use for:**
+
 - JavaScript/TypeScript projects
 - npm package distribution
 - npx-based execution
@@ -29,9 +33,11 @@ MCP servers extend Claude Code's capabilities by providing:
 [View Node.js Template →](nodejs/README.md)
 
 ### Python
+
 **Location:** `python/`
 
 **Features:**
+
 - Modern Python (3.10+)
 - Type hints and mypy
 - Async/await support
@@ -39,6 +45,7 @@ MCP servers extend Claude Code's capabilities by providing:
 - Testing with pytest
 
 **Use for:**
+
 - Python projects
 - PyPI package distribution
 - pipx-based execution
@@ -80,6 +87,7 @@ Edit the server implementation to add your custom tools, resources, and prompts.
 Add to `.mcp.json` in your project root:
 
 **Node.js:**
+
 ```json
 {
   "mcpServers": {
@@ -94,6 +102,7 @@ Add to `.mcp.json` in your project root:
 ```
 
 **Python:**
+
 ```json
 {
   "mcpServers": {
@@ -112,7 +121,9 @@ Add to `.mcp.json` in your project root:
 Both templates include:
 
 ### Tools
+
 Functions Claude can call to perform actions:
+
 - Query databases
 - Call APIs
 - Read/write files
@@ -120,7 +131,9 @@ Functions Claude can call to perform actions:
 - Custom business logic
 
 ### Resources
+
 Data Claude can read:
+
 - Configuration files
 - Database records
 - API responses
@@ -128,7 +141,9 @@ Data Claude can read:
 - Status information
 
 ### Prompts
+
 Templates for common tasks:
+
 - Code review
 - Documentation generation
 - Test creation
@@ -138,24 +153,28 @@ Templates for common tasks:
 ## Use Cases
 
 ### Development Tools
+
 - Custom linters and formatters
 - Project scaffolding
 - Code generation
 - Build automation
 
 ### Data Access
+
 - Database queries
 - File system operations
 - API integrations
 - Configuration management
 
 ### Business Logic
+
 - Domain-specific operations
 - Workflow automation
 - Data validation
 - Report generation
 
 ### Testing
+
 - Test execution
 - Coverage reporting
 - Performance benchmarking
@@ -164,22 +183,26 @@ Templates for common tasks:
 ## Publishing
 
 ### npm (Node.js)
+
 ```bash
 npm publish --access public
 ```
 
 Users install with:
+
 ```bash
 npx @your-org/mcp-server-example
 ```
 
 ### PyPI (Python)
+
 ```bash
 python -m build
 twine upload dist/*
 ```
 
 Users install with:
+
 ```bash
 pipx run mcp-server-example
 ```
@@ -200,6 +223,7 @@ See [MCP_SECURITY.md](../docs/security/MCP_SECURITY.md) for comprehensive securi
 ## Example Servers
 
 ### Database Server (Node.js)
+
 ```typescript
 Tool(
   name: 'query',
@@ -214,6 +238,7 @@ Tool(
 ```
 
 ### API Server (Python)
+
 ```python
 Tool(
     name="fetch_data",
@@ -228,6 +253,7 @@ Tool(
 ```
 
 ### File Server (Node.js)
+
 ```typescript
 Resource(
   uri: 'file://config',
@@ -239,12 +265,14 @@ Resource(
 ## Testing
 
 ### Node.js
+
 ```bash
 npm test
 npm run dev  # Watch mode
 ```
 
 ### Python
+
 ```bash
 pytest
 pytest --cov  # With coverage
@@ -254,6 +282,7 @@ mypy src  # Type checking
 ## Documentation
 
 Each template includes:
+
 - Comprehensive README
 - Code examples
 - API documentation
@@ -263,12 +292,14 @@ Each template includes:
 ## Resources
 
 ### Official Documentation
+
 - [MCP Specification](https://modelcontextprotocol.io)
 - [MCP SDK (Node.js)](https://github.com/modelcontextprotocol/sdk)
 - [MCP SDK (Python)](https://github.com/modelcontextprotocol/python-sdk)
 - [Claude Code Documentation](https://code.claude.com/docs)
 
 ### Example Servers
+
 - [Official MCP Servers](https://github.com/modelcontextprotocol/servers)
 - Playwright (browser automation)
 - Filesystem (file operations)
@@ -276,6 +307,7 @@ Each template includes:
 - Memory (knowledge graphs)
 
 ### Project Documentation
+
 - [MCP_SETUP.md](../docs/integrations/MCP_SETUP.md) - Setup guide
 - [MCP_SECURITY.md](../docs/security/MCP_SECURITY.md) - Security guide
 - [CLAUDE_CODE_WORKFLOWS.md](../docs/workflows/CLAUDE_CODE_WORKFLOWS.md) - Workflows guide

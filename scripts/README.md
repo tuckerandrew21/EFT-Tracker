@@ -7,16 +7,19 @@ Automation scripts and utilities for the project-intake-template repository.
 ### Label Setup Scripts
 
 **setup-labels.sh** (Mac/Linux/Git Bash)
+
 ```bash
 bash setup-labels.sh
 ```
 
 **setup-labels.bat** (Windows)
+
 ```bash
 setup-labels.bat
 ```
 
 Creates the complete label system for GitHub issues:
+
 - Priority labels (high, medium, low)
 - Type labels (feature, bug, docs, refactor, test)
 - Status labels (blocked, in-progress, needs-review, ready)
@@ -29,6 +32,7 @@ Creates the complete label system for GitHub issues:
 ### Tools Directory
 
 Additional automation utilities in [`tools/`](tools/):
+
 - `convert_drafts_to_issues.py` - Convert draft issues to GitHub issues
 - `create_issue.sh` - Create GitHub issues via CLI
 - `work-epic-issue.sh` - Workflow automation for epics
@@ -38,6 +42,7 @@ Additional automation utilities in [`tools/`](tools/):
 ### First-Time Setup
 
 1. **Install GitHub CLI:**
+
    ```bash
    # Mac
    brew install gh
@@ -50,11 +55,13 @@ Additional automation utilities in [`tools/`](tools/):
    ```
 
 2. **Authenticate:**
+
    ```bash
    gh auth login
    ```
 
 3. **Run label setup:**
+
    ```bash
    # Mac/Linux
    bash scripts/setup-labels.sh
@@ -80,6 +87,7 @@ bash scripts/tools/create_issue.sh "Issue title" "Issue body"
 ### setup-labels.sh / .bat
 
 Creates a complete GitHub label system with:
+
 - **13 priority/type labels** for categorization
 - **7 status labels** for workflow tracking
 - **3 effort labels** for estimation
@@ -91,6 +99,7 @@ All labels include descriptions and appropriate color coding.
 ### convert_drafts_to_issues.py
 
 Converts locally drafted issues to GitHub issues:
+
 - Reads draft files from specified directory
 - Parses title, body, labels, and metadata
 - Creates issues via GitHub API
@@ -99,6 +108,7 @@ Converts locally drafted issues to GitHub issues:
 ### create_issue.sh
 
 Quick CLI wrapper for creating issues:
+
 - Simple interface for common issue creation
 - Uses GitHub CLI (`gh issue create`)
 - Supports labels, milestones, assignees
@@ -106,6 +116,7 @@ Quick CLI wrapper for creating issues:
 ### work-epic-issue.sh
 
 Workflow automation for epic-level issues:
+
 - Links related issues
 - Updates epic progress
 - Manages epic status
@@ -115,6 +126,7 @@ Workflow automation for epic-level issues:
 ### Modifying Labels
 
 Edit `setup-labels.sh` or `setup-labels.bat`:
+
 ```bash
 gh label create "custom-label" \
   --description "Custom label description" \
@@ -131,16 +143,20 @@ gh label create "custom-label" \
 ## 🐛 Troubleshooting
 
 **"gh: command not found"**
+
 - Install GitHub CLI (see First-Time Setup above)
 
 **"authentication required"**
+
 - Run: `gh auth login`
 - Follow authentication prompts
 
 **"permission denied"**
+
 - Make script executable: `chmod +x scripts/setup-labels.sh`
 
 **Script fails on Windows**
+
 - Use Git Bash or Windows Subsystem for Linux (WSL)
 - Or use the .bat version where available
 

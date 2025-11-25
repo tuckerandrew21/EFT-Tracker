@@ -41,11 +41,13 @@ Control which tools Claude Code can use automatically:
 ```
 
 **Permission Levels:**
+
 - `allow` - Tools that can be used without asking
 - `ask` - Tools that require confirmation (default for most tools)
 - `deny` - Tools that are completely blocked
 
 **Common Tools:**
+
 - `Bash` - Execute shell commands
 - `Read` - Read files
 - `Edit` - Edit files
@@ -56,14 +58,15 @@ Control which tools Claude Code can use automatically:
 - `WebSearch` - Search the web
 
 **Wildcard Patterns:**
+
 ```json
 {
   "permissions": {
     "allow": [
-      "Bash(*)",           // Allow all bash commands
-      "Bash(git *)",       // Allow only git commands
-      "Bash(npm *)",       // Allow only npm commands
-      "Read(*)"            // Allow reading any file
+      "Bash(*)", // Allow all bash commands
+      "Bash(git *)", // Allow only git commands
+      "Bash(npm *)", // Allow only npm commands
+      "Read(*)" // Allow reading any file
     ]
   }
 }
@@ -105,17 +108,20 @@ Add project-specific context for Claude Code:
 ### User-Level (~/.claude/settings.json)
 
 Applies to all projects by default. Good for:
+
 - Personal tool preferences
 - Global permissions
 - Personal MCP servers
 
 **Location:**
+
 - **Mac/Linux:** `~/.claude/settings.json`
 - **Windows:** `%USERPROFILE%\.claude\settings.json`
 
 ### Project-Level (.claude/settings.json)
 
 Applies to this repository. Good for:
+
 - Team-shared settings
 - Project-specific permissions
 - Project conventions
@@ -125,6 +131,7 @@ Applies to this repository. Good for:
 ### Local-Level (.claude/settings.local.json)
 
 Machine-specific overrides. Good for:
+
 - Personal overrides
 - Machine-specific paths
 - Local development servers
@@ -136,6 +143,7 @@ Machine-specific overrides. Good for:
 ### For Individual Developers
 
 1. **Start with template:**
+
    ```bash
    cp .claude/settings.json.template .claude/settings.json
    ```
@@ -143,11 +151,12 @@ Machine-specific overrides. Good for:
 2. **Customize permissions** based on trust level and project needs
 
 3. **Use wildcards carefully** - Be specific with allowed commands:
+
    ```json
    {
      "allow": [
-       "Bash(git *)",      // Good - specific
-       "Bash(*)"           // Risky - allows everything
+       "Bash(git *)", // Good - specific
+       "Bash(*)" // Risky - allows everything
      ]
    }
    ```
@@ -162,6 +171,7 @@ Machine-specific overrides. Good for:
 1. **Commit the template** - Provides consistent starting point
 
 2. **Document project conventions** - Add custom instructions:
+
    ```json
    {
      "customInstructions": "Follow CODING_STANDARDS.md. Use conventional commits. Run 'npm test' before committing."
@@ -185,12 +195,13 @@ Machine-specific overrides. Good for:
    - Review regularly
 
 3. **Audit wildcard permissions:**
+
    ```json
    {
      "allow": [
-       "Bash(rm *)",      // Dangerous!
-       "Bash(curl *)",    // Potential security risk
-       "Write(*)"         // Can overwrite any file
+       "Bash(rm *)", // Dangerous!
+       "Bash(curl *)", // Potential security risk
+       "Write(*)" // Can overwrite any file
      ]
    }
    ```
@@ -199,9 +210,9 @@ Machine-specific overrides. Good for:
    ```json
    {
      "ask": [
-       "WebFetch",        // External requests
-       "WebSearch",       // Search queries
-       "Bash(docker *)"   // Container operations
+       "WebFetch", // External requests
+       "WebSearch", // Search queries
+       "Bash(docker *)" // Container operations
      ]
    }
    ```
@@ -213,18 +224,8 @@ Machine-specific overrides. Good for:
 ```json
 {
   "permissions": {
-    "allow": [
-      "Read",
-      "Glob",
-      "Grep"
-    ],
-    "ask": [
-      "Bash",
-      "Edit",
-      "Write",
-      "WebFetch",
-      "WebSearch"
-    ]
+    "allow": ["Read", "Glob", "Grep"],
+    "ask": ["Bash", "Edit", "Write", "WebFetch", "WebSearch"]
   }
 }
 ```
@@ -245,12 +246,7 @@ Machine-specific overrides. Good for:
       "Glob",
       "Grep"
     ],
-    "ask": [
-      "Write",
-      "WebFetch",
-      "WebSearch",
-      "Bash"
-    ]
+    "ask": ["Write", "WebFetch", "WebSearch", "Bash"]
   }
 }
 ```
@@ -270,10 +266,7 @@ Machine-specific overrides. Good for:
       "Glob(*)",
       "Grep(*)"
     ],
-    "ask": [
-      "WebFetch",
-      "WebSearch"
-    ]
+    "ask": ["WebFetch", "WebSearch"]
   }
 }
 ```
@@ -317,11 +310,13 @@ Machine-specific overrides. Good for:
 ### Settings Not Applied
 
 1. **Check file location:**
+
    ```bash
    ls -la .claude/settings.json
    ```
 
 2. **Validate JSON syntax:**
+
    ```bash
    cat .claude/settings.json | jq .
    ```

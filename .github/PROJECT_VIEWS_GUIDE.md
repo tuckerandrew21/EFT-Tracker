@@ -3,6 +3,7 @@
 > Essential project views for managing SafeQuote.io effectively
 
 ## Quick Access
+
 **Project Board**: https://github.com/orgs/razorvision/projects/16
 
 ---
@@ -10,15 +11,18 @@
 ## Recommended Views
 
 ### 1. 📋 Kanban Board (Primary View)
+
 **Purpose**: Daily workflow management - see work in progress at a glance
 
 **Setup**:
+
 1. Go to your [project board](https://github.com/orgs/razorvision/projects/16)
 2. Click "+ New view" → "Board"
 3. Name it: "Kanban Board"
 4. Configure columns:
 
 **Columns**:
+
 - **Backlog** - Not yet prioritized
   - Filter: `no:status` or `status:"Backlog"`
 - **Ready** - Prioritized and ready to start
@@ -36,15 +40,18 @@
 ---
 
 ### 2. 🎯 Phase 1 Sprint View
+
 **Purpose**: Track Phase 1: MVP Launch progress
 
 **Setup**:
+
 1. Click "+ New view" → "Board"
 2. Name it: "Phase 1: MVP Launch"
 3. Add filter: `milestone:"Phase 1: MVP Launch"`
 
 **Columns**: Same as Kanban (Backlog → Done)
 **Additional Filters**:
+
 - Show only: `milestone:"Phase 1: MVP Launch"`
 - Exclude: Closed issues (or include based on preference)
 
@@ -53,9 +60,11 @@
 ---
 
 ### 3. 📊 Priority Matrix
+
 **Purpose**: See what's urgent vs important at a glance
 
 **Setup**:
+
 1. Click "+ New view" → "Table"
 2. Name it: "Priority Matrix"
 3. Configure columns:
@@ -71,6 +80,7 @@
 **Sorting**: By Updated (Most recent first)
 
 **Filters**:
+
 - State: Open only
 - Exclude: Epics (#1, #2, #3)
 
@@ -79,18 +89,22 @@
 ---
 
 ### 4. 🚀 This Week View
+
 **Purpose**: What's being worked on this week
 
 **Setup**:
+
 1. Click "+ New view" → "Board"
 2. Name it: "This Week"
 3. Configure:
 
 **Filters**:
+
 - Status: `In Progress` OR `In Review`
 - Updated: Last 7 days
 
 **Columns**:
+
 - In Progress
 - In Review
 - Done This Week
@@ -100,9 +114,11 @@
 ---
 
 ### 5. 👥 By Assignee View
+
 **Purpose**: See who's working on what
 
 **Setup**:
+
 1. Click "+ New view" → "Board"
 2. Name it: "By Team Member"
 3. Configure:
@@ -116,18 +132,22 @@
 ---
 
 ### 6. 🏷️ Client-Facing Features
+
 **Purpose**: Track user-visible work for client demos
 
 **Setup**:
+
 1. Click "+ New view" → "Table"
 2. Name it: "Client Visible"
 3. Configure:
 
 **Filters**:
+
 - Label: `client: visible`
 - State: Open
 
 **Columns**:
+
 - Title
 - Status
 - Priority
@@ -141,9 +161,11 @@
 ---
 
 ### 7. 📈 Roadmap View
+
 **Purpose**: High-level overview of all phases
 
 **Setup**:
+
 1. Click "+ New view" → "Roadmap"
 2. Name it: "Product Roadmap"
 3. Configure:
@@ -159,18 +181,22 @@
 ---
 
 ### 8. 🐛 Bugs & Issues View
+
 **Purpose**: Track bugs separately from features
 
 **Setup**:
+
 1. Click "+ New view" → "Table"
 2. Name it: "Bugs & Issues"
 3. Configure:
 
 **Filters**:
+
 - Label: `type: bug`
 - State: Open
 
 **Columns**:
+
 - Title
 - Priority
 - Status
@@ -222,18 +248,22 @@
 Set up workflow automation (Project Settings → Workflows):
 
 ### Auto-add to Project
+
 - **Trigger**: Item added to project
 - **Action**: Set status to "Backlog"
 
 ### Auto-progress
+
 - **Trigger**: Pull request opened
 - **Action**: Move to "In Review"
 
 ### Auto-complete
+
 - **Trigger**: Pull request merged
 - **Action**: Move to "Done"
 
 ### Auto-close
+
 - **Trigger**: Issue closed
 - **Action**: Set status to "Done"
 
@@ -242,21 +272,25 @@ Set up workflow automation (Project Settings → Workflows):
 ## View Usage Guide
 
 ### Daily Workflow
+
 1. **Start with**: Kanban Board
 2. **Check**: This Week view
 3. **Triage**: Priority Matrix
 
 ### Weekly Planning
+
 1. **Review**: Phase 1 Sprint View
 2. **Plan**: Backlog column in Kanban
 3. **Assign**: By Assignee view
 
 ### Client Demos
+
 1. **Prepare**: Client-Facing Features
 2. **Present**: Roadmap View
 3. **Show**: Completed items in Done column
 
 ### Sprint Planning
+
 1. **Overview**: Roadmap View
 2. **Details**: Phase-specific view
 3. **Assign**: By Assignee view
@@ -266,32 +300,41 @@ Set up workflow automation (Project Settings → Workflows):
 ## Pro Tips
 
 ### 1. Use Draft Issues
+
 Create quick tasks without leaving the board:
+
 - Click "+ Add item" in any column
 - Type title → Enter
 - Add details later
 
 ### 2. Keyboard Shortcuts
+
 - `?` - Show all shortcuts
 - `c` - Create new item
 - `e` - Edit item
 - `/` - Focus search
 
 ### 3. Filters
+
 Combine filters for powerful views:
+
 ```
 is:open label:"priority: high" milestone:"Phase 1: MVP Launch"
 ```
 
 ### 4. Custom Fields
+
 Add useful fields:
+
 - **Story Points** (number)
 - **Sprint** (text)
 - **Epic** (text to link to epic issues)
 - **Due Date** (date)
 
 ### 5. Insights
+
 View project insights:
+
 - Burndown charts
 - Velocity tracking
 - Cycle time analysis
@@ -301,6 +344,7 @@ View project insights:
 ## Commands to Quickly Add Items
 
 ### Add issue to project board
+
 ```bash
 # Add by issue number
 gh project item-add 16 --owner razorvision --url https://github.com/razorvision/safequote.io-React-Only/issues/7
@@ -310,7 +354,9 @@ gh project item-list 16 --owner razorvision --format json
 ```
 
 ### Update item status
+
 Items update automatically when you:
+
 - Open a PR → Moves to "In Review"
 - Merge PR → Moves to "Done"
 - Close issue → Moves to "Done"
@@ -319,27 +365,29 @@ Items update automatically when you:
 
 ## View Comparison
 
-| View | Best For | Update Frequency |
-|------|----------|------------------|
-| **Kanban Board** | Daily workflow | Real-time |
-| **Phase 1 Sprint** | Sprint focus | Daily |
-| **Priority Matrix** | Triage | Daily |
-| **This Week** | Standups | Daily |
-| **By Assignee** | Team balance | Daily |
-| **Client Visible** | Demos | Before client meetings |
-| **Roadmap** | Planning | Weekly |
-| **Bugs & Issues** | Quality tracking | As needed |
+| View                | Best For         | Update Frequency       |
+| ------------------- | ---------------- | ---------------------- |
+| **Kanban Board**    | Daily workflow   | Real-time              |
+| **Phase 1 Sprint**  | Sprint focus     | Daily                  |
+| **Priority Matrix** | Triage           | Daily                  |
+| **This Week**       | Standups         | Daily                  |
+| **By Assignee**     | Team balance     | Daily                  |
+| **Client Visible**  | Demos            | Before client meetings |
+| **Roadmap**         | Planning         | Weekly                 |
+| **Bugs & Issues**   | Quality tracking | As needed              |
 
 ---
 
 ## Mobile Access
 
 GitHub Projects work on mobile:
+
 - iOS: GitHub Mobile app
 - Android: GitHub Mobile app
 - Web: Mobile browser at github.com
 
 **Recommended mobile views**:
+
 - Kanban Board (swipe columns)
 - This Week (quick overview)
 
@@ -348,11 +396,13 @@ GitHub Projects work on mobile:
 ## Sharing Views
 
 ### With Stakeholders
+
 1. **Public URL**: Share project URL (if public)
 2. **Screenshots**: Export view as image
 3. **Reports**: Use Insights tab for charts
 
 ### With Team
+
 1. **Pin important views**: Star them for quick access
 2. **Set default view**: Make Kanban your default
 3. **Save custom filters**: Bookmark filtered URLs

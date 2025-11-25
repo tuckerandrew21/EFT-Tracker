@@ -5,6 +5,7 @@ One-page reference for common testing commands and patterns.
 ## 🚀 Quick Commands
 
 ### Run Tests
+
 ```bash
 # All tests (excluding slow browser tests)
 docker exec CONTAINER pytest /tests/ -v -m 'not playwright'
@@ -17,11 +18,13 @@ docker exec CONTAINER pytest /tests/test_myfeature.py::TestClass::test_method -v
 ```
 
 ### Claude Code Slash Command
+
 ```
 /test                    # Auto-discover and run relevant tests
 ```
 
 ### Common Options
+
 ```bash
 -v                      # Verbose output
 -vv                     # Very verbose (show diffs)
@@ -58,6 +61,7 @@ class MyFeatureTestCase(TestCase):
 ## 🎭 Common Patterns
 
 ### Mocking
+
 ```python
 with patch('module.function') as mock:
     mock.return_value = value
@@ -66,6 +70,7 @@ with patch('module.function') as mock:
 ```
 
 ### Request Factory
+
 ```python
 request = self.factory.get('/path/')
 request.session = MagicMock()
@@ -73,6 +78,7 @@ request.session.get.return_value = 123
 ```
 
 ### AJAX Testing
+
 ```python
 request.headers = {'X-Requested-With': 'XMLHttpRequest'}
 response = view(request)
@@ -80,6 +86,7 @@ self.assertIsInstance(response, JsonResponse)
 ```
 
 ### Assertions
+
 ```python
 self.assertEqual(a, b)
 self.assertNotEqual(a, b)
@@ -101,6 +108,7 @@ self.assertRaises(Exception, func)
 ```
 
 Run by marker:
+
 ```bash
 docker exec CONTAINER pytest -m unit -v        # Only unit tests
 docker exec CONTAINER pytest -m "not slow" -v  # Skip slow tests
@@ -109,6 +117,7 @@ docker exec CONTAINER pytest -m "not slow" -v  # Skip slow tests
 ## 🐳 Docker Commands
 
 ### Container Status
+
 ```bash
 docker ps                                    # List running containers
 docker ps -a                                # List all containers
@@ -116,6 +125,7 @@ docker ps --filter "name=myapp"             # Filter by name
 ```
 
 ### Container Management
+
 ```bash
 docker-compose up -d                        # Start containers
 docker-compose restart core                 # Restart service
@@ -124,6 +134,7 @@ docker exec -it CONTAINER bash              # Shell access
 ```
 
 ### Common Issues
+
 ```bash
 # Port in use
 docker-compose restart core
@@ -170,6 +181,7 @@ docker exec CONTAINER pytest /tests/ \
 ## 🎯 Workflow Tips
 
 1. **TDD Workflow:**
+
    ```bash
    # Write failing test
    /test
@@ -180,12 +192,14 @@ docker exec CONTAINER pytest /tests/ \
    ```
 
 2. **Debug Failing Test:**
+
    ```bash
    # Run with full output
    docker exec CONTAINER pytest /tests/test_file.py::test_name -vv -s
    ```
 
 3. **Quick Feedback Loop:**
+
    ```bash
    # Run only modified tests (use /test command)
    /test
@@ -197,6 +211,7 @@ docker exec CONTAINER pytest /tests/ \
 ## 🔗 File Paths Checklist
 
 **Update these in your project:**
+
 - [ ] Container name: `CONTAINER`
 - [ ] Test directory: `/tests/`
 - [ ] App name: `myapp`

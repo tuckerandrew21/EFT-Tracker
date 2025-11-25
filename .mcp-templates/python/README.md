@@ -5,6 +5,7 @@ Template for creating custom Model Context Protocol (MCP) servers in Python.
 ## What is an MCP Server?
 
 An MCP server provides tools, resources, and prompts that Claude Code can use to interact with external systems. This allows Claude to:
+
 - Call APIs
 - Query databases
 - Read files
@@ -213,6 +214,7 @@ Configure in `.mcp.json`:
 ```
 
 Then set in your shell:
+
 ```bash
 export API_KEY="your-api-key"
 ```

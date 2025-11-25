@@ -8,8 +8,8 @@
  * external systems, APIs, databases, or any other services.
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -17,11 +17,11 @@ import {
   ReadResourceRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+} from "@modelcontextprotocol/sdk/types.js";
 
 // Server configuration
-const SERVER_NAME = 'example-server';
-const SERVER_VERSION = '1.0.0';
+const SERVER_NAME = "example-server";
+const SERVER_VERSION = "1.0.0";
 
 // Create MCP server instance
 const server = new Server(
@@ -31,9 +31,9 @@ const server = new Server(
   },
   {
     capabilities: {
-      tools: {},      // This server provides tools
-      resources: {},  // This server provides resources
-      prompts: {},    // This server provides prompts
+      tools: {}, // This server provides tools
+      resources: {}, // This server provides resources
+      prompts: {}, // This server provides prompts
     },
   }
 );
@@ -50,48 +50,48 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'echo',
-        description: 'Echo back the provided message',
+        name: "echo",
+        description: "Echo back the provided message",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             message: {
-              type: 'string',
-              description: 'The message to echo back',
+              type: "string",
+              description: "The message to echo back",
             },
           },
-          required: ['message'],
+          required: ["message"],
         },
       },
       {
-        name: 'get_time',
-        description: 'Get the current time',
+        name: "get_time",
+        description: "Get the current time",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {},
         },
       },
       {
-        name: 'calculate',
-        description: 'Perform basic arithmetic calculations',
+        name: "calculate",
+        description: "Perform basic arithmetic calculations",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             operation: {
-              type: 'string',
-              enum: ['add', 'subtract', 'multiply', 'divide'],
-              description: 'The arithmetic operation to perform',
+              type: "string",
+              enum: ["add", "subtract", "multiply", "divide"],
+              description: "The arithmetic operation to perform",
             },
             a: {
-              type: 'number',
-              description: 'First number',
+              type: "number",
+              description: "First number",
             },
             b: {
-              type: 'number',
-              description: 'Second number',
+              type: "number",
+              description: "Second number",
             },
           },
-          required: ['operation', 'a', 'b'],
+          required: ["operation", "a", "b"],
         },
       },
     ],
@@ -104,43 +104,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case 'echo':
+      case "echo":
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: args.message as string,
             },
           ],
         };
 
-      case 'get_time':
+      case "get_time":
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: new Date().toISOString(),
             },
           ],
         };
 
-      case 'calculate': {
-        const { operation, a, b } = args as { operation: string; a: number; b: number };
+      case "calculate": {
+        const { operation, a, b } = args as {
+          operation: string;
+          a: number;
+          b: number;
+        };
         let result: number;
 
         switch (operation) {
-          case 'add':
+          case "add":
             result = a + b;
             break;
-          case 'subtract':
+          case "subtract":
             result = a - b;
             break;
-          case 'multiply':
+          case "multiply":
             result = a * b;
             break;
-          case 'divide':
+          case "divide":
             if (b === 0) {
-              throw new Error('Division by zero');
+              throw new Error("Division by zero");
             }
             result = a / b;
             break;
@@ -151,7 +155,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: `Result: ${result}`,
             },
           ],
@@ -162,11 +166,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error(`Unknown tool: ${name}`);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return {
       content: [
         {
-          type: 'text',
+          type: "text",
           text: `Error: ${errorMessage}`,
         },
       ],
@@ -187,16 +192,16 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
   return {
     resources: [
       {
-        uri: 'example://config',
-        name: 'Server Configuration',
-        description: 'Current server configuration',
-        mimeType: 'application/json',
+        uri: "example://config",
+        name: "Server Configuration",
+        description: "Current server configuration",
+        mimeType: "application/json",
       },
       {
-        uri: 'example://status',
-        name: 'Server Status',
-        description: 'Current server status and health',
-        mimeType: 'application/json',
+        uri: "example://status",
+        name: "Server Status",
+        description: "Current server status and health",
+        mimeType: "application/json",
       },
     ],
   };
@@ -207,17 +212,17 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   const { uri } = request.params;
 
   switch (uri) {
-    case 'example://config':
+    case "example://config":
       return {
         contents: [
           {
             uri,
-            mimeType: 'application/json',
+            mimeType: "application/json",
             text: JSON.stringify(
               {
                 name: SERVER_NAME,
                 version: SERVER_VERSION,
-                capabilities: ['tools', 'resources', 'prompts'],
+                capabilities: ["tools", "resources", "prompts"],
               },
               null,
               2
@@ -226,15 +231,15 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
         ],
       };
 
-    case 'example://status':
+    case "example://status":
       return {
         contents: [
           {
             uri,
-            mimeType: 'application/json',
+            mimeType: "application/json",
             text: JSON.stringify(
               {
-                status: 'healthy',
+                status: "healthy",
                 uptime: process.uptime(),
                 timestamp: new Date().toISOString(),
               },
@@ -262,12 +267,12 @@ server.setRequestHandler(ListPromptsRequestSchema, async () => {
   return {
     prompts: [
       {
-        name: 'example_prompt',
-        description: 'An example prompt template',
+        name: "example_prompt",
+        description: "An example prompt template",
         arguments: [
           {
-            name: 'topic',
-            description: 'The topic to discuss',
+            name: "topic",
+            description: "The topic to discuss",
             required: true,
           },
         ],
@@ -281,14 +286,14 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   switch (name) {
-    case 'example_prompt':
+    case "example_prompt":
       return {
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: {
-              type: 'text',
-              text: `Please provide information about: ${args?.topic || 'general topics'}`,
+              type: "text",
+              text: `Please provide information about: ${args?.topic || "general topics"}`,
             },
           },
         ],
@@ -312,6 +317,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });

@@ -17,8 +17,12 @@ describe("trader-colors", () => {
 
       expectedTraders.forEach((trader) => {
         expect(TRADER_COLORS).toHaveProperty(trader);
-        expect(TRADER_COLORS[trader as keyof typeof TRADER_COLORS]).toHaveProperty("primary");
-        expect(TRADER_COLORS[trader as keyof typeof TRADER_COLORS]).toHaveProperty("bg");
+        expect(
+          TRADER_COLORS[trader as keyof typeof TRADER_COLORS]
+        ).toHaveProperty("primary");
+        expect(
+          TRADER_COLORS[trader as keyof typeof TRADER_COLORS]
+        ).toHaveProperty("bg");
       });
     });
 

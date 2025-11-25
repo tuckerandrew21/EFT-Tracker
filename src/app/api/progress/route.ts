@@ -86,7 +86,9 @@ export async function POST(request: Request) {
       const completedDeps = await prisma.questProgress.count({
         where: {
           userId: session.user.id,
-          questId: { in: quest.dependsOn.map((d: QuestDependency) => d.requiredId) },
+          questId: {
+            in: quest.dependsOn.map((d: QuestDependency) => d.requiredId),
+          },
           status: "COMPLETED",
         },
       });

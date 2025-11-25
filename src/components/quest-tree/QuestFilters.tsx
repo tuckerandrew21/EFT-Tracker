@@ -66,119 +66,119 @@ const FilterControls = ({
   activeFilterCount,
   handleReset,
 }: FilterControlsProps) => (
-    <div
-      className={
-        isMobile
-          ? "flex flex-col gap-4"
-          : "hidden md:flex flex-wrap items-end gap-4"
-      }
-    >
-      {/* Trader Filter */}
-      <div className={isMobile ? "w-full" : "w-[160px]"}>
-        <Label className="text-xs text-muted-foreground">Trader</Label>
-        <Select
-          value={filters.traderId || "all"}
-          onValueChange={(value) =>
-            onFilterChange({ traderId: value === "all" ? null : value })
-          }
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue placeholder="All Traders" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Traders</SelectItem>
-            {traders.map((trader) => (
-              <SelectItem key={trader.id} value={trader.id}>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{
-                      backgroundColor: getTraderColor(trader.id).primary,
-                    }}
-                  />
-                  {trader.name}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Status Filter */}
-      <div className={isMobile ? "w-full" : "w-[140px]"}>
-        <Label className="text-xs text-muted-foreground">Status</Label>
-        <Select
-          value={filters.status || "all"}
-          onValueChange={(value) =>
-            onFilterChange({
-              status: value === "all" ? null : (value as QuestStatus),
-            })
-          }
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue placeholder="All Statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUSES.map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {status.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Map Filter */}
-      <div className={isMobile ? "w-full" : "w-[160px]"}>
-        <Label className="text-xs text-muted-foreground">Map</Label>
-        <Select
-          value={filters.map || "all"}
-          onValueChange={(value) =>
-            onFilterChange({ map: value === "all" ? null : value })
-          }
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue placeholder="All Maps" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Maps</SelectItem>
-            {MAPS.map((map) => (
-              <SelectItem key={map} value={map}>
-                {map}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Kappa Toggle */}
-      <div className="flex items-center gap-2 py-2">
-        <Switch
-          id={isMobile ? "kappa-mobile" : "kappa"}
-          checked={filters.kappaOnly}
-          onCheckedChange={(checked) => onFilterChange({ kappaOnly: checked })}
-        />
-        <Label
-          htmlFor={isMobile ? "kappa-mobile" : "kappa"}
-          className="text-sm cursor-pointer"
-        >
-          Kappa Only
-        </Label>
-      </div>
-
-      {/* Reset Button */}
-      {activeFilterCount > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleReset}
-          className={isMobile ? "w-full" : ""}
-        >
-          Reset Filters
-        </Button>
-      )}
+  <div
+    className={
+      isMobile
+        ? "flex flex-col gap-4"
+        : "hidden md:flex flex-wrap items-end gap-4"
+    }
+  >
+    {/* Trader Filter */}
+    <div className={isMobile ? "w-full" : "w-[160px]"}>
+      <Label className="text-xs text-muted-foreground">Trader</Label>
+      <Select
+        value={filters.traderId || "all"}
+        onValueChange={(value) =>
+          onFilterChange({ traderId: value === "all" ? null : value })
+        }
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="All Traders" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Traders</SelectItem>
+          {traders.map((trader) => (
+            <SelectItem key={trader.id} value={trader.id}>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{
+                    backgroundColor: getTraderColor(trader.id).primary,
+                  }}
+                />
+                {trader.name}
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
-  );
+
+    {/* Status Filter */}
+    <div className={isMobile ? "w-full" : "w-[140px]"}>
+      <Label className="text-xs text-muted-foreground">Status</Label>
+      <Select
+        value={filters.status || "all"}
+        onValueChange={(value) =>
+          onFilterChange({
+            status: value === "all" ? null : (value as QuestStatus),
+          })
+        }
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="All Statuses" />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((status) => (
+            <SelectItem key={status.value} value={status.value}>
+              {status.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Map Filter */}
+    <div className={isMobile ? "w-full" : "w-[160px]"}>
+      <Label className="text-xs text-muted-foreground">Map</Label>
+      <Select
+        value={filters.map || "all"}
+        onValueChange={(value) =>
+          onFilterChange({ map: value === "all" ? null : value })
+        }
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="All Maps" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Maps</SelectItem>
+          {MAPS.map((map) => (
+            <SelectItem key={map} value={map}>
+              {map}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Kappa Toggle */}
+    <div className="flex items-center gap-2 py-2">
+      <Switch
+        id={isMobile ? "kappa-mobile" : "kappa"}
+        checked={filters.kappaOnly}
+        onCheckedChange={(checked) => onFilterChange({ kappaOnly: checked })}
+      />
+      <Label
+        htmlFor={isMobile ? "kappa-mobile" : "kappa"}
+        className="text-sm cursor-pointer"
+      >
+        Kappa Only
+      </Label>
+    </div>
+
+    {/* Reset Button */}
+    {activeFilterCount > 0 && (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleReset}
+        className={isMobile ? "w-full" : ""}
+      >
+        Reset Filters
+      </Button>
+    )}
+  </div>
+);
 
 export function QuestFilters({
   traders,

@@ -25,7 +25,9 @@ export const questHandlers = [
     }
 
     if (status) {
-      filteredQuests = filteredQuests.filter((q) => q.computedStatus === status);
+      filteredQuests = filteredQuests.filter(
+        (q) => q.computedStatus === status
+      );
     }
 
     if (map) {

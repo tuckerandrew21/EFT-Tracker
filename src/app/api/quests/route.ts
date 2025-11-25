@@ -121,11 +121,15 @@ export async function GET(request: Request) {
         computedStatus = progress.status.toLowerCase();
       } else {
         // Check if all dependencies are completed
-        const hasIncompleteDeps = quest.dependsOn.some((dep: QuestDependency) => {
-          const depQuest = quests.find((q: QuestWithRelations) => q.id === dep.requiredQuest.id);
-          const depProgress = depQuest?.progress?.[0];
-          return !depProgress || depProgress.status !== "COMPLETED";
-        });
+        const hasIncompleteDeps = quest.dependsOn.some(
+          (dep: QuestDependency) => {
+            const depQuest = quests.find(
+              (q: QuestWithRelations) => q.id === dep.requiredQuest.id
+            );
+            const depProgress = depQuest?.progress?.[0];
+            return !depProgress || depProgress.status !== "COMPLETED";
+          }
+        );
 
         if (quest.dependsOn.length > 0 && hasIncompleteDeps) {
           computedStatus = "locked";

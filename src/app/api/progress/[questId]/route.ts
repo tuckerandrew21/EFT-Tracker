@@ -63,7 +63,9 @@ export async function PATCH(
         const completedDeps = await prisma.questProgress.count({
           where: {
             userId: session.user.id,
-            questId: { in: quest.dependsOn.map((d: QuestDependency) => d.requiredId) },
+            questId: {
+              in: quest.dependsOn.map((d: QuestDependency) => d.requiredId),
+            },
             status: "COMPLETED",
           },
         });
@@ -85,7 +87,10 @@ export async function PATCH(
 
     // Validate transition
     const allowedTransitions = VALID_TRANSITIONS[currentStatus] || [];
-    if (!allowedTransitions.includes(newStatus) && currentStatus !== newStatus) {
+    if (
+      !allowedTransitions.includes(newStatus) &&
+      currentStatus !== newStatus
+    ) {
       // Special case: allow LOCKED -> AVAILABLE for auto-unlock
       if (!(currentStatus === "LOCKED" && newStatus === "AVAILABLE")) {
         return NextResponse.json(
@@ -256,7 +261,10 @@ export async function GET(
     });
 
     if (!progress) {
-      return NextResponse.json({ error: "Progress not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Progress not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ progress });

@@ -90,8 +90,16 @@ describe("useProgress", () => {
         http.get("/api/progress", () => {
           return HttpResponse.json({
             progress: [
-              { questId: "quest_1", status: "COMPLETED", updatedAt: new Date().toISOString() },
-              { questId: "quest_2", status: "IN_PROGRESS", updatedAt: new Date().toISOString() },
+              {
+                questId: "quest_1",
+                status: "COMPLETED",
+                updatedAt: new Date().toISOString(),
+              },
+              {
+                questId: "quest_2",
+                status: "IN_PROGRESS",
+                updatedAt: new Date().toISOString(),
+              },
             ],
           });
         })
@@ -185,7 +193,13 @@ describe("useProgress", () => {
       server.use(
         http.get("/api/progress", () => {
           return HttpResponse.json({
-            progress: [{ questId: "quest_1", status: "AVAILABLE", updatedAt: new Date().toISOString() }],
+            progress: [
+              {
+                questId: "quest_1",
+                status: "AVAILABLE",
+                updatedAt: new Date().toISOString(),
+              },
+            ],
           });
         }),
         http.patch("/api/progress/:questId", () => {
@@ -258,7 +272,13 @@ describe("useProgress", () => {
       server.use(
         http.get("/api/progress", () => {
           return HttpResponse.json({
-            progress: [{ questId: "quest_1", status: "COMPLETED", updatedAt: new Date().toISOString() }],
+            progress: [
+              {
+                questId: "quest_1",
+                status: "COMPLETED",
+                updatedAt: new Date().toISOString(),
+              },
+            ],
           });
         })
       );

@@ -241,16 +241,13 @@ describe("/api/auth/register", () => {
       ];
 
       for (const email of invalidEmails) {
-        const request = new Request(
-          "http://localhost:3000/api/auth/register",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email,
-              password: "password123",
-            }),
-          }
-        );
+        const request = new Request("http://localhost:3000/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password: "password123",
+          }),
+        });
 
         const response = await POST(request);
         expect(response.status).toBe(400);

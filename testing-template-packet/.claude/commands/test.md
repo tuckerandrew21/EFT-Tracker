@@ -12,17 +12,18 @@ You are a testing assistant that automatically runs the appropriate unit tests b
    - Look at git status to find modified files that need testing
 
 2. **Find the corresponding test file:**
-   - For `code/core/customer_site/views.py` ’ look for `code/core/customer_site/tests/test_views.py`
-   - For `code/core/customer_site/dashboard/sign_in.py` ’ look for `code/core/customer_site/tests/test_sign_in.py` or `test_signin_*.py`
-   - For `code/core/static/js/*.js` files ’ look for tests that import or reference that functionality
+   - For `code/core/customer_site/views.py` ï¿½ look for `code/core/customer_site/tests/test_views.py`
+   - For `code/core/customer_site/dashboard/sign_in.py` ï¿½ look for `code/core/customer_site/tests/test_sign_in.py` or `test_signin_*.py`
+   - For `code/core/static/js/*.js` files ï¿½ look for tests that import or reference that functionality
    - Check if test file exists using glob/grep
 
 3. **Determine test scope:**
-   - If specific test file found ’ run that file
-   - If multiple related test files found ’ run all of them
-   - If no specific tests found ’ run all tests in `code/core/customer_site/tests/` (excluding playwright)
+   - If specific test file found ï¿½ run that file
+   - If multiple related test files found ï¿½ run all of them
+   - If no specific tests found ï¿½ run all tests in `code/core/customer_site/tests/` (excluding playwright)
 
 4. **Execute tests using Docker:**
+
    ```bash
    powershell -Command "docker exec wiseloan-core-core-1 pytest [TEST_PATH] -v -m 'not playwright' --tb=short"
    ```
@@ -36,16 +37,19 @@ You are a testing assistant that automatically runs the appropriate unit tests b
 
 **User says:** "run unit tests for this code" (with views.py selected)
 **You do:**
+
 - Find test_views.py or related tests
 - Run: `docker exec wiseloan-core-core-1 pytest .../tests/test_views.py -v`
 
 **User says:** "test the browser session detection"
 **You do:**
+
 - Find test_browser_session_detection.py
 - Run: `docker exec wiseloan-core-core-1 pytest .../tests/test_browser_session_detection.py -v`
 
 **User says:** "run tests"
 **You do:**
+
 - Check git status for modified files
 - Find tests for those files OR run all tests
 - Run with appropriate scope
@@ -61,11 +65,13 @@ You are a testing assistant that automatically runs the appropriate unit tests b
 ## Container Check
 
 Before running tests, verify container is running:
+
 ```bash
 docker ps --filter "name=wiseloan-core-core-1" --format "{{.Status}}"
 ```
 
 If not running, start it:
+
 ```bash
 docker-compose up -d
 ```

@@ -5,6 +5,7 @@ Template for creating custom Model Context Protocol (MCP) servers in Node.js/Typ
 ## What is an MCP Server?
 
 An MCP server provides tools, resources, and prompts that Claude Code can use to interact with external systems. This allows Claude to:
+
 - Call APIs
 - Query databases
 - Read files
@@ -188,13 +189,13 @@ Always handle errors gracefully:
 try {
   // Tool logic
   return {
-    content: [{ type: 'text', text: 'Success' }],
+    content: [{ type: "text", text: "Success" }],
   };
 } catch (error) {
   return {
     content: [
       {
-        type: 'text',
+        type: "text",
         text: `Error: ${error.message}`,
       },
     ],
@@ -210,7 +211,7 @@ Access environment variables from Claude Code configuration:
 ```typescript
 const apiKey = process.env.API_KEY;
 if (!apiKey) {
-  throw new Error('API_KEY environment variable not set');
+  throw new Error("API_KEY environment variable not set");
 }
 ```
 
@@ -232,6 +233,7 @@ Configure in `.mcp.json`:
 ```
 
 Then set in your shell:
+
 ```bash
 export API_KEY="your-api-key"
 ```

@@ -3,7 +3,10 @@ import { http, HttpResponse } from "msw";
 const API_BASE = "/api";
 
 // Simulated user store for tests
-const mockUsers = new Map<string, { id: string; email: string; password: string; name: string }>();
+const mockUsers = new Map<
+  string,
+  { id: string; email: string; password: string; name: string }
+>();
 
 // Pre-populate with test user
 mockUsers.set("qa@test.com", {
@@ -94,7 +97,8 @@ export const authHandlers = [
 
   // GET /api/auth/session - Get current session
   http.get(`${API_BASE}/auth/session`, ({ request }) => {
-    const isAuthenticated = request.headers.get("x-test-authenticated") === "true";
+    const isAuthenticated =
+      request.headers.get("x-test-authenticated") === "true";
 
     if (!isAuthenticated) {
       return HttpResponse.json({});

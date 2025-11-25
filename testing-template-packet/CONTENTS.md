@@ -25,6 +25,7 @@ testing-template-packet/
 ### Core Documentation
 
 #### README.md
+
 - **Purpose:** Main entry point and overview
 - **Contains:**
   - What's included in the package
@@ -37,6 +38,7 @@ testing-template-packet/
 - **Read first:** Yes
 
 #### SETUP-CHECKLIST.md
+
 - **Purpose:** Step-by-step setup guide
 - **Contains:**
   - Pre-setup requirements
@@ -49,6 +51,7 @@ testing-template-packet/
 - **Use when:** Installing this template in a project
 
 #### QUICK-REFERENCE.md
+
 - **Purpose:** Quick command reference card
 - **Contains:**
   - Common test commands
@@ -63,6 +66,7 @@ testing-template-packet/
 - **Tip:** Print and keep handy!
 
 #### CONTENTS.md (This File)
+
 - **Purpose:** Package inventory and file descriptions
 - **Contains:**
   - Complete file listing
@@ -75,6 +79,7 @@ testing-template-packet/
 ### Configuration Files
 
 #### pytest.ini.example
+
 - **Purpose:** Example pytest configuration
 - **Contains:**
   - Django settings configuration
@@ -90,6 +95,7 @@ testing-template-packet/
 ### Claude Code Integration
 
 #### .claude/commands/test.md
+
 - **Purpose:** Automated test execution slash command
 - **Contains:**
   - Test discovery logic
@@ -106,6 +112,7 @@ testing-template-packet/
 ### Documentation
 
 #### docs/TESTING.md
+
 - **Purpose:** Comprehensive testing guide
 - **Contains:**
   - Prerequisites
@@ -134,6 +141,7 @@ testing-template-packet/
 ### Test Examples
 
 #### tests/test_example.py
+
 - **Purpose:** Example test file showing best practices
 - **Contains:**
   - Unit test class structure
@@ -153,6 +161,7 @@ testing-template-packet/
 ## 🎯 Getting Started Path
 
 ### For First-Time Setup:
+
 1. Read `README.md` (overview)
 2. Follow `SETUP-CHECKLIST.md` (step-by-step)
 3. Customize `pytest.ini.example`
@@ -161,11 +170,13 @@ testing-template-packet/
 6. Use `tests/test_example.py` as template
 
 ### For Daily Use:
+
 1. Use `/test` command (Claude Code)
 2. Reference `QUICK-REFERENCE.md` for commands
 3. Refer to `docs/TESTING.md` for detailed help
 
 ### For Team Onboarding:
+
 1. Share `docs/TESTING.md`
 2. Show `QUICK-REFERENCE.md`
 3. Demo `/test` command
@@ -173,16 +184,19 @@ testing-template-packet/
 ## 🔧 Customization Requirements
 
 ### Must Customize:
+
 - ✅ Container names (in all files)
 - ✅ Test directory paths (in all files)
 - ✅ App names (in pytest.ini and docs)
 
 ### Should Customize:
+
 - ⚠️ Pytest markers (add project-specific ones)
 - ⚠️ File-to-test mapping patterns
 - ⚠️ Docker compose commands (if using custom setup)
 
 ### Optional Customization:
+
 - 💡 Coverage thresholds
 - 💡 Additional pytest plugins
 - 💡 CI/CD specific commands
@@ -190,34 +204,37 @@ testing-template-packet/
 
 ## 📊 File Sizes (Approximate)
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| README.md | ~200 | Overview & guide |
-| SETUP-CHECKLIST.md | ~250 | Setup instructions |
-| QUICK-REFERENCE.md | ~180 | Command reference |
-| CONTENTS.md | ~150 | This inventory |
-| pytest.ini.example | ~70 | Pytest config |
-| .claude/commands/test.md | ~70 | Slash command |
-| docs/TESTING.md | ~200 | Full testing guide |
-| tests/test_example.py | ~210 | Example tests |
+| File                     | Lines | Purpose            |
+| ------------------------ | ----- | ------------------ |
+| README.md                | ~200  | Overview & guide   |
+| SETUP-CHECKLIST.md       | ~250  | Setup instructions |
+| QUICK-REFERENCE.md       | ~180  | Command reference  |
+| CONTENTS.md              | ~150  | This inventory     |
+| pytest.ini.example       | ~70   | Pytest config      |
+| .claude/commands/test.md | ~70   | Slash command      |
+| docs/TESTING.md          | ~200  | Full testing guide |
+| tests/test_example.py    | ~210  | Example tests      |
 
 **Total:** ~1,300 lines of documentation and examples
 
 ## 🎓 Learning Path
 
 ### Beginner:
+
 1. Start with `README.md`
 2. Follow `SETUP-CHECKLIST.md`
 3. Run examples from `QUICK-REFERENCE.md`
 4. Study `tests/test_example.py`
 
 ### Intermediate:
+
 1. Customize `pytest.ini.example`
 2. Modify `.claude/commands/test.md`
 3. Add custom markers and patterns
 4. Write project-specific tests
 
 ### Advanced:
+
 1. Set up CI/CD integration
 2. Configure coverage reporting
 3. Add performance testing
@@ -237,6 +254,7 @@ testing-template-packet/
 ## 🔄 Updates and Maintenance
 
 ### When to Update:
+
 - Django version changes
 - pytest version changes
 - Project structure changes
@@ -244,6 +262,7 @@ testing-template-packet/
 - CI/CD pipeline changes
 
 ### What to Update:
+
 - Version numbers in docs
 - Command syntax if tools change
 - Paths when structure changes
@@ -252,12 +271,14 @@ testing-template-packet/
 ## 📞 Support
 
 All files include:
+
 - Clear documentation
 - Examples
 - Common issues and solutions
 - Tips for customization
 
 For project-specific help, refer to:
+
 - `docs/TESTING.md` - Troubleshooting section
 - `SETUP-CHECKLIST.md` - Common issues during setup
 - `QUICK-REFERENCE.md` - Quick fixes

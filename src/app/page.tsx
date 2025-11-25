@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  GitBranch,
-  CheckCircle2,
-  Users,
-  Map,
-  Zap,
-  Shield,
-} from "lucide-react";
+import { GitBranch, CheckCircle2, Users, Map, Zap, Shield } from "lucide-react";
 
 const features = [
   {
@@ -31,8 +24,7 @@ const features = [
   {
     icon: Map,
     title: "Map Filtering",
-    description:
-      "Filter quests by map location to plan efficient raid routes.",
+    description: "Filter quests by map location to plan efficient raid routes.",
   },
   {
     icon: Zap,

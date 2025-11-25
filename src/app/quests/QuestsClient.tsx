@@ -43,10 +43,9 @@ export function QuestsClient() {
   useEffect(() => {
     if (unlockedQuests.length > 0) {
       const count = unlockedQuests.length;
-      toast.success(
-        `${count} quest${count > 1 ? "s" : ""} unlocked!`,
-        { description: "New quests are now available." }
-      );
+      toast.success(`${count} quest${count > 1 ? "s" : ""} unlocked!`, {
+        description: "New quests are now available.",
+      });
       clearUnlocked();
       refetch();
     }

@@ -5,6 +5,7 @@ Create tests for existing code following project testing standards.
 ## Instructions
 
 Ask the user for:
+
 1. File path to test
 2. Test type (unit, integration, e2e)
 3. Specific functionality to test
@@ -162,38 +163,38 @@ describe('ComponentName', () => {
 ## Integration Test Template
 
 ```typescript
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import request from 'supertest';
-import app from '@/server';
-import { db } from '@/db';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import request from "supertest";
+import app from "@/server";
+import { db } from "@/db";
 
-describe('User API Integration', () => {
+describe("User API Integration", () => {
   let authToken: string;
   let testUserId: string;
 
   beforeAll(async () => {
     // Setup: Create test user, get auth token
     const response = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'test@example.com', password: 'password' });
+      .post("/api/auth/login")
+      .send({ email: "test@example.com", password: "password" });
     authToken = response.body.token;
   });
 
   afterAll(async () => {
     // Cleanup: Delete test data
-    await db.delete(users).where(eq(users.email, 'test@example.com'));
+    await db.delete(users).where(eq(users.email, "test@example.com"));
   });
 
-  describe('POST /api/users', () => {
-    it('creates a new user', async () => {
+  describe("POST /api/users", () => {
+    it("creates a new user", async () => {
       const userData = {
-        email: 'newuser@example.com',
-        name: 'New User'
+        email: "newuser@example.com",
+        name: "New User",
       };
 
       const response = await request(app)
-        .post('/api/users')
-        .set('Authorization', `Bearer ${authToken}`)
+        .post("/api/users")
+        .set("Authorization", `Bearer ${authToken}`)
         .send(userData)
         .expect(201);
 
@@ -201,42 +202,42 @@ describe('User API Integration', () => {
       testUserId = response.body.data.id;
     });
 
-    it('returns 400 for invalid data', async () => {
+    it("returns 400 for invalid data", async () => {
       const response = await request(app)
-        .post('/api/users')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ email: 'invalid' })
+        .post("/api/users")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({ email: "invalid" })
         .expect(400);
 
       expect(response.body.error).toBeDefined();
     });
 
-    it('returns 409 for duplicate email', async () => {
+    it("returns 409 for duplicate email", async () => {
       await request(app)
-        .post('/api/users')
-        .set('Authorization', `Bearer ${authToken}`)
+        .post("/api/users")
+        .set("Authorization", `Bearer ${authToken}`)
         .send({
-          email: 'newuser@example.com',
-          name: 'Duplicate'
+          email: "newuser@example.com",
+          name: "Duplicate",
         })
         .expect(409);
     });
   });
 
-  describe('GET /api/users/:id', () => {
-    it('retrieves user by id', async () => {
+  describe("GET /api/users/:id", () => {
+    it("retrieves user by id", async () => {
       const response = await request(app)
         .get(`/api/users/${testUserId}`)
-        .set('Authorization', `Bearer ${authToken}`)
+        .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.data.id).toBe(testUserId);
     });
 
-    it('returns 404 for non-existent user', async () => {
+    it("returns 404 for non-existent user", async () => {
       await request(app)
-        .get('/api/users/00000000-0000-0000-0000-000000000000')
-        .set('Authorization', `Bearer ${authToken}`)
+        .get("/api/users/00000000-0000-0000-0000-000000000000")
+        .set("Authorization", `Bearer ${authToken}`)
         .expect(404);
     });
   });
@@ -246,44 +247,44 @@ describe('User API Integration', () => {
 ## E2E Test Template (Playwright)
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('User Registration Flow', () => {
+test.describe("User Registration Flow", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/register');
+    await page.goto("/register");
   });
 
-  test('completes registration successfully', async ({ page }) => {
+  test("completes registration successfully", async ({ page }) => {
     // Fill form
-    await page.fill('input[name="email"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'SecurePass123!');
-    await page.fill('input[name="confirmPassword"]', 'SecurePass123!');
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "SecurePass123!");
+    await page.fill('input[name="confirmPassword"]', "SecurePass123!");
 
     // Submit
     await page.click('button[type="submit"]');
 
     // Verify success
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('h1')).toContainText('Welcome');
+    await expect(page).toHaveURL("/dashboard");
+    await expect(page.locator("h1")).toContainText("Welcome");
   });
 
-  test('shows validation errors', async ({ page }) => {
+  test("shows validation errors", async ({ page }) => {
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('.error')).toContainText('Email is required');
+    await expect(page.locator(".error")).toContainText("Email is required");
   });
 
-  test('handles server errors gracefully', async ({ page }) => {
+  test("handles server errors gracefully", async ({ page }) => {
     // Mock API error
-    await page.route('/api/register', route => {
-      route.fulfill({ status: 500, body: 'Server error' });
+    await page.route("/api/register", (route) => {
+      route.fulfill({ status: 500, body: "Server error" });
     });
 
-    await page.fill('input[name="email"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'SecurePass123!');
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "SecurePass123!");
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('.error')).toBeVisible();
+    await expect(page.locator(".error")).toBeVisible();
   });
 });
 ```
@@ -308,6 +309,7 @@ test.describe('User Registration Flow', () => {
 ## Confirm with User
 
 After generating tests, show:
+
 - Test file path
 - Number of test cases created
 - Coverage areas (rendering, interactions, errors, edge cases)

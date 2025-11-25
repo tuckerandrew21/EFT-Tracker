@@ -5,6 +5,7 @@ This project uses [pre-commit](https://pre-commit.com/) to automatically run cod
 ## What are Pre-commit Hooks?
 
 Pre-commit hooks are scripts that run automatically before you commit code. They help:
+
 - Catch bugs and issues early
 - Enforce code quality standards
 - Prevent committing secrets or sensitive data
@@ -16,18 +17,21 @@ Pre-commit hooks are scripts that run automatically before you commit code. They
 ### Installation
 
 **Node.js/npm projects:**
+
 ```bash
 npm install -D pre-commit
 npx pre-commit install
 ```
 
 **Python projects:**
+
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
 **Install commit message hook:**
+
 ```bash
 pre-commit install --hook-type commit-msg
 ```
@@ -35,6 +39,7 @@ pre-commit install --hook-type commit-msg
 ### First Run
 
 Run on all files to ensure everything passes:
+
 ```bash
 npx pre-commit run --all-files  # Node.js
 # or
@@ -44,6 +49,7 @@ pre-commit run --all-files      # Python
 ## Configured Hooks
 
 ### General File Checks
+
 - **check-added-large-files** - Prevent files >500KB (excluding lock files)
 - **check-case-conflict** - Detect case-sensitive filename conflicts
 - **end-of-file-fixer** - Ensure files end with newline
@@ -55,11 +61,13 @@ pre-commit run --all-files      # Python
 - **mixed-line-ending** - Enforce LF line endings
 
 ### Security
+
 - **detect-secrets** - Scan for hardcoded secrets/credentials
   - Baseline file: `.secrets.baseline`
   - Update baseline: `detect-secrets scan --baseline .secrets.baseline`
 
 ### TypeScript/JavaScript
+
 - **ESLint** - Linting with auto-fix
   - Configured for TypeScript
   - Max warnings: 0 (fails on warnings)
@@ -69,6 +77,7 @@ pre-commit run --all-files      # Python
 - **Run Tests** - Optional test execution (disabled by default)
 
 ### Python
+
 - **Black** - Code formatting (line length: 100)
 - **Ruff** - Fast linting with auto-fix
 - **mypy** - Type checking (strict mode)
@@ -76,19 +85,23 @@ pre-commit run --all-files      # Python
 - **Bandit** - Security issue detection
 
 ### Markdown
+
 - **markdownlint** - Markdown linting with auto-fix
 
 ### Commit Messages
+
 - **Conventional Commits** - Enforces commit message format
   - Format: `type(scope): subject`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
   - Example: `feat(auth): add OAuth2 support`
 
 ### Docker & Shell
+
 - **hadolint** - Dockerfile linting
 - **shellcheck** - Shell script linting
 
 ### Development
+
 - **check-todos** - Reports TODO/FIXME comments (warning only)
 
 ## Usage
@@ -96,6 +109,7 @@ pre-commit run --all-files      # Python
 ### Normal Commit Flow
 
 Hooks run automatically:
+
 ```bash
 git add .
 git commit -m "feat: add new feature"
@@ -142,7 +156,7 @@ repos:
     rev: v8.56.0
     hooks:
       - id: eslint
-        exclude: ^legacy/  # Skip legacy code
+        exclude: ^legacy/ # Skip legacy code
 ```
 
 ### Enable Test Hook
@@ -153,7 +167,7 @@ By default, tests don't run on every commit (too slow). To enable:
 - repo: local
   hooks:
     - id: run-tests
-      always_run: true  # Change false to true
+      always_run: true # Change false to true
 ```
 
 ### Skip in CI
@@ -203,27 +217,30 @@ npm install -D eslint-config-prettier
 ```
 
 Add to `.eslintrc.js`:
+
 ```javascript
 module.exports = {
   extends: [
     // ... other configs
-    'prettier' // Must be last
-  ]
+    "prettier", // Must be last
+  ],
 };
 ```
 
 ### Hook Too Slow
 
 **Option 1:** Skip slow hooks for local commits:
+
 ```yaml
 - id: run-tests
   always_run: false
 ```
 
 **Option 2:** Run only on specific branches:
+
 ```yaml
 - id: run-tests
-  stages: [push]  # Only run on push, not commit
+  stages: [push] # Only run on push, not commit
 ```
 
 **Option 3:** Use `--no-verify` sparingly (not recommended)
@@ -247,11 +264,13 @@ detect-secrets scan --baseline .secrets.baseline --update
 Ensure your commit message follows Conventional Commits:
 
 **❌ Invalid:**
+
 ```
 Added new feature
 ```
 
 **✅ Valid:**
+
 ```
 feat: add user authentication
 feat(api): add rate limiting to endpoints
@@ -270,6 +289,7 @@ npx pre-commit install
 ```
 
 If issues persist, install Python version:
+
 ```bash
 pip install pre-commit
 pre-commit install
@@ -280,6 +300,7 @@ pre-commit install
 ### 1. Run Before Committing
 
 Get in the habit of running checks manually:
+
 ```bash
 npm run lint
 npm test
@@ -289,6 +310,7 @@ npx pre-commit run --all-files
 ### 2. Fix Issues Incrementally
 
 Don't skip hooks to bypass issues. Fix them:
+
 ```bash
 # See what would run
 git diff --cached --name-only
@@ -314,6 +336,7 @@ npx pre-commit run --all-files  # Test updates
 ### 5. Team Alignment
 
 Ensure all team members:
+
 - Install hooks: `npx pre-commit install`
 - Run initial check: `npx pre-commit run --all-files`
 - Understand how to skip (for emergencies only)
@@ -321,6 +344,7 @@ Ensure all team members:
 ### 6. CI Integration
 
 Pre-commit.ci automatically:
+
 - Runs hooks on PRs
 - Auto-fixes issues
 - Updates hook versions weekly
@@ -332,11 +356,13 @@ Enable at: https://pre-commit.ci
 ### VS Code
 
 Install extensions:
+
 - **ESLint** - `dbaeumer.vscode-eslint`
 - **Prettier** - `esbenp.prettier-vscode`
 - **markdownlint** - `DavidAnson.vscode-markdownlint`
 
 Settings (`.vscode/settings.json`):
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -356,6 +382,7 @@ Settings (`.vscode/settings.json`):
 ### Vim / Neovim
 
 Use plugins:
+
 - **ALE** - Async linting
 - **coc.nvim** - LSP support
 - **vim-prettier** - Prettier integration
@@ -371,6 +398,7 @@ Use plugins:
 ## Support
 
 Issues with pre-commit hooks? Check:
+
 1. This README (troubleshooting section)
 2. [Pre-commit GitHub Issues](https://github.com/pre-commit/pre-commit/issues)
 3. Project GitHub Discussions

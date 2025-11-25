@@ -5,6 +5,7 @@ Create a new React component following project standards.
 ## Instructions
 
 Ask the user for:
+
 1. Component name (PascalCase)
 2. Component type (page, feature component, UI component)
 3. Required props
@@ -88,6 +89,7 @@ export function ComponentName({ prop1, prop2, className }: ComponentNameProps) {
 ## Also Create
 
 1. **Test File** → `ComponentName.test.tsx`
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 import { ComponentName } from './ComponentName';
@@ -107,14 +109,16 @@ describe('ComponentName', () => {
 ```
 
 2. **Export from index** (if in components directory)
-Update `src/components/index.ts`:
+   Update `src/components/index.ts`:
+
 ```typescript
-export { ComponentName } from './ComponentName';
+export { ComponentName } from "./ComponentName";
 ```
 
 ## Confirm with User
 
 After generating files, show:
+
 - File paths created
 - Ask if they want to add any additional functionality
 - Ask if they want to create a Storybook story (if project uses Storybook)

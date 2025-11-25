@@ -16,15 +16,15 @@ This document outlines the coding conventions, best practices, and standards for
 
 Consistent naming conventions make the codebase easier to navigate and understand.
 
-| Type | Convention | Example |
-|------|------------|---------|
-| React Components | PascalCase | `UserDashboard.tsx` |
-| Pages | PascalCase | `About.tsx`, `Index.tsx` |
-| Utilities | camelCase | `formatDate.ts` |
-| Hooks | camelCase with `use` prefix | `useAuth.ts` |
-| Contexts | PascalCase with Context suffix | `AuthContext.tsx` |
-| Types | PascalCase | `User.ts` |
-| Constants | SCREAMING_SNAKE_CASE | `API_URL.ts` |
+| Type             | Convention                     | Example                  |
+| ---------------- | ------------------------------ | ------------------------ |
+| React Components | PascalCase                     | `UserDashboard.tsx`      |
+| Pages            | PascalCase                     | `About.tsx`, `Index.tsx` |
+| Utilities        | camelCase                      | `formatDate.ts`          |
+| Hooks            | camelCase with `use` prefix    | `useAuth.ts`             |
+| Contexts         | PascalCase with Context suffix | `AuthContext.tsx`        |
+| Types            | PascalCase                     | `User.ts`                |
+| Constants        | SCREAMING_SNAKE_CASE           | `API_URL.ts`             |
 
 ## Component Structure
 
@@ -95,25 +95,25 @@ Organize imports in this order for consistency:
 
 ```typescript
 // 1. React and core libraries
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 // 2. Third-party UI libraries
-import { Button } from '@radix-ui/react-button';
+import { Button } from "@radix-ui/react-button";
 
 // 3. Local components (aliased)
-import { Header } from '@/components/Header';
-import { Card } from '@/components/ui/Card';
+import { Header } from "@/components/Header";
+import { Card } from "@/components/ui/Card";
 
 // 4. Utilities and helpers (aliased)
-import { cn } from '@/lib/utils';
-import { formatDate } from '@/lib/date';
+import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/date";
 
 // 5. Types (aliased)
-import type { User } from '@/types/user';
+import type { User } from "@/types/user";
 
 // 6. Styles (if any)
-import './Component.css';
+import "./Component.css";
 ```
 
 ## TypeScript Best Practices
@@ -129,7 +129,7 @@ interface User {
 }
 
 // ✅ Good: Use type for unions and intersections
-type Status = 'pending' | 'success' | 'error';
+type Status = "pending" | "success" | "error";
 type UserWithStatus = User & { status: Status };
 ```
 
@@ -146,19 +146,19 @@ function getUser(id: string): Promise<User> {
 
 ```typescript
 // ✅ Good: Use const assertions for literal types
-const STATUSES = ['pending', 'success', 'error'] as const;
-type Status = typeof STATUSES[number];
+const STATUSES = ["pending", "success", "error"] as const;
+type Status = (typeof STATUSES)[number];
 ```
 
 ### Avoid 'any'
 
 ```typescript
 // ❌ Bad: Using 'any'
-function processData(data: any) { } // Avoid
+function processData(data: any) {} // Avoid
 
 // ✅ Good: Use 'unknown' and type guards
 function processData(data: unknown) {
-  if (typeof data === 'string') {
+  if (typeof data === "string") {
     // Now TypeScript knows data is string
   }
 }
@@ -169,6 +169,7 @@ function processData(data: unknown) {
 ### Environment Variables & Secrets
 
 **Rules:**
+
 - Never commit secrets to git
 - Use `.env` files for local development
 - Add `.env` to `.gitignore`
@@ -176,6 +177,7 @@ function processData(data: unknown) {
 - Use environment variables for all sensitive data
 
 **Example .env.example:**
+
 ```env
 # Database
 DATABASE_URL=postgresql://username:password@localhost:5432/dbname
@@ -193,7 +195,7 @@ API_SECRET=your-api-secret-here
 
 ```typescript
 // ✅ Good: Hash passwords with bcrypt
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 // When creating user
 const saltRounds = 10;
@@ -204,6 +206,7 @@ const isValid = await bcrypt.compare(password, passwordHash);
 ```
 
 **Rules:**
+
 - Never store plain text passwords
 - Use bcrypt or argon2 for hashing
 - Use minimum 10 salt rounds for bcrypt
@@ -213,14 +216,15 @@ const isValid = await bcrypt.compare(password, passwordHash);
 
 ```typescript
 // ✅ Good: Use parameterized queries (Drizzle ORM)
-const user = await db.select()
+const user = await db
+  .select()
   .from(users)
   .where(eq(users.email, email))
   .limit(1);
 
 // ✅ Good: Use Prisma
 const user = await prisma.user.findUnique({
-  where: { email }
+  where: { email },
 });
 
 // ❌ Bad: String concatenation
@@ -245,13 +249,13 @@ const sanitized = DOMPurify.sanitize(untrustedHTML);
 
 ```typescript
 // ✅ Good: Verify JWT tokens
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 // Create token
 const token = jwt.sign(
   { userId: user.id, email: user.email },
   process.env.JWT_SECRET!,
-  { expiresIn: '7d' }
+  { expiresIn: "7d" }
 );
 
 // Verify token
@@ -259,15 +263,15 @@ const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
 
 // ✅ Good: Protect routes
 export const requireAuth = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    res.status(401).json({ error: "Invalid token" });
   }
 };
 ```
@@ -276,12 +280,12 @@ export const requireAuth = (req, res, next) => {
 
 ```typescript
 // ✅ Good: Use Zod for validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const userSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  name: z.string().min(1, 'Name is required'),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().min(1, "Name is required"),
 });
 
 // Validate
@@ -297,17 +301,17 @@ if (!result.success) {
 
 ```typescript
 // test/utils/formatDate.test.ts
-import { describe, it, expect } from 'vitest';
-import { formatDate } from '@/lib/formatDate';
+import { describe, it, expect } from "vitest";
+import { formatDate } from "@/lib/formatDate";
 
-describe('formatDate', () => {
-  it('formats date in MM/DD/YYYY format', () => {
-    const date = new Date('2024-01-15');
-    expect(formatDate(date)).toBe('01/15/2024');
+describe("formatDate", () => {
+  it("formats date in MM/DD/YYYY format", () => {
+    const date = new Date("2024-01-15");
+    expect(formatDate(date)).toBe("01/15/2024");
   });
 
-  it('handles invalid dates', () => {
-    expect(formatDate(null)).toBe('Invalid date');
+  it("handles invalid dates", () => {
+    expect(formatDate(null)).toBe("Invalid date");
   });
 });
 ```
@@ -338,23 +342,21 @@ describe('Button', () => {
 
 ```typescript
 // test/api/auth.test.ts
-import { describe, it, expect } from 'vitest';
-import request from 'supertest';
-import app from '../server';
+import { describe, it, expect } from "vitest";
+import request from "supertest";
+import app from "../server";
 
-describe('POST /api/auth/register', () => {
-  it('creates a new user', async () => {
-    const response = await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        password: 'Password123!',
-        name: 'Test User'
-      });
+describe("POST /api/auth/register", () => {
+  it("creates a new user", async () => {
+    const response = await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "Password123!",
+      name: "Test User",
+    });
 
     expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('user');
-    expect(response.body.user.email).toBe('test@example.com');
+    expect(response.body).toHaveProperty("user");
+    expect(response.body.user.email).toBe("test@example.com");
   });
 });
 ```
@@ -364,6 +366,7 @@ describe('POST /api/auth/register', () => {
 Use this checklist when reviewing code:
 
 ### Functionality
+
 - [ ] Code implements the requirements
 - [ ] All acceptance criteria met
 - [ ] Edge cases handled
@@ -371,6 +374,7 @@ Use this checklist when reviewing code:
 - [ ] No obvious bugs
 
 ### Code Quality
+
 - [ ] Code is readable and well-organized
 - [ ] Functions are small and focused
 - [ ] Variable and function names are descriptive
@@ -379,12 +383,14 @@ Use this checklist when reviewing code:
 - [ ] Comments added for complex logic
 
 ### TypeScript
+
 - [ ] No 'any' types (use 'unknown' + type guards)
 - [ ] Proper type definitions
 - [ ] Interfaces for object shapes
 - [ ] Return types specified for functions
 
 ### Security
+
 - [ ] No secrets committed
 - [ ] Input validation implemented
 - [ ] SQL injection prevented (parameterized queries)
@@ -392,6 +398,7 @@ Use this checklist when reviewing code:
 - [ ] Authentication/authorization checked
 
 ### Testing
+
 - [ ] Unit tests added for new functions
 - [ ] Component tests added for new components
 - [ ] Integration tests added for API endpoints
@@ -399,24 +406,28 @@ Use this checklist when reviewing code:
 - [ ] Edge cases covered
 
 ### Performance
+
 - [ ] No unnecessary re-renders
 - [ ] Database queries optimized
 - [ ] Large lists virtualized if needed
 - [ ] Images optimized
 
 ### Accessibility
+
 - [ ] Semantic HTML used
 - [ ] Aria labels added where needed
 - [ ] Keyboard navigation works
 - [ ] Color contrast meets WCAG standards
 
 ### Documentation
+
 - [ ] README updated if needed
 - [ ] JSDoc comments added for public APIs
 - [ ] Complex logic explained in comments
 - [ ] Environment variables documented
 
 ### Git
+
 - [ ] Commit messages follow conventions
 - [ ] Branch name follows conventions
 - [ ] PR description is clear and complete
@@ -425,23 +436,26 @@ Use this checklist when reviewing code:
 ## State Management
 
 ### Local State
+
 ```typescript
 // Use useState for component-specific state
 const [isOpen, setIsOpen] = useState(false);
 ```
 
 ### Global State
+
 ```typescript
 // Use React Context for app-wide state
 const { user, login, logout } = useAuth();
 ```
 
 ### Server State
+
 ```typescript
 // Use TanStack Query for server data
 const { data, isLoading } = useQuery({
-  queryKey: ['users'],
-  queryFn: () => api.get('/users'),
+  queryKey: ["users"],
+  queryFn: () => api.get("/users"),
 });
 ```
 
@@ -473,10 +487,10 @@ app.use((err, req, res, next) => {
 
   res.status(err.status || 500).json({
     error: {
-      message: err.message || 'Internal server error',
+      message: err.message || "Internal server error",
       code: err.code,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-    }
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    },
   });
 });
 ```
@@ -486,10 +500,10 @@ app.use((err, req, res, next) => {
 ```typescript
 // ✅ Good: Frontend error handling
 try {
-  const data = await api.post('/endpoint', payload);
+  const data = await api.post("/endpoint", payload);
   return { data };
 } catch (error) {
-  console.error('Error:', error);
+  console.error("Error:", error);
   return { error: error.message };
 }
 ```
@@ -508,6 +522,7 @@ try {
 ## Questions or Suggestions?
 
 If you have questions about these standards or suggestions for improvements, please:
+
 - Open an issue for discussion
 - Bring it up in team meetings
 - Submit a PR with proposed changes

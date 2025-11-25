@@ -3,6 +3,7 @@
 > A comprehensive guide for managing the SafeQuote.io React project using GitHub's tools and workflows.
 
 ## Table of Contents
+
 - [✅ Setup Complete](#-setup-complete)
 - [Quick Start](#quick-start)
 - [Project Structure](#project-structure)
@@ -30,32 +31,40 @@
 ### 📊 Project Management Infrastructure (All Merged!)
 
 #### 1. Labels System (20 Labels Created)
+
 Complete label taxonomy for organizing work:
 
 **Priority Labels:**
+
 - `priority: high` 🔴 - Critical, needs immediate attention
 - `priority: medium` 🟡 - Important but not urgent
 - `priority: low` 🟢 - Nice to have, low urgency
 
 **Type Labels:**
+
 - `type: feature` - New functionality
 - `type: bug` - Something isn't working
 - `enhancement` - Improvement to existing feature
 
 **Status Labels:**
+
 - `status: blocked` - Cannot proceed due to dependencies
 - `status: needs-review` - Awaiting product/client feedback
 
 **Phase Labels:**
+
 - `phase: 1` - Phase 1: Initial Build
 - `phase: 2` - Phase 2: Add Revenue
 - `phase: 3` - Phase 3: Scale
 
 **Client Labels:**
+
 - `client: visible` - User-facing feature or change
 
 #### 2. Issue & PR Templates
+
 Standardized templates for consistency:
+
 - ✅ **Feature Request Template** - With user stories & acceptance criteria
 - ✅ **Bug Report Template** - With reproduction steps & environment
 - ✅ **Epic Template** - For large bodies of work
@@ -64,23 +73,30 @@ Standardized templates for consistency:
 **Location**: `.github/ISSUE_TEMPLATE/` and `.github/pull_request_template.md`
 
 #### 3. Milestones
+
 Three-phase roadmap established:
+
 - ✅ **Phase 1: MVP Launch** - Due December 31, 2025 (7/12 issues completed - 58%)
 - ✅ **Phase 2: Revenue Features** - Due March 31, 2026
 - ✅ **Phase 3: Scale & Growth** - Due June 30, 2026
 
 #### 4. Status Reporting
+
 Weekly reporting infrastructure:
+
 - ✅ **Weekly Status Template** - Comprehensive format for consistent updates
 - ✅ **First Status Report** - Nov 17, 2025 baseline report created
 - ✅ **Status Reports Directory** - `.github/status-reports/` for archiving
 
 #### 5. Documentation
+
 Complete project documentation:
+
 - ✅ **CHANGELOG.md** - Comprehensive version history (0.1.0 → 0.3.0)
 - ✅ **PROJECT_MANAGEMENT_GUIDE.md** - Complete PM guide (this document)
 
 #### 6. Client Communication
+
 - ✅ **GitHub Discussions Enabled** - For announcements, demos, Q&A, and ideas
 
 ### 📈 Current Project Status
@@ -90,12 +106,14 @@ Complete project documentation:
 **Due Date**: December 31, 2025
 
 **Recent Wins:**
+
 - Fixed critical F-150 safety ratings bug (Issue #16)
 - Added insurance CTA feature (Issue #6)
 - Established complete PM infrastructure
 - Achieved 85% test coverage
 
 **Total Changes in Setup**:
+
 - 1,080+ lines of code and documentation
 - 10 files created
 - 9 documentation/template files
@@ -106,6 +124,7 @@ Complete project documentation:
 #### Quick Reference Commands
 
 **Daily Check-ins:**
+
 ```bash
 # View project board
 gh project view 16 --owner razorvision --web
@@ -118,6 +137,7 @@ gh issue list --label "status: needs-review"
 ```
 
 **Weekly Status:**
+
 ```bash
 # Create new status report
 cp .github/WEEKLY_STATUS_TEMPLATE.md .github/status-reports/$(date +%Y-%m-%d)-weekly-status.md
@@ -127,6 +147,7 @@ gh pr list --state merged --json number,title,mergedAt --jq 'map(select(.mergedA
 ```
 
 **Triage Issues:**
+
 ```bash
 # Add labels and milestone to issue
 gh issue edit <number> --add-label "priority: high,phase: 1" --milestone "Phase 1: MVP Launch"
@@ -136,6 +157,7 @@ gh issue list --milestone "Phase 1: MVP Launch"
 ```
 
 #### Essential Links
+
 - 📋 [Project Board](https://github.com/orgs/razorvision/projects/16) - Kanban board
 - 🎯 [Milestones](https://github.com/razorvision/safequote.io-React-Only/milestones) - Phase tracking
 - 💬 [Discussions](https://github.com/razorvision/safequote.io-React-Only/discussions) - Team communication
@@ -168,6 +190,7 @@ Now that setup is complete, here's your workflow:
 ## Quick Start
 
 ### Essential Commands
+
 ```bash
 # View project board
 gh project view 16 --owner razorvision --web
@@ -184,6 +207,7 @@ gh issue list --state closed --limit 10
 ```
 
 ### Key Links
+
 - **Project Board**: https://github.com/orgs/razorvision/projects/16
 - **Milestones**: https://github.com/razorvision/safequote.io-React-Only/milestones
 - **Issues**: https://github.com/razorvision/safequote.io-React-Only/issues
@@ -194,6 +218,7 @@ gh issue list --state closed --limit 10
 ## Project Structure
 
 ### Repository Organization
+
 ```
 safequote.io-React-Only/
 ├── .github/
@@ -215,13 +240,17 @@ safequote.io-React-Only/
 ## Labels System
 
 ### Priority Labels
+
 Use to indicate urgency and importance:
+
 - `priority: high` 🔴 - Critical, needs immediate attention
 - `priority: medium` 🟡 - Important but not urgent
 - `priority: low` 🟢 - Nice to have, low urgency
 
 ### Type Labels
+
 Categorize the nature of work:
+
 - `type: feature` - New functionality
 - `type: bug` - Something isn't working
 - `type: enhancement` - Improvement to existing feature
@@ -229,22 +258,28 @@ Categorize the nature of work:
 - `documentation` - Docs updates
 
 ### Status Labels
+
 Track current state:
+
 - `status: blocked` - Cannot proceed due to dependencies
 - `status: needs-review` - Awaiting product/client feedback
 - `good first issue` - Good for newcomers
 - `help wanted` - Extra attention needed
 
 ### Phase Labels
+
 Organize by project phase:
+
 - `phase: 1` - Phase 1: Initial Build
 - `phase: 2` - Phase 2: Add Revenue
 - `phase: 3` - Phase 3: Scale
 
 ### Client Labels
+
 - `client: visible` - User-facing changes that affect customer experience
 
 ### Applying Labels
+
 ```bash
 # Add labels to an issue
 gh issue edit 7 --add-label "priority: high,type: feature,phase: 1"
@@ -263,24 +298,28 @@ gh label list
 ### Current Milestones
 
 #### Phase 1: MVP Launch
+
 - **Due**: December 31, 2025
 - **Goal**: Core features for initial launch
 - **Key Features**: Safety ratings, vehicle search, insurance quotes
 - [View Milestone](https://github.com/razorvision/safequote.io-React-Only/milestone/1)
 
 #### Phase 2: Revenue Features
+
 - **Due**: March 31, 2026
 - **Goal**: Add monetization capabilities
 - **Key Features**: Affiliate integrations, email capture, partnerships
 - [View Milestone](https://github.com/razorvision/safequote.io-React-Only/milestone/2)
 
 #### Phase 3: Scale & Growth
+
 - **Due**: June 30, 2026
 - **Goal**: Scale the platform
 - **Key Features**: Blog/SEO, advanced comparisons, engagement tools
 - [View Milestone](https://github.com/razorvision/safequote.io-React-Only/milestone/3)
 
 ### Managing Milestones
+
 ```bash
 # Add issue to milestone
 gh issue edit 7 --milestone "Phase 1: MVP Launch"
@@ -299,11 +338,13 @@ gh api repos/razorvision/safequote.io-React-Only/milestones
 ### Creating Issues
 
 **Use Templates**: When creating issues via GitHub web interface, select appropriate template:
+
 - **Feature Request**: For new features or functionality
 - **Bug Report**: For bugs and issues
 - **Epic**: For large bodies of work spanning multiple issues
 
 **Via CLI**:
+
 ```bash
 # Create feature issue
 gh issue create --title "Feature Name" --body "Description" --label "type: feature,priority: medium,phase: 1"
@@ -319,14 +360,17 @@ gh issue create --title "[BUG] Description" --body "Details" --label "type: bug,
    - ❌ Bad: "Update page"
 
 2. **Acceptance Criteria**: Always include clear acceptance criteria
+
    ```markdown
    ## Acceptance Criteria
+
    - [ ] CTA button appears after rating is shown
    - [ ] Button styled consistently with design system
    - [ ] Button links to insurance quote flow
    ```
 
 3. **Link Related Issues**: Connect related work
+
    ```markdown
    Related to #5
    Blocks #10
@@ -350,42 +394,52 @@ gh issue create --title "[BUG] Description" --body "Details" --label "type: bug,
 4. **Request reviews**: Tag team members explicitly
 
 **Example PR Description**:
+
 ```markdown
 ## Description
+
 Adds insurance quote CTA after safety ratings display
 
 ## Type of Change
+
 - [x] New feature
 
 ## Related Issues
+
 Closes #6
 
 ## Changes Made
+
 - Added gradient CTA section below safety ratings
 - Implemented click handler to navigate to insurance flow
 - Added responsive styling
 
 ## Screenshots
+
 [Add screenshot]
 
 ## Testing
+
 - [x] Tested locally
 - [x] No console errors
 - [x] Mobile responsive
 
 ## Client-Facing Impact
+
 - [x] This change is visible to end users
 ```
 
 ### PR Review Process
 
 **As PM reviewing PRs**:
+
 1. Check business requirements against issue acceptance criteria
 2. Verify user-facing changes match design/mockups
 3. Test functionality from user perspective
 4. Don't review code quality (leave to technical reviewers)
 
 **Commands**:
+
 ```bash
 # List open PRs
 gh pr list
@@ -414,7 +468,9 @@ gh pr merge 28 --squash --delete-branch
 **Location**: Save to `.github/status-reports/YYYY-MM-DD-weekly-status.md`
 
 **Process**:
+
 1. Copy template
+
    ```bash
    cp .github/WEEKLY_STATUS_TEMPLATE.md .github/status-reports/2025-11-24-weekly-status.md
    ```
@@ -432,6 +488,7 @@ gh pr merge 28 --squash --delete-branch
    - Slack/Teams with summary
 
 **Gathering Data**:
+
 ```bash
 # Completed this week (adjust date)
 gh pr list --state merged --json number,title,mergedAt --jq 'map(select(.mergedAt > "2025-11-17"))'
@@ -448,6 +505,7 @@ gh issue list --milestone "Phase 1: MVP Launch" --json number,state
 ### Sprint Metrics
 
 Track these metrics in each status report:
+
 - **Velocity**: Issues completed per week
 - **Burndown**: Issues remaining in milestone
 - **Quality**: Test coverage, bugs opened vs closed
@@ -460,12 +518,14 @@ Track these metrics in each status report:
 ### GitHub Discussions
 
 Use for:
+
 - Weekly announcements
 - Feature demos
 - Q&A sessions
 - Idea gathering
 
 **Creating Discussions**:
+
 1. Go to [Discussions tab](https://github.com/razorvision/safequote.io-React-Only/discussions)
 2. Click "New discussion"
 3. Choose category:
@@ -475,20 +535,24 @@ Use for:
    - ❓ **Q&A**: Questions and answers
 
 **Example Weekly Update Post**:
+
 ```markdown
 Title: Weekly Update - Week of Nov 17, 2025
 
 Hi team! Here's our weekly progress update.
 
 ## This Week's Highlights
+
 - ✅ Fixed critical F-150 safety ratings bug
 - ✅ Added insurance quote CTA
 - ✅ Established PM processes
 
 ## Demo
+
 Check out the new insurance CTA: [staging link]
 
 ## Need Your Feedback
+
 Please review the CTA placement and copy. Does it feel natural after seeing safety ratings?
 
 Full report: [link to status report]
@@ -497,6 +561,7 @@ Full report: [link to status report]
 ### Email Updates
 
 For formal client communication:
+
 - **Subject**: "SafeQuote.io Weekly Update - [Date]"
 - **Body**: Summary with link to full GitHub status report
 - **Attachments**: Screenshots of key features
@@ -508,23 +573,27 @@ For formal client communication:
 ### For Product/Project Managers
 
 #### Daily
+
 - [ ] Check project board for blockers
 - [ ] Review and respond to issue comments
 - [ ] Approve or request changes on open PRs
 
 #### Weekly
+
 - [ ] Create and share weekly status report
 - [ ] Update milestone progress
 - [ ] Triage new issues (add labels, milestones, priorities)
 - [ ] Plan next week's priorities
 
 #### Sprint Start
+
 - [ ] Review backlog
 - [ ] Prioritize issues for sprint
 - [ ] Set sprint goals
 - [ ] Communicate expectations
 
 #### Sprint End
+
 - [ ] Demo completed features
 - [ ] Gather feedback
 - [ ] Close milestone or update dates
@@ -533,6 +602,7 @@ For formal client communication:
 ### Issue Triage Checklist
 
 When new issues are created:
+
 1. [ ] Add appropriate labels (type, priority, phase)
 2. [ ] Assign to milestone
 3. [ ] Add acceptance criteria if missing
@@ -543,6 +613,7 @@ When new issues are created:
 ### PR Merge Checklist
 
 Before merging PRs:
+
 1. [ ] All acceptance criteria met
 2. [ ] Tests passing
 3. [ ] No console errors
@@ -558,6 +629,7 @@ Before merging PRs:
 ### GitHub Actions (Future Enhancement)
 
 Consider automating:
+
 - **Auto-labeling**: Label PRs based on files changed
 - **Auto-milestone**: Add issues to current milestone
 - **Status checks**: Ensure tests pass before merge
@@ -567,6 +639,7 @@ Consider automating:
 ### Project Board Automation
 
 Enable in project settings:
+
 - Add new issues to "Backlog" column
 - Move to "In Progress" when PR opened
 - Move to "Done" when PR merged
@@ -595,16 +668,19 @@ A: Labels must be created first: `gh label create "name" --color "hex" --descrip
 ## Resources
 
 ### GitHub Documentation
+
 - [GitHub Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects)
 - [GitHub Milestones](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones)
 - [GitHub Discussions](https://docs.github.com/en/discussions)
 
 ### Templates
+
 - [Issue Templates](.github/ISSUE_TEMPLATE/)
 - [PR Template](.github/pull_request_template.md)
 - [Status Report Template](.github/WEEKLY_STATUS_TEMPLATE.md)
 
 ### Project Links
+
 - [CHANGELOG](../CHANGELOG.md)
 - [README](../README.md)
 - [Project Board](https://github.com/orgs/razorvision/projects/16)
@@ -614,6 +690,7 @@ A: Labels must be created first: `gh label create "name" --color "hex" --descrip
 ## Questions?
 
 For questions about this guide or project management workflows:
+
 - Open a [Discussion](https://github.com/razorvision/safequote.io-React-Only/discussions)
 - Contact the PM team
 - Refer to [GitHub Docs](https://docs.github.com)

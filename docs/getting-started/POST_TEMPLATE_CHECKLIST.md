@@ -61,6 +61,7 @@ Replace template content with your project information:
 **If starting with existing code:**
 
 - [ ] Copy `config.template.json` to `config.json`:
+
   ```bash
   cp .project-intake/config.template.json .project-intake/config.json
   ```
@@ -74,6 +75,7 @@ Replace template content with your project information:
   - [ ] Project board preferences
 
 - [ ] Validate configuration:
+
   ```bash
   node .project-intake/scripts/validate-config.cjs
   ```
@@ -89,6 +91,7 @@ Replace template content with your project information:
 
 - [ ] Review `.env.example` (if exists)
 - [ ] Create your own `.env.example` with required variables:
+
   ```env
   # Database
   DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
@@ -108,6 +111,7 @@ Replace template content with your project information:
 If using Claude Code for development:
 
 - [ ] Copy CLAUDE.md template to project root:
+
   ```bash
   cp .project-intake/templates/CLAUDE.md ./CLAUDE.md
   ```
@@ -130,11 +134,13 @@ If using Claude Code for development:
 ### 3.1 Install Pre-Commit Hooks
 
 **Mac/Linux/Git Bash:**
+
 ```bash
 bash .project-intake/scripts/setup-hooks.sh
 ```
 
 **Windows PowerShell:**
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .project-intake/scripts/setup-hooks.ps1
 ```
@@ -175,16 +181,19 @@ powershell -ExecutionPolicy Bypass -File .project-intake/scripts/setup-hooks.ps1
 ### 4.1 Create Labels
 
 **Using bash script:**
+
 ```bash
 bash setup-labels.sh
 ```
 
 **Or Windows batch:**
+
 ```cmd
 setup-labels.bat
 ```
 
 **Or manually via GitHub CLI:**
+
 ```bash
 # See README.md for full list of label commands
 gh label create "priority: high" --color "d73a4a"
@@ -237,11 +246,13 @@ gh api repos/:owner/:repo/milestones -f title="Phase 2: Enhancements" -f descrip
 ### 5.1 Install GitHub CLI
 
 **Check if installed:**
+
 ```bash
 gh --version
 ```
 
 **Install if needed:**
+
 - **Mac:** `brew install gh`
 - **Windows:** `winget install GitHub.cli`
 - **Linux:** See [GitHub CLI installation](https://github.com/cli/cli#installation)
@@ -363,23 +374,27 @@ Create a team onboarding document:
 # New Team Member Checklist
 
 ## Access
+
 - [ ] GitHub repository access
 - [ ] Project board access
 - [ ] Required API keys/credentials
 
 ## Tools Setup
+
 - [ ] Node.js 18+
 - [ ] GitHub CLI
 - [ ] Claude Code (optional)
 - [ ] Code editor configured
 
 ## Documentation Review
+
 - [ ] Read README.md
 - [ ] Review CODING_STANDARDS.md
 - [ ] Understand BRANCH_STRATEGY.md
 - [ ] Review project architecture
 
 ## First Tasks
+
 - [ ] Clone repository
 - [ ] Run local development environment
 - [ ] Pick up first good-first-issue
@@ -532,6 +547,7 @@ claude mcp list
 **Error:** Missing required fields or invalid format
 
 **Solution:**
+
 ```bash
 node .project-intake/scripts/validate-config.cjs
 # Read error messages and fix config.json accordingly
@@ -542,6 +558,7 @@ node .project-intake/scripts/validate-config.cjs
 **Error:** Can still commit to main directly
 
 **Solution:**
+
 ```bash
 # Reinstall hooks
 bash .project-intake/scripts/setup-hooks.sh  # Mac/Linux
@@ -558,6 +575,7 @@ type .git\hooks\pre-commit  # Windows
 **Error:** `gh` command not found or authentication errors
 
 **Solution:**
+
 ```bash
 # Install GitHub CLI first
 brew install gh  # Mac
@@ -575,6 +593,7 @@ gh repo view
 **Error:** Playwright MCP server not responding
 
 **Solution:**
+
 ```bash
 # Verify npx available
 npx --version
@@ -630,6 +649,7 @@ Before considering setup complete, verify:
 **Congratulations!** Your project is now set up with best practices and ready for development. 🎉
 
 **Next Steps:**
+
 1. Start building your first feature
 2. Onboard your team
 3. Begin tracking work on the project board

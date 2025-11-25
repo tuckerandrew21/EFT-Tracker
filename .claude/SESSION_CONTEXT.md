@@ -7,6 +7,7 @@
 **EFT Quest Tracker** - A web app to track Escape from Tarkov quest progress across all traders with dependency visualization and wiki integration.
 
 ### Core Features
+
 1. Quest progress tracking (not started / in progress / completed)
 2. Trader-organized views (Prapor, Therapist, Skier, Peacekeeper, Mechanic, Ragman, Jaeger, Fence, Lightkeeper)
 3. Quest dependency visualization
@@ -16,30 +17,30 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS, shadcn/ui |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Auth | NextAuth.js |
-| Hosting | Vercel (app), Supabase/Neon (db) |
+| Layer     | Technology                       |
+| --------- | -------------------------------- |
+| Framework | Next.js 14 (App Router)          |
+| Language  | TypeScript                       |
+| Styling   | Tailwind CSS, shadcn/ui          |
+| Database  | PostgreSQL                       |
+| ORM       | Prisma                           |
+| Auth      | NextAuth.js                      |
+| Hosting   | Vercel (app), Supabase/Neon (db) |
 
 ## MCP Servers Configured
 
-| Server | Status |
-|--------|--------|
-| GitHub | ✅ Working |
-| Context7 | ✅ Working |
-| Brave Search | ✅ Configured |
-| Playwright | ✅ Fixed |
-| Memory | ✅ Ready |
-| Git | ✅ Ready |
-| Filesystem | ✅ Ready |
-| Docker | ✅ Ready |
-| SQLite | ✅ Ready |
-| Postgres | ⏸️ Need connection string |
+| Server       | Status                    |
+| ------------ | ------------------------- |
+| GitHub       | ✅ Working                |
+| Context7     | ✅ Working                |
+| Brave Search | ✅ Configured             |
+| Playwright   | ✅ Fixed                  |
+| Memory       | ✅ Ready                  |
+| Git          | ✅ Ready                  |
+| Filesystem   | ✅ Ready                  |
+| Docker       | ✅ Ready                  |
+| SQLite       | ✅ Ready                  |
+| Postgres     | ⏸️ Need connection string |
 
 ## Project Links
 

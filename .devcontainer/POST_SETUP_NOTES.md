@@ -9,17 +9,20 @@ The dev container has been reviewed and optimized. However, there's a critical i
 ### Problem: Windows Binary Files in Linux Container
 
 **Symptoms:**
+
 ```
 Error: Cannot find module '../lightningcss.linux-x64-msvc.node'
 rm: cannot remove 'node_modules/@next/swc-win32-x64-msvc/*.node': Input/output error
 ```
 
 **Root Cause:**
+
 - The `node_modules` directory is bind-mounted from the Windows host into the Linux container
 - Windows-specific binary files (`.node` files) are incompatible with Linux
 - File locking issues prevent deletion/replacement of these files
 
 **Files Affected:**
+
 - `@next/swc-win32-x64-msvc/next-swc.win32-x64-msvc.node`
 - `@tailwindcss/oxide-win32-x64-msvc/tailwindcss-oxide.win32-x64-msvc.node`
 - `lightningcss-win32-x64-msvc/lightningcss.win32-x64-msvc.node`
@@ -142,14 +145,17 @@ npm run dev
 ### 🔄 Recommendations for Optimization
 
 1. **Prisma Version Update**
+
    ```bash
    npm i --save-dev prisma@latest
    npm i @prisma/client@latest
    ```
+
    Current: 7.0.0 → Available: 7.0.1
 
 2. **Setup Script Enhancement**
    Consider adding:
+
    ```bash
    # Generate Prisma client during setup
    npx prisma generate
@@ -168,6 +174,7 @@ npm run dev
 ### Current Workflow
 
 1. **On Host (Windows)**:
+
    ```powershell
    op inject -i .env.template -o .env
    ```
@@ -190,6 +197,7 @@ npm run dev
 ### Improvement Suggestions
 
 Consider adding to [.env.template](../.env.template):
+
 ```bash
 # NextAuth (required for production)
 NEXTAUTH_SECRET=op://vault/nextauth/secret
@@ -204,6 +212,7 @@ SENTRY_PROJECT=op://vault/sentry/project
 ## Summary
 
 ### What Works
+
 - ✅ Dev container builds and starts
 - ✅ Database connectivity established
 - ✅ Environment variables loaded
@@ -212,11 +221,13 @@ SENTRY_PROJECT=op://vault/sentry/project
 - ✅ Extensions installed
 
 ### What Needs Rebuild
+
 - ⚠️ Node modules binary compatibility
 - ⚠️ Application build (blocked by above)
 - ⚠️ Dev server startup (blocked by above)
 
 ### Estimated Rebuild Time
+
 - Container rebuild: ~3 minutes
 - npm install (on volume): ~2 minutes
 - Total: ~5 minutes
@@ -239,6 +250,7 @@ Created:
 **🚨 YOU MUST REBUILD THE CONTAINER FOR THE FIXES TO TAKE EFFECT 🚨**
 
 After rebuild, the container will be fully operational with:
+
 - Proper Linux binaries for all native modules
 - Working builds and dev server
 - Optimal performance with volume mounts

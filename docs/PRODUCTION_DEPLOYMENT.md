@@ -3,6 +3,7 @@
 This guide covers deploying the EFT-Tracker application in production using Docker containers.
 
 ## Table of Contents
+
 - [Prerequisites](#prerequisites)
 - [Building the Production Image](#building-the-production-image)
 - [Running the Container](#running-the-container)
@@ -65,7 +66,7 @@ docker run -d \
 Create a `docker-compose.prod.yml`:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -79,7 +80,13 @@ services:
       NODE_ENV: production
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -87,10 +94,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
   nginx:
@@ -196,35 +203,35 @@ spec:
         app: eft-tracker
     spec:
       containers:
-      - name: eft-tracker
-        image: your-registry.com/eft-tracker:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        envFrom:
-        - secretRef:
-            name: eft-tracker-secrets
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        resources:
-          limits:
-            cpu: "1"
-            memory: "1Gi"
-          requests:
-            cpu: "100m"
-            memory: "256Mi"
+        - name: eft-tracker
+          image: your-registry.com/eft-tracker:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+          envFrom:
+            - secretRef:
+                name: eft-tracker-secrets
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
 ```
 
 ### AWS ECS Task Definition
@@ -257,7 +264,10 @@ spec:
         }
       ],
       "healthCheck": {
-        "command": ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""],
+        "command": [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""
+        ],
         "interval": 30,
         "timeout": 5,
         "retries": 3,
@@ -281,11 +291,13 @@ spec:
 ### Image Security
 
 1. **Regular Updates**: Rebuild images weekly to get security patches
+
    ```bash
    docker build --no-cache -t eft-tracker:$(date +%Y%m%d) .
    ```
 
 2. **Vulnerability Scanning**: Use Trivy or Snyk
+
    ```bash
    trivy image eft-tracker:latest
    ```
@@ -327,6 +339,7 @@ curl http://localhost:3000/api/health
 ```
 
 Response:
+
 ```json
 {
   "status": "healthy",
@@ -340,6 +353,7 @@ Response:
 #### Prometheus Metrics
 
 Add metrics collection (future enhancement):
+
 ```yaml
 services:
   app:
@@ -352,6 +366,7 @@ services:
 #### Logging
 
 Structured JSON logging to stdout:
+
 ```bash
 docker logs -f eft-tracker
 ```
@@ -371,11 +386,13 @@ docker inspect eft-tracker
 ### Container Won't Start
 
 1. Check logs:
+
    ```bash
    docker logs eft-tracker
    ```
 
 2. Verify environment variables:
+
    ```bash
    docker inspect eft-tracker | jq '.[].Config.Env'
    ```
@@ -388,11 +405,13 @@ docker inspect eft-tracker
 ### Health Check Failing
 
 1. Check if app is responding:
+
    ```bash
    docker exec -it eft-tracker wget -O- http://localhost:3000/api/health
    ```
 
 2. Verify port is exposed:
+
    ```bash
    docker port eft-tracker
    ```
@@ -436,6 +455,7 @@ docker inspect eft-tracker
 ### CDN Configuration
 
 Serve static assets from CDN:
+
 - `/public/*` - Images, fonts, static files
 - `/_next/static/*` - Next.js build artifacts
 

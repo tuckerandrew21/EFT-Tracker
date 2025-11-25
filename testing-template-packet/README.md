@@ -5,12 +5,14 @@ A comprehensive testing setup template for Django projects using Docker, pytest,
 ## 📦 What's Included
 
 ### 1. **Claude Code Integration** (`.claude/commands/test.md`)
+
 - Custom `/test` slash command for automated testing
 - Intelligent test discovery based on context
 - Automatically finds and runs relevant tests for modified files
 - Windows/Docker-compatible command execution
 
 ### 2. **Testing Documentation** (`docs/TESTING.md`)
+
 - Quick start guide for running tests
 - Common test commands and patterns
 - Docker container management
@@ -19,6 +21,7 @@ A comprehensive testing setup template for Django projects using Docker, pytest,
 - CI/CD integration examples
 
 ### 3. **Example Test File** (`tests/test_example.py`)
+
 - Comprehensive unit test examples
 - Mock and patch patterns
 - Django TestCase usage
@@ -30,6 +33,7 @@ A comprehensive testing setup template for Django projects using Docker, pytest,
 ### For a New Project
 
 1. **Copy the testing structure:**
+
    ```bash
    cp -r testing-template-packet/.claude your-project/
    cp testing-template-packet/docs/TESTING.md your-project/
@@ -53,20 +57,25 @@ A comprehensive testing setup template for Django projects using Docker, pytest,
 ## 📝 Key Features
 
 ### Automated Test Discovery
+
 The `/test` slash command automatically:
+
 - Detects modified files from git status
 - Finds corresponding test files
 - Runs appropriate tests based on context
 - Provides clear pass/fail reporting
 
 ### Docker Integration
+
 All commands are designed to work with Docker:
+
 - Windows PowerShell compatibility
 - Container health checks
 - Automatic container startup
 - Path handling for containerized tests
 
 ### Best Practices
+
 - **Pytest markers** for test categorization (`@pytest.mark.playwright`, etc.)
 - **Short tracebacks** for faster debugging
 - **Verbose output** for test visibility
@@ -78,11 +87,13 @@ All commands are designed to work with Docker:
 ### Running Tests with Claude Code
 
 Simply use the `/test` command:
+
 ```
 /test
 ```
 
 Claude will automatically:
+
 1. Check what files you're working on
 2. Find relevant test files
 3. Run the appropriate tests
@@ -91,6 +102,7 @@ Claude will automatically:
 ### Manual Testing
 
 See `docs/TESTING.md` for comprehensive manual commands:
+
 - Run all tests
 - Run specific test files
 - Run specific test classes/methods
@@ -102,6 +114,7 @@ See `docs/TESTING.md` for comprehensive manual commands:
 ### 1. Update Container Names
 
 **In `.claude/commands/test.md`:**
+
 ```bash
 # Change:
 docker exec wiseloan-core-core-1 pytest ...
@@ -116,6 +129,7 @@ Update all references to container names and paths.
 ### 2. Update Test Paths
 
 **In `.claude/commands/test.md`:**
+
 ```bash
 # Change:
 /srv/core/customer_site/tests/
@@ -128,6 +142,7 @@ Update all references to container names and paths.
 
 **In `.claude/commands/test.md`:**
 Update the file path mapping logic:
+
 ```
 For `your/app/views.py` → look for `your/app/tests/test_views.py`
 ```
@@ -135,6 +150,7 @@ For `your/app/views.py` → look for `your/app/tests/test_views.py`
 ### 4. Add Project-Specific Markers
 
 **In `docs/TESTING.md` and test files:**
+
 ```python
 @pytest.mark.slow
 @pytest.mark.api
@@ -146,6 +162,7 @@ For `your/app/views.py` → look for `your/app/tests/test_views.py`
 The example test file demonstrates:
 
 ### 1. **Unit Tests**
+
 ```python
 class MyFeatureTestCase(TestCase):
     def setUp(self):
@@ -156,6 +173,7 @@ class MyFeatureTestCase(TestCase):
 ```
 
 ### 2. **Mock Usage**
+
 ```python
 with patch('module.function') as mock_func:
     mock_func.return_value = expected_value
@@ -163,6 +181,7 @@ with patch('module.function') as mock_func:
 ```
 
 ### 3. **AJAX/JSON Testing**
+
 ```python
 request.headers = {'X-Requested-With': 'XMLHttpRequest'}
 response = view(request)
@@ -170,6 +189,7 @@ self.assertIsInstance(response, JsonResponse)
 ```
 
 ### 4. **Integration Tests**
+
 ```python
 @pytest.mark.django_db
 class IntegrationTestCase(TestCase):
@@ -188,14 +208,18 @@ class IntegrationTestCase(TestCase):
 ## 📖 Documentation Files
 
 ### `.claude/commands/test.md`
+
 Defines the `/test` slash command behavior:
+
 - Automatic test discovery
 - Context-aware test execution
 - Result reporting
 - Windows/Docker command formatting
 
 ### `docs/TESTING.md`
+
 Complete testing guide:
+
 - Quick start commands
 - Common workflows
 - Docker management
@@ -203,7 +227,9 @@ Complete testing guide:
 - Best practices
 
 ### `tests/test_example.py`
+
 Example test file showing:
+
 - Test class structure
 - Setup and teardown
 - Various test patterns

@@ -36,6 +36,7 @@ scripts\setup-labels.bat
 ```
 
 This creates:
+
 - ✅ Priority labels (high, medium, low)
 - ✅ Type labels (feature, bug, docs, refactor, test)
 - ✅ Status labels (blocked, in-progress, needs-review, ready)
@@ -49,6 +50,7 @@ This creates:
 Configure 16 MCP servers for enhanced Claude Code capabilities:
 
 1. Start Claude Code in your repository:
+
    ```bash
    claude
    ```
@@ -56,6 +58,7 @@ Configure 16 MCP servers for enhanced Claude Code capabilities:
 2. Approve MCP servers when prompted (type `yes`)
 
 3. Configure environment variables for optional servers:
+
    ```bash
    # Slack (optional)
    export SLACK_BOT_TOKEN="xoxb-..."
@@ -147,16 +150,16 @@ gh pr create
 
 ### File Locations
 
-| What | Where |
-|------|-------|
-| Documentation | `docs/` |
-| Scripts | `scripts/` |
-| Templates | `templates/` |
-| Testing setup | `testing-template-packet/` |
-| MCP config | `.mcp.json` |
-| Slash commands | `.claude/commands/` |
-| GitHub workflows | `.github/workflows/` |
-| Issue templates | `.github/ISSUE_TEMPLATE/` |
+| What             | Where                      |
+| ---------------- | -------------------------- |
+| Documentation    | `docs/`                    |
+| Scripts          | `scripts/`                 |
+| Templates        | `templates/`               |
+| Testing setup    | `testing-template-packet/` |
+| MCP config       | `.mcp.json`                |
+| Slash commands   | `.claude/commands/`        |
+| GitHub workflows | `.github/workflows/`       |
+| Issue templates  | `.github/ISSUE_TEMPLATE/`  |
 
 ### Key Documentation
 

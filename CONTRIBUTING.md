@@ -78,6 +78,7 @@ git checkout -b feature/your-feature-name
 ```
 
 **Branch naming conventions:**
+
 - `feature/` - New features or enhancements
 - `bugfix/` - Bug fixes
 - `docs/` - Documentation changes
@@ -104,6 +105,7 @@ git commit -m "docs: improve quick start instructions"
 ```
 
 **Commit types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes

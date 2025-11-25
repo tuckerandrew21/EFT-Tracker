@@ -41,6 +41,7 @@ Model Context Protocol (MCP) enables Claude Code to connect to external tools an
 ### Threat Model
 
 **What MCP servers CAN access:**
+
 - ✅ Files your user account can read/write
 - ✅ Network requests to any URL
 - ✅ Environment variables passed in configuration
@@ -50,6 +51,7 @@ Model Context Protocol (MCP) enables Claude Code to connect to external tools an
 - ✅ Database connections (if credentials provided)
 
 **What MCP servers CANNOT access (unless explicitly given):**
+
 - ❌ Files outside your user permissions
 - ❌ Root/Administrator operations
 - ❌ Other user accounts
@@ -58,26 +60,31 @@ Model Context Protocol (MCP) enables Claude Code to connect to external tools an
 ### Attack Vectors
 
 **1. Malicious Server Code**
+
 - **Risk**: Server performs unauthorized actions
 - **Example**: Data exfiltration, file deletion, credential theft
 - **Mitigation**: Only use servers from trusted sources, audit code
 
 **2. Supply Chain Attacks**
+
 - **Risk**: Legitimate server compromised via dependencies
 - **Example**: npm package with malicious update
 - **Mitigation**: Pin versions, audit dependencies, use lock files
 
 **3. Configuration Injection**
+
 - **Risk**: Malicious config exploits environment variables
 - **Example**: `"command": "rm -rf /"` in `.mcp.json`
 - **Mitigation**: Review config changes in PRs, validate JSON schema
 
 **4. Credential Exposure**
+
 - **Risk**: Secrets leaked through server logs or errors
 - **Example**: API keys in environment variables exposed in error messages
 - **Mitigation**: Use secret management, rotate credentials, audit logs
 
 **5. Privilege Escalation**
+
 - **Risk**: Server gains more permissions than intended
 - **Example**: Server modifies shell configuration to run on startup
 - **Mitigation**: Monitor file changes, use sandboxing where possible
@@ -89,12 +96,14 @@ Model Context Protocol (MCP) enables Claude Code to connect to external tools an
 **Risk Level: LOW**
 
 Official servers from `@modelcontextprotocol/*` on npm:
+
 - `@modelcontextprotocol/server-playwright`
 - `@modelcontextprotocol/server-filesystem`
 - `@modelcontextprotocol/server-git`
 - `@modelcontextprotocol/server-memory`
 
 **Why Low Risk:**
+
 - Published by Model Context Protocol organization
 - Open source and auditable
 - Community reviewed
@@ -102,6 +111,7 @@ Official servers from `@modelcontextprotocol/*` on npm:
 - Clear documentation
 
 **Residual Risks:**
+
 - Supply chain compromise (npm account takeover)
 - Dependency vulnerabilities
 - Misconfiguration by user
@@ -111,6 +121,7 @@ Official servers from `@modelcontextprotocol/*` on npm:
 **Risk Level: MEDIUM to HIGH**
 
 Community-developed or proprietary servers:
+
 - Unknown code quality
 - Varying security practices
 - Potential backdoors or malicious code
@@ -118,6 +129,7 @@ Community-developed or proprietary servers:
 - Limited community review
 
 **Evaluation Required:**
+
 - Source code audit
 - Author reputation
 - Community adoption
@@ -129,6 +141,7 @@ Community-developed or proprietary servers:
 **Risk Level: VARIES**
 
 Servers developed by your organization:
+
 - Risk depends on internal security practices
 - Requires code review and testing
 - Needs ongoing maintenance
@@ -153,6 +166,7 @@ Do you want to allow these servers? (yes/no)
 **Before approving:**
 
 1. **Review `.mcp.json` contents**
+
    ```bash
    cat .mcp.json
    ```
@@ -164,6 +178,7 @@ Do you want to allow these servers? (yes/no)
    - Transport type
 
 3. **Verify server source:**
+
    ```bash
    # Check npm package details
    npm view @modelcontextprotocol/server-playwright
@@ -192,6 +207,7 @@ For permissions that apply across ALL projects:
 ```
 
 **Security Implications:**
+
 - Bypasses per-project approval
 - Applies to every repository
 - Can expose all projects to risk
@@ -213,6 +229,7 @@ For machine-specific configurations:
 ```
 
 **Security Implications:**
+
 - Not committed to version control
 - Machine-specific trust decisions
 - Can override project settings
@@ -228,11 +245,11 @@ For machine-specific configurations:
 
 ### When to Use Each Scope
 
-| Scope | Use Case | Security Consideration |
-|-------|----------|----------------------|
-| **Local** | Machine-specific tools, local database servers | Never commit to git |
-| **Project** | Team-shared servers for project workflow | Review in every PR |
-| **User** | Personal preferences across all repos | Broad permissions risk |
+| Scope       | Use Case                                       | Security Consideration |
+| ----------- | ---------------------------------------------- | ---------------------- |
+| **Local**   | Machine-specific tools, local database servers | Never commit to git    |
+| **Project** | Team-shared servers for project workflow       | Review in every PR     |
+| **User**    | Personal preferences across all repos          | Broad permissions risk |
 
 ### Configuration Validation
 
@@ -343,7 +360,11 @@ Use this checklist before approving any MCP server:
     "filesystem": {
       "transport": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem@1.0.0", "${PROJECT_ROOT}"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem@1.0.0",
+        "${PROJECT_ROOT}"
+      ],
       "env": {
         "PROJECT_ROOT": "${PWD}"
       }
@@ -353,6 +374,7 @@ Use this checklist before approving any MCP server:
 ```
 
 **Key Security Features:**
+
 - Pinned versions (`@1.2.3`) prevent supply chain attacks
 - No hardcoded credentials
 - Scoped filesystem access (`${PROJECT_ROOT}`)
@@ -363,6 +385,7 @@ Use this checklist before approving any MCP server:
 When reviewing `.mcp.json` changes:
 
 **Required Checks:**
+
 - [ ] Server source is approved (official or vetted)
 - [ ] Version is pinned (not `latest` or `*`)
 - [ ] No credentials in environment variables
@@ -371,6 +394,7 @@ When reviewing `.mcp.json` changes:
 - [ ] Security team notified (if required by policy)
 
 **Red Flags:**
+
 - ❌ Unknown npm packages
 - ❌ HTTP transport to untrusted domains
 - ❌ Wildcard version ranges
@@ -383,6 +407,7 @@ When reviewing `.mcp.json` changes:
 ### 1. Pin Server Versions
 
 **❌ Bad - Unpinned version:**
+
 ```json
 {
   "mcpServers": {
@@ -395,6 +420,7 @@ When reviewing `.mcp.json` changes:
 ```
 
 **✅ Good - Pinned version:**
+
 ```json
 {
   "mcpServers": {
@@ -409,6 +435,7 @@ When reviewing `.mcp.json` changes:
 ### 2. Scope Filesystem Access
 
 **❌ Bad - Unlimited access:**
+
 ```json
 {
   "filesystem": {
@@ -419,12 +446,13 @@ When reviewing `.mcp.json` changes:
 ```
 
 **✅ Good - Scoped to project:**
+
 ```json
 {
   "filesystem": {
     "command": "npx",
     "args": ["@modelcontextprotocol/server-filesystem", "${PROJECT_ROOT}"],
-    "env": {"PROJECT_ROOT": "${PWD}"}
+    "env": { "PROJECT_ROOT": "${PWD}" }
   }
 }
 ```
@@ -432,6 +460,7 @@ When reviewing `.mcp.json` changes:
 ### 3. Never Commit Secrets
 
 **❌ Bad - Hardcoded credentials:**
+
 ```json
 {
   "database": {
@@ -443,6 +472,7 @@ When reviewing `.mcp.json` changes:
 ```
 
 **✅ Good - Reference external secrets:**
+
 ```json
 {
   "database": {
@@ -454,6 +484,7 @@ When reviewing `.mcp.json` changes:
 ```
 
 Then set in shell:
+
 ```bash
 export DB_PASSWORD="supersecret123"
 ```
@@ -465,16 +496,8 @@ Configure Claude Code to only allow specific tools:
 ```json
 {
   "permissions": {
-    "allow": [
-      "Read",
-      "Write",
-      "Bash(git *)",
-      "Bash(npm *)"
-    ],
-    "deny": [
-      "Bash(rm *)",
-      "Bash(curl *)"
-    ]
+    "allow": ["Read", "Write", "Bash(git *)", "Bash(npm *)"],
+    "deny": ["Bash(rm *)", "Bash(curl *)"]
   }
 }
 ```
@@ -482,12 +505,14 @@ Configure Claude Code to only allow specific tools:
 ### 5. Regular Security Audits
 
 **Monthly:**
+
 - Review approved MCP servers
 - Check for server updates
 - Audit configuration changes
 - Review access logs
 
 **Quarterly:**
+
 - Full dependency audit
 - Penetration testing
 - Policy review and updates
@@ -498,6 +523,7 @@ Configure Claude Code to only allow specific tools:
 **If you suspect a compromised MCP server:**
 
 1. **Immediate Actions:**
+
    ```bash
    # Stop Claude Code
    # Kill all MCP server processes
@@ -572,12 +598,14 @@ Configure Claude Code to only allow specific tools:
 ### Response Phases
 
 #### 1. Detection
+
 - Monitor for unusual behavior
 - Watch for permission escalation
 - Check for unexpected network traffic
 - Review error logs
 
 #### 2. Containment
+
 ```bash
 # Stop Claude Code immediately
 # Disconnect network if needed
@@ -589,6 +617,7 @@ claude mcp reset-project-choices
 ```
 
 #### 3. Investigation
+
 ```bash
 # Check recent file changes
 find . -type f -mtime -1 -ls
@@ -606,12 +635,14 @@ history | tail -100
 ```
 
 #### 4. Recovery
+
 - Restore affected files from backup
 - Rotate compromised credentials
 - Update to patched server versions
 - Apply additional security controls
 
 #### 5. Post-Incident
+
 - Document what happened
 - Update security policies
 - Train team on lessons learned
@@ -620,16 +651,19 @@ history | tail -100
 ### Reporting Security Issues
 
 **For Official MCP Servers:**
+
 - Report to Model Context Protocol Security initiative
 - GitHub: https://github.com/ModelContextProtocol-Security
 - Follow coordinated disclosure
 
 **For Third-Party Servers:**
+
 - Contact server maintainer
 - Check for security.txt or SECURITY.md
 - Consider public disclosure if no response
 
 **For Internal Incidents:**
+
 - Follow organization's incident response policy
 - Notify security team
 - Document timeline and impact
@@ -638,28 +672,33 @@ history | tail -100
 ## Additional Resources
 
 ### Documentation
+
 - [Model Context Protocol Specification](https://modelcontextprotocol.io)
 - [Claude Code Documentation](https://code.claude.com/docs)
 - [MCP Security Initiative](https://github.com/ModelContextProtocol-Security/modelcontextprotocol-security.io)
 
 ### Security Standards
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [CIS Controls](https://www.cisecurity.org/controls)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 
 ### Tools
+
 - [npm audit](https://docs.npmjs.com/cli/v8/commands/npm-audit) - Check for vulnerabilities
 - [Snyk](https://snyk.io/) - Dependency scanning
 - [Socket Security](https://socket.dev/) - Supply chain protection
 - [Dependabot](https://github.com/dependabot) - Automated dependency updates
 
 ### Community
+
 - [MCP GitHub Discussions](https://github.com/orgs/modelcontextprotocol/discussions)
 - [Claude Code GitHub Issues](https://github.com/anthropics/claude-code/issues)
 
 ## Checklist Summary
 
 **Before Using MCP Servers:**
+
 - [ ] Read this security guide
 - [ ] Establish approval process
 - [ ] Configure appropriate scopes
@@ -669,6 +708,7 @@ history | tail -100
 - [ ] Document decisions
 
 **Regular Maintenance:**
+
 - [ ] Update servers monthly
 - [ ] Audit configurations quarterly
 - [ ] Review access logs
@@ -676,6 +716,7 @@ history | tail -100
 - [ ] Security training for team
 
 **For Each New Server:**
+
 - [ ] Complete evaluation checklist
 - [ ] Get security approval (if required)
 - [ ] Pin specific version
@@ -694,6 +735,7 @@ MCP servers are powerful tools that enhance Claude Code's capabilities, but they
 5. **Maintain security** - Regular updates and audits
 
 **Key Takeaways:**
+
 - ✅ Only use servers from trusted sources
 - ✅ Pin versions to prevent supply chain attacks
 - ✅ Never commit credentials to version control
@@ -710,6 +752,7 @@ MCP servers are powerful tools that enhance Claude Code's capabilities, but they
 **Version:** 1.0.0
 
 **Questions or Concerns?**
+
 - Open an issue in this repository
 - Contact your security team
 - Review [MCP Security Initiative](https://github.com/ModelContextProtocol-Security/modelcontextprotocol-security.io)

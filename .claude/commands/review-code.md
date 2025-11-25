@@ -69,6 +69,7 @@ Perform a comprehensive code review following project standards.
 # Code Review Report
 
 ## Summary
+
 - Files Reviewed: X
 - Issues Found: X
 - Blockers: X
@@ -77,6 +78,7 @@ Perform a comprehensive code review following project standards.
 ## Blocking Issues
 
 ### 1. [Issue Title]
+
 **Priority:** High
 **Location:** `path/to/file.ts:123`
 **Issue:** [Description]

@@ -5,6 +5,7 @@ Welcome! This is your complete testing infrastructure template.
 ## 📦 What You Have
 
 A production-ready testing setup with:
+
 - ✅ Claude Code integration (`/test` command)
 - ✅ Comprehensive documentation
 - ✅ Example test files
@@ -17,16 +18,20 @@ A production-ready testing setup with:
 ## 🎯 Quick Start (3 Steps)
 
 ### 1. Read the Overview (5 min)
+
 Open: `README.md`
 
 ### 2. Follow the Setup (30 min)
+
 Open: `SETUP-CHECKLIST.md`
+
 - Copy files to your project
 - Update container names
 - Customize paths
 - Test it works
 
 ### 3. Start Testing! (Now)
+
 - Use: `/test` command in Claude Code
 - Or refer to: `QUICK-REFERENCE.md`
 
@@ -51,16 +56,19 @@ testing-template-packet/
 ## 🎓 Reading Order
 
 ### First Time Setup:
+
 1. ✅ `START-HERE.md` (this file)
 2. ✅ `README.md` - understand what you have
 3. ✅ `SETUP-CHECKLIST.md` - follow the steps
 4. ✅ `QUICK-REFERENCE.md` - bookmark for daily use
 
 ### Daily Development:
+
 - Use `/test` command
 - Refer to `QUICK-REFERENCE.md`
 
 ### When Stuck:
+
 - Check `docs/TESTING.md` - troubleshooting section
 - Review `tests/test_example.py` - for patterns
 
@@ -69,12 +77,14 @@ testing-template-packet/
 Before using this template, you MUST update:
 
 1. **Container name** - in all files
+
    ```
    Find: wiseloan-core-core-1
    Replace: your-container-name
    ```
 
 2. **Test paths** - in all files
+
    ```
    Find: /srv/core/customer_site/tests/
    Replace: /your/test/path/
@@ -91,17 +101,20 @@ See `SETUP-CHECKLIST.md` for complete customization guide.
 ## ✨ Key Features
 
 ### Claude Code Integration
+
 ```
 /test                    # Automatically discovers and runs tests
 ```
 
 ### Comprehensive Docs
+
 - 200+ lines of testing guide
 - Step-by-step setup checklist
 - Quick reference card
 - Example test patterns
 
 ### Production Ready
+
 - Docker integration
 - pytest configuration
 - Django test patterns
@@ -110,20 +123,21 @@ See `SETUP-CHECKLIST.md` for complete customization guide.
 
 ## 📖 File Purpose Summary
 
-| File | Use It For |
-|------|------------|
-| `README.md` | Overview and understanding |
-| `SETUP-CHECKLIST.md` | Initial setup (one-time) |
-| `QUICK-REFERENCE.md` | Daily commands (keep handy!) |
-| `CONTENTS.md` | Full package inventory |
-| `docs/TESTING.md` | Detailed testing guide |
-| `tests/test_example.py` | Example patterns to copy |
-| `.claude/commands/test.md` | Claude Code automation |
-| `pytest.ini.example` | Pytest configuration |
+| File                       | Use It For                   |
+| -------------------------- | ---------------------------- |
+| `README.md`                | Overview and understanding   |
+| `SETUP-CHECKLIST.md`       | Initial setup (one-time)     |
+| `QUICK-REFERENCE.md`       | Daily commands (keep handy!) |
+| `CONTENTS.md`              | Full package inventory       |
+| `docs/TESTING.md`          | Detailed testing guide       |
+| `tests/test_example.py`    | Example patterns to copy     |
+| `.claude/commands/test.md` | Claude Code automation       |
+| `pytest.ini.example`       | Pytest configuration         |
 
 ## 🎯 Success Checklist
 
 After setup, you should be able to:
+
 - ✅ Run `/test` in Claude Code
 - ✅ Execute tests with Docker
 - ✅ Write new tests using examples
@@ -148,6 +162,7 @@ After setup, you should be able to:
 ## 📞 Need Help?
 
 Each file includes:
+
 - Clear instructions
 - Examples
 - Troubleshooting tips

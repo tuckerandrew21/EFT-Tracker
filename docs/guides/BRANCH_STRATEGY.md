@@ -16,17 +16,20 @@ This document outlines the git workflow, branch naming conventions, and commit m
 ### Main Branch Protection
 
 The `main` branch is protected by a pre-commit hook that **prevents direct commits**. This ensures:
+
 - All changes go through code review
 - Feature branches are properly tested
 - No accidental commits to production code
 - Clear history of changes via pull requests
 
 If you try to commit directly to `main`, you'll see:
+
 ```
 ❌ ERROR: Direct commits to 'main' branch are not allowed!
 ```
 
 **Emergency bypass (not recommended):**
+
 ```bash
 git commit --no-verify
 ```
@@ -39,15 +42,15 @@ Use bypass only in critical situations and document why in the commit message.
 
 Use these prefixes to categorize your work:
 
-| Prefix | Purpose | Example |
-|--------|---------|---------|
-| `feature/` | New features | `feature/add-user-auth` |
-| `bugfix/` | Bug fixes | `bugfix/fix-login-error` |
-| `hotfix/` | Critical production fixes | `hotfix/security-patch` |
-| `docs/` | Documentation only | `docs/update-readme` |
-| `refactor/` | Code refactoring | `refactor/simplify-api` |
-| `test/` | Test additions | `test/add-unit-tests` |
-| `chore/` | Maintenance tasks | `chore/update-deps` |
+| Prefix      | Purpose                   | Example                  |
+| ----------- | ------------------------- | ------------------------ |
+| `feature/`  | New features              | `feature/add-user-auth`  |
+| `bugfix/`   | Bug fixes                 | `bugfix/fix-login-error` |
+| `hotfix/`   | Critical production fixes | `hotfix/security-patch`  |
+| `docs/`     | Documentation only        | `docs/update-readme`     |
+| `refactor/` | Code refactoring          | `refactor/simplify-api`  |
+| `test/`     | Test additions            | `test/add-unit-tests`    |
+| `chore/`    | Maintenance tasks         | `chore/update-deps`      |
 
 ### Naming Rules
 
@@ -60,6 +63,7 @@ Use these prefixes to categorize your work:
 ### Examples
 
 ✅ **Good:**
+
 - `feature/add-dark-mode`
 - `bugfix/fix-navbar-collapse`
 - `hotfix/critical-security-patch`
@@ -68,6 +72,7 @@ Use these prefixes to categorize your work:
 - `test/add-login-tests`
 
 ❌ **Bad:**
+
 - `my-branch` (no prefix)
 - `Feature/Add Dark Mode` (capitals, spaces)
 - `feature/add_dark_mode` (underscores)
@@ -91,19 +96,19 @@ We follow **Conventional Commits** format for clear, semantic version history.
 
 ### Commit Types
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `feat:` | New feature | `feat: Add user registration` |
-| `fix:` | Bug fix | `fix: Resolve login timeout issue` |
-| `docs:` | Documentation | `docs: Update API documentation` |
-| `style:` | Formatting (no logic change) | `style: Format with Prettier` |
-| `refactor:` | Code restructuring | `refactor: Simplify auth logic` |
-| `test:` | Add/update tests | `test: Add login component tests` |
-| `chore:` | Maintenance | `chore: Update dependencies` |
-| `perf:` | Performance improvement | `perf: Optimize image loading` |
-| `ci:` | CI/CD changes | `ci: Add GitHub Actions workflow` |
-| `build:` | Build system changes | `build: Update Vite config` |
-| `revert:` | Revert previous commit | `revert: Revert "feat: Add feature"` |
+| Type        | Purpose                      | Example                              |
+| ----------- | ---------------------------- | ------------------------------------ |
+| `feat:`     | New feature                  | `feat: Add user registration`        |
+| `fix:`      | Bug fix                      | `fix: Resolve login timeout issue`   |
+| `docs:`     | Documentation                | `docs: Update API documentation`     |
+| `style:`    | Formatting (no logic change) | `style: Format with Prettier`        |
+| `refactor:` | Code restructuring           | `refactor: Simplify auth logic`      |
+| `test:`     | Add/update tests             | `test: Add login component tests`    |
+| `chore:`    | Maintenance                  | `chore: Update dependencies`         |
+| `perf:`     | Performance improvement      | `perf: Optimize image loading`       |
+| `ci:`       | CI/CD changes                | `ci: Add GitHub Actions workflow`    |
+| `build:`    | Build system changes         | `build: Update Vite config`          |
+| `revert:`   | Revert previous commit       | `revert: Revert "feat: Add feature"` |
 
 ### Commit Message Rules
 
@@ -343,6 +348,7 @@ git stash clear
 ### What They Do
 
 Pre-commit hooks run automatically before each commit to:
+
 - Block direct commits to `main` branch
 - Run linting/formatting (if configured)
 - Run tests (if configured)
@@ -353,11 +359,13 @@ Pre-commit hooks run automatically before each commit to:
 Hooks are typically installed during project setup:
 
 **Mac/Linux/Git Bash:**
+
 ```bash
 bash .project-intake/scripts/setup-hooks.sh
 ```
 
 **Windows PowerShell:**
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .project-intake/scripts/setup-hooks.ps1
 ```
@@ -411,6 +419,7 @@ gh pr create \
 ### PR Guidelines
 
 **Title:** Use conventional commit format
+
 ```
 feat: Add user dashboard with analytics
 fix: Resolve login timeout on slow connections
@@ -418,6 +427,7 @@ docs: Update API documentation with examples
 ```
 
 **Description should include:**
+
 - What changed and why
 - How to test the changes
 - Screenshots (for UI changes)
@@ -427,6 +437,7 @@ docs: Update API documentation with examples
 ### Reviewing PRs
 
 When reviewing:
+
 - Check code quality and standards
 - Test the changes locally
 - Verify all tests pass
@@ -507,6 +518,7 @@ git rebase main
 ## Questions?
 
 If you have questions about the git workflow:
+
 - Check this document first
 - Ask in team chat or meetings
 - Open a discussion issue

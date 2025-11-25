@@ -1,9 +1,9 @@
 ## Description
+
 <!-- Brief description of what this PR does and why. Include motivation and context. -->
 
-
-
 ## Type of Change
+
 - [ ] ✨ New feature (non-breaking change which adds functionality)
 - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
 - [ ] ⚡ Enhancement (improvement to existing feature)
@@ -15,12 +15,14 @@
 - [ ] ⚙️ Configuration/infrastructure changes
 
 ## Related Issues
+
 <!-- Link related issues using "Closes #123" or "Relates to #456" -->
 
 Closes #
 Relates to #
 
 ## Changes Made
+
 <!-- Detailed list of changes -->
 
 -
@@ -28,15 +30,15 @@ Relates to #
 -
 
 ## Screenshots/Demo
+
 <!-- If applicable, add screenshots, GIFs, or video demonstrating the changes -->
 
 **Before:**
 
-
 **After:**
 
-
 ## Testing
+
 - [ ] Tested locally
 - [ ] All existing tests pass (`npm test`)
 - [ ] Added new tests for new functionality
@@ -46,6 +48,7 @@ Relates to #
 - [ ] E2E tests pass (if applicable)
 
 ### Test Plan
+
 <!-- Describe how you tested these changes -->
 
 1.
@@ -53,6 +56,7 @@ Relates to #
 3.
 
 ## Security Checklist
+
 <!-- Only applicable if changes involve security-sensitive code -->
 
 - [ ] No hardcoded secrets or API keys
@@ -70,16 +74,16 @@ Relates to #
 
 **Justification:**
 
-
 ## Performance Impact
+
 - [ ] No performance impact
 - [ ] Performance improved
 - [ ] Performance regression (documented and justified)
 
 **Details:**
 
-
 ## Code Quality Checklist
+
 - [ ] Code follows project style guidelines (see [CODING_STANDARDS.md](../CODING_STANDARDS.md))
 - [ ] Self-review completed
 - [ ] Complex logic has explanatory comments
@@ -90,6 +94,7 @@ Relates to #
 - [ ] Accessibility standards met (semantic HTML, ARIA labels)
 
 ## Documentation
+
 - [ ] README updated (if needed)
 - [ ] API documentation updated (if applicable)
 - [ ] Inline code comments added for complex logic
@@ -98,17 +103,18 @@ Relates to #
 - [ ] Migration guide provided (if breaking changes)
 
 ## Reviewer Guidance
+
 <!-- Help reviewers by pointing out areas that need special attention -->
 
-**Focus areas:**
--
--
+## **Focus areas:**
 
-**Questions for reviewers:**
+- **Questions for reviewers:**
+
 -
 -
 
 ## Deployment Notes
+
 <!-- Any special considerations for deployment -->
 
 - [ ] Database migrations included
@@ -125,6 +131,7 @@ Relates to #
 3.
 
 ## Client-Facing Impact
+
 - [ ] This change is visible to end users
 - [ ] This change requires user communication/announcement
 - [ ] This change needs client approval before deployment
@@ -133,8 +140,8 @@ Relates to #
 
 **User Impact:**
 
-
 ## Claude Code Review
+
 <!-- Optional: Request automated code review from Claude Code -->
 
 - [ ] Request `/review-code` analysis
@@ -142,11 +149,11 @@ Relates to #
 - [ ] Performance optimization recommended
 
 ## Additional Notes
+
 <!-- Any additional context, concerns, or considerations for reviewers -->
 
-
-
 ## Post-Merge Checklist
+
 <!-- Complete after PR is merged -->
 
 - [ ] Verify deployment successful

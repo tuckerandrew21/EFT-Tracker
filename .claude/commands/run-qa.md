@@ -14,47 +14,54 @@ Execute the full QA automation pipeline which includes:
 ## Quick Commands
 
 ### Run All Tests
+
 ```bash
 npm test
 ```
 
 ### Run Unit Tests Only
+
 ```bash
 npm test -- --testPathPattern="__tests__/unit"
 ```
 
 ### Run Component Tests Only
+
 ```bash
 npm test -- --testPathPattern="__tests__/components"
 ```
 
 ### Run API Integration Tests Only
+
 ```bash
 npm test -- --testPathPattern="__tests__/integration"
 ```
 
 ### Run Tests with Coverage
+
 ```bash
 npm test -- --coverage
 ```
 
 ### Run Tests in Watch Mode
+
 ```bash
 npm test -- --watch
 ```
 
 ## Test Locations
 
-| Test Type | Directory | Description |
-|-----------|-----------|-------------|
-| Unit | `__tests__/unit/` | Hooks, utilities, helpers |
-| Components | `__tests__/components/` | React component tests |
-| Integration | `__tests__/integration/api/` | API endpoint tests |
-| E2E | `__tests__/e2e/` | Browser automation tests |
+| Test Type   | Directory                    | Description               |
+| ----------- | ---------------------------- | ------------------------- |
+| Unit        | `__tests__/unit/`            | Hooks, utilities, helpers |
+| Components  | `__tests__/components/`      | React component tests     |
+| Integration | `__tests__/integration/api/` | API endpoint tests        |
+| E2E         | `__tests__/e2e/`             | Browser automation tests  |
 
 ## Visual Baseline Locations
 
 Visual regression baselines are stored in:
+
 - **Desktop:** `.claude/qa/baselines/desktop/`
 - **Tablet:** `.claude/qa/baselines/tablet/`
 - **Mobile:** `.claude/qa/baselines/mobile/`
@@ -89,14 +96,17 @@ When this command is invoked:
 ## Troubleshooting Common Issues
 
 ### Database Connection Errors
+
 - Ensure Prisma mock is properly configured
 - Check `__tests__/setup.ts` for mock setup
 
 ### Authentication Errors
+
 - Verify NextAuth session mocks are in place
 - Check `__mocks__/next-auth/react.ts`
 
 ### Component Rendering Issues
+
 - Ensure proper provider wrappers (QueryClient, SessionProvider)
 - Check `__tests__/utils/test-utils.tsx` for render helpers
 

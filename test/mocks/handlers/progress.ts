@@ -1,5 +1,9 @@
 import { http, HttpResponse } from "msw";
-import type { QuestStatus, QuestProgress, ProgressUpdateResponse } from "@/types";
+import type {
+  QuestStatus,
+  QuestProgress,
+  ProgressUpdateResponse,
+} from "@/types";
 
 const API_BASE = "/api";
 
@@ -23,13 +27,11 @@ export const progressHandlers = [
     const authHeader = request.headers.get("authorization");
 
     // For MSW tests, we'll check for a custom header that indicates auth status
-    const isAuthenticated = request.headers.get("x-test-authenticated") === "true";
+    const isAuthenticated =
+      request.headers.get("x-test-authenticated") === "true";
 
     if (!isAuthenticated && !authHeader) {
-      return HttpResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const progress = Array.from(mockProgressStore.values());
@@ -38,16 +40,17 @@ export const progressHandlers = [
 
   // POST /api/progress - Create progress record
   http.post(`${API_BASE}/progress`, async ({ request }) => {
-    const isAuthenticated = request.headers.get("x-test-authenticated") === "true";
+    const isAuthenticated =
+      request.headers.get("x-test-authenticated") === "true";
 
     if (!isAuthenticated) {
-      return HttpResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await request.json()) as { questId: string; status?: QuestStatus };
+    const body = (await request.json()) as {
+      questId: string;
+      status?: QuestStatus;
+    };
 
     if (!body.questId) {
       return HttpResponse.json(
@@ -71,13 +74,11 @@ export const progressHandlers = [
 
   // PATCH /api/progress/:questId - Update quest status
   http.patch(`${API_BASE}/progress/:questId`, async ({ params, request }) => {
-    const isAuthenticated = request.headers.get("x-test-authenticated") === "true";
+    const isAuthenticated =
+      request.headers.get("x-test-authenticated") === "true";
 
     if (!isAuthenticated) {
-      return HttpResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const questId = params.questId as string;
@@ -91,7 +92,12 @@ export const progressHandlers = [
     }
 
     // Validate status value
-    const validStatuses: QuestStatus[] = ["locked", "available", "in_progress", "completed"];
+    const validStatuses: QuestStatus[] = [
+      "locked",
+      "available",
+      "in_progress",
+      "completed",
+    ];
     if (!validStatuses.includes(body.status)) {
       return HttpResponse.json(
         { error: "Invalid status value" },
@@ -132,13 +138,19 @@ export const progressHandlers = [
 ];
 
 // Helper handlers for specific test scenarios
-export const unauthorizedProgressHandler = http.get(`${API_BASE}/progress`, () => {
-  return HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
-});
+export const unauthorizedProgressHandler = http.get(
+  `${API_BASE}/progress`,
+  () => {
+    return HttpResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+);
 
-export const progressErrorHandler = http.patch(`${API_BASE}/progress/:questId`, () => {
-  return HttpResponse.json(
-    { error: "Internal server error" },
-    { status: 500 }
-  );
-});
+export const progressErrorHandler = http.patch(
+  `${API_BASE}/progress/:questId`,
+  () => {
+    return HttpResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+);

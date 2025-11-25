@@ -10,14 +10,14 @@ const prisma = new PrismaClient({ adapter });
 
 // Trader color mapping for UI
 const TRADER_COLORS: Record<string, string> = {
-  prapor: "#b8860b",     // Dark goldenrod
-  therapist: "#dc143c",  // Crimson
-  skier: "#4169e1",      // Royal blue
+  prapor: "#b8860b", // Dark goldenrod
+  therapist: "#dc143c", // Crimson
+  skier: "#4169e1", // Royal blue
   peacekeeper: "#228b22", // Forest green
-  mechanic: "#708090",   // Slate gray
-  ragman: "#9932cc",     // Dark orchid
-  jaeger: "#8b4513",     // Saddle brown
-  fence: "#696969",      // Dim gray
+  mechanic: "#708090", // Slate gray
+  ragman: "#9932cc", // Dark orchid
+  jaeger: "#8b4513", // Saddle brown
+  fence: "#696969", // Dim gray
   lightkeeper: "#ffd700", // Gold
 };
 
@@ -82,7 +82,9 @@ async function main() {
   const questsData: TarkovQuest[] = await questsRes.json();
 
   const traderKeys = Object.keys(tradersObj);
-  console.log(`Found ${traderKeys.length} traders and ${questsData.length} quests`);
+  console.log(
+    `Found ${traderKeys.length} traders and ${questsData.length} quests`
+  );
 
   // Clear existing data
   console.log("Clearing existing data...");
@@ -122,10 +124,12 @@ async function main() {
   const kappaQuestIds = new Set<number>();
 
   // Find the Collector quest and get its requirements
-  const collectorQuest = questsData.find(q => q.locales?.en?.toLowerCase().includes("collector"));
+  const collectorQuest = questsData.find((q) =>
+    q.locales?.en?.toLowerCase().includes("collector")
+  );
   if (collectorQuest) {
     // All quests required by Collector are Kappa quests
-    collectorQuest.require.quests.forEach(id => kappaQuestIds.add(id));
+    collectorQuest.require.quests.forEach((id) => kappaQuestIds.add(id));
   }
 
   // Create quests (first pass - without dependencies)
@@ -146,7 +150,11 @@ async function main() {
     // Extract maps from objectives
     const objectiveMaps = new Set<string>();
     for (const obj of quest.objectives || []) {
-      if (obj.location !== undefined && obj.location >= 0 && MAP_NAMES[obj.location]) {
+      if (
+        obj.location !== undefined &&
+        obj.location >= 0 &&
+        MAP_NAMES[obj.location]
+      ) {
         objectiveMaps.add(MAP_NAMES[obj.location]);
       }
     }
@@ -162,12 +170,14 @@ async function main() {
         objectives: {
           create: (quest.objectives || []).map((obj) => {
             // Convert description to string (some objectives have numeric values)
-            const desc = obj.hint || obj.target || obj.type || "Complete objective";
+            const desc =
+              obj.hint || obj.target || obj.type || "Complete objective";
             return {
               description: String(desc),
-              map: obj.location !== undefined && obj.location >= 0
-                ? MAP_NAMES[obj.location] || null
-                : null,
+              map:
+                obj.location !== undefined && obj.location >= 0
+                  ? MAP_NAMES[obj.location] || null
+                  : null,
             };
           }),
         },
