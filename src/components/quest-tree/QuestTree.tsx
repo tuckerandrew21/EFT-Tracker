@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -23,6 +23,20 @@ const nodeTypes: NodeTypes = {
   quest: QuestNode,
 };
 
+// Hook to detect mobile screens
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 interface QuestTreeProps {
   quests: QuestWithProgress[];
   selectedQuestId?: string | null;
@@ -36,6 +50,8 @@ export function QuestTree({
   onQuestSelect,
   onStatusChange,
 }: QuestTreeProps) {
+  const isMobile = useIsMobile();
+
   // Build graph with layout
   const { initialNodes, initialEdges } = useMemo(() => {
     const graph = buildQuestGraph(quests, {
@@ -68,7 +84,7 @@ export function QuestTree({
   }, []);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full touch-pan-x touch-pan-y">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -77,25 +93,37 @@ export function QuestTree({
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{
-          padding: 0.2,
-          maxZoom: 1,
+          padding: isMobile ? 0.1 : 0.2,
+          maxZoom: isMobile ? 0.8 : 1,
         }}
-        minZoom={0.1}
-        maxZoom={2}
+        minZoom={0.05}
+        maxZoom={isMobile ? 1.5 : 2}
         defaultEdgeOptions={{
           type: "smoothstep",
         }}
         proOptions={{ hideAttribution: true }}
+        panOnScroll={!isMobile}
+        zoomOnScroll={!isMobile}
+        panOnDrag={true}
+        zoomOnPinch={true}
+        zoomOnDoubleClick={true}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-        <Controls showInteractive={false} />
-        <MiniMap
-          nodeColor={getNodeColor}
-          nodeStrokeWidth={3}
-          zoomable
-          pannable
-          className="!bg-background/80 !border-border"
+        <Controls
+          showInteractive={false}
+          className="!shadow-md"
+          position={isMobile ? "bottom-left" : "bottom-left"}
         />
+        {/* Hide MiniMap on mobile for more screen space */}
+        {!isMobile && (
+          <MiniMap
+            nodeColor={getNodeColor}
+            nodeStrokeWidth={3}
+            zoomable
+            pannable
+            className="!bg-background/80 !border-border"
+          />
+        )}
       </ReactFlow>
     </div>
   );

@@ -12,6 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { getTraderColor } from "@/lib/trader-colors";
 import type { Trader, QuestFilters as Filters, QuestStatus } from "@/types";
 
@@ -48,6 +55,7 @@ export function QuestFilters({
   onFilterChange,
 }: QuestFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -71,32 +79,24 @@ export function QuestFilters({
     });
   };
 
-  const hasActiveFilters =
-    filters.traderId ||
-    filters.status ||
-    filters.search ||
-    filters.kappaOnly ||
-    filters.map;
+  const activeFilterCount = [
+    filters.traderId,
+    filters.status,
+    filters.search,
+    filters.kappaOnly,
+    filters.map,
+  ].filter(Boolean).length;
 
-  return (
-    <div className="flex flex-wrap items-end gap-4 p-4 bg-background border-b">
-      {/* Search */}
-      <div className="flex-1 min-w-[200px]">
-        <Label htmlFor="search" className="text-xs text-muted-foreground">
-          Search
-        </Label>
-        <Input
-          id="search"
-          type="text"
-          placeholder="Search quests..."
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          className="h-9"
-        />
-      </div>
-
+  const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <div
+      className={
+        isMobile
+          ? "flex flex-col gap-4"
+          : "hidden md:flex flex-wrap items-end gap-4"
+      }
+    >
       {/* Trader Filter */}
-      <div className="w-[180px]">
+      <div className={isMobile ? "w-full" : "w-[160px]"}>
         <Label className="text-xs text-muted-foreground">Trader</Label>
         <Select
           value={filters.traderId || "all"}
@@ -114,7 +114,9 @@ export function QuestFilters({
                 <div className="flex items-center gap-2">
                   <div
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: getTraderColor(trader.id).primary }}
+                    style={{
+                      backgroundColor: getTraderColor(trader.id).primary,
+                    }}
                   />
                   {trader.name}
                 </div>
@@ -125,7 +127,7 @@ export function QuestFilters({
       </div>
 
       {/* Status Filter */}
-      <div className="w-[160px]">
+      <div className={isMobile ? "w-full" : "w-[140px]"}>
         <Label className="text-xs text-muted-foreground">Status</Label>
         <Select
           value={filters.status || "all"}
@@ -149,7 +151,7 @@ export function QuestFilters({
       </div>
 
       {/* Map Filter */}
-      <div className="w-[180px]">
+      <div className={isMobile ? "w-full" : "w-[160px]"}>
         <Label className="text-xs text-muted-foreground">Map</Label>
         <Select
           value={filters.map || "all"}
@@ -172,23 +174,78 @@ export function QuestFilters({
       </div>
 
       {/* Kappa Toggle */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 py-2">
         <Switch
-          id="kappa"
+          id={isMobile ? "kappa-mobile" : "kappa"}
           checked={filters.kappaOnly}
           onCheckedChange={(checked) => onFilterChange({ kappaOnly: checked })}
         />
-        <Label htmlFor="kappa" className="text-sm cursor-pointer">
+        <Label
+          htmlFor={isMobile ? "kappa-mobile" : "kappa"}
+          className="text-sm cursor-pointer"
+        >
           Kappa Only
         </Label>
       </div>
 
       {/* Reset Button */}
-      {hasActiveFilters && (
-        <Button variant="ghost" size="sm" onClick={handleReset}>
-          Reset
+      {activeFilterCount > 0 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleReset}
+          className={isMobile ? "w-full" : ""}
+        >
+          Reset Filters
         </Button>
       )}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-wrap items-end gap-2 md:gap-4 p-3 md:p-4 bg-background border-b">
+      {/* Search - always visible */}
+      <div className="flex-1 min-w-[150px]">
+        <Label
+          htmlFor="search"
+          className="text-xs text-muted-foreground hidden md:block"
+        >
+          Search
+        </Label>
+        <Input
+          id="search"
+          type="text"
+          placeholder="Search quests..."
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          className="h-9"
+        />
+      </div>
+
+      {/* Desktop Filters */}
+      <FilterControls />
+
+      {/* Mobile Filter Button */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="sm" className="md:hidden relative">
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="h-auto max-h-[80vh]">
+          <SheetHeader>
+            <SheetTitle>Filter Quests</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <FilterControls isMobile />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

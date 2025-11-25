@@ -6,8 +6,11 @@ import { cn } from "@/lib/utils";
 import { getTraderColor, STATUS_COLORS } from "@/lib/trader-colors";
 import type { QuestNode as QuestNodeType } from "@/types";
 
-export const QUEST_NODE_WIDTH = 200;
-export const QUEST_NODE_HEIGHT = 72;
+// Responsive node sizes
+export const QUEST_NODE_WIDTH = 180;
+export const QUEST_NODE_HEIGHT = 68;
+export const QUEST_NODE_WIDTH_MOBILE = 160;
+export const QUEST_NODE_HEIGHT_MOBILE = 60;
 
 function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   const { quest, onStatusChange, onClick } = data;

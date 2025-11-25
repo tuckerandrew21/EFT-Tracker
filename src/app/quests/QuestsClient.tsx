@@ -2,7 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { QuestTree, QuestFilters } from "@/components/quest-tree";
+import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
 import type { QuestStatus, QuestWithProgress } from "@/types";
@@ -13,6 +15,13 @@ const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
   available: "in_progress",
   in_progress: "completed",
   completed: "available", // Reset
+};
+
+const STATUS_LABELS: Record<QuestStatus, string> = {
+  locked: "Locked",
+  available: "Available",
+  in_progress: "In Progress",
+  completed: "Completed",
 };
 
 export function QuestsClient() {
@@ -40,12 +49,22 @@ export function QuestsClient() {
   // Show notification when quests are unlocked
   useEffect(() => {
     if (unlockedQuests.length > 0) {
-      // Could add a toast here
-      console.log("Quests unlocked:", unlockedQuests);
+      const count = unlockedQuests.length;
+      toast.success(
+        `${count} quest${count > 1 ? "s" : ""} unlocked!`,
+        { description: "New quests are now available." }
+      );
       clearUnlocked();
-      refetch(); // Refresh to show updated statuses
+      refetch();
     }
   }, [unlockedQuests, clearUnlocked, refetch]);
+
+  // Show error toast when progress error occurs
+  useEffect(() => {
+    if (progressError) {
+      toast.error("Progress Error", { description: progressError });
+    }
+  }, [progressError]);
 
   const handleQuestSelect = useCallback((questId: string) => {
     setSelectedQuestId((prev) => (prev === questId ? null : questId));
@@ -53,23 +72,28 @@ export function QuestsClient() {
 
   const handleStatusChange = useCallback(
     async (questId: string, clickedStatus: QuestStatus) => {
-      // Find the quest to get its current status
       const quest = questsWithProgress.find((q) => q.id === questId);
       if (!quest) return;
 
       const currentStatus = quest.computedStatus;
 
-      // If locked, don't allow status change
+      // If locked, show info toast
       if (currentStatus === "locked") {
-        // Could show a tooltip or toast here
-        console.log("Quest is locked - complete prerequisites first");
+        toast.info("Quest Locked", {
+          description: "Complete prerequisite quests first.",
+        });
         return;
       }
 
       // If not authenticated, prompt to login
       if (sessionStatus !== "authenticated") {
-        // Could show a modal here
-        console.log("Please sign in to track progress");
+        toast.warning("Sign In Required", {
+          description: "Please sign in to track your progress.",
+          action: {
+            label: "Sign In",
+            onClick: () => (window.location.href = "/login"),
+          },
+        });
         return;
       }
 
@@ -79,29 +103,44 @@ export function QuestsClient() {
 
       const success = await updateStatus(questId, nextStatus);
       if (success) {
+        // Show success toast for completed quests
+        if (nextStatus === "completed") {
+          toast.success("Quest Completed!", {
+            description: quest.title,
+          });
+        } else if (nextStatus === "in_progress") {
+          toast.info("Quest Started", {
+            description: quest.title,
+          });
+        }
         await refetch();
+      } else {
+        toast.error("Failed to Update", {
+          description: "Could not update quest status. Please try again.",
+        });
       }
     },
     [questsWithProgress, sessionStatus, updateStatus, refetch]
   );
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading quests...</p>
-        </div>
-      </div>
-    );
+    return <QuestTreeSkeleton />;
   }
 
   if (error) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-destructive">
-          <p className="text-lg font-medium">Error loading quests</p>
-          <p className="text-sm">{error}</p>
+        <div className="text-center">
+          <p className="text-lg font-medium text-destructive">
+            Error loading quests
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -110,37 +149,48 @@ export function QuestsClient() {
   // Calculate progress stats
   const stats = {
     total: questsWithProgress.length,
-    completed: questsWithProgress.filter((q) => q.computedStatus === "completed").length,
-    inProgress: questsWithProgress.filter((q) => q.computedStatus === "in_progress").length,
-    available: questsWithProgress.filter((q) => q.computedStatus === "available").length,
-    locked: questsWithProgress.filter((q) => q.computedStatus === "locked").length,
+    completed: questsWithProgress.filter(
+      (q) => q.computedStatus === "completed"
+    ).length,
+    inProgress: questsWithProgress.filter(
+      (q) => q.computedStatus === "in_progress"
+    ).length,
+    available: questsWithProgress.filter(
+      (q) => q.computedStatus === "available"
+    ).length,
+    locked: questsWithProgress.filter((q) => q.computedStatus === "locked")
+      .length,
   };
 
   return (
     <div className="flex-1 flex flex-col">
-      {progressError && (
-        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-2 text-sm">
-          {progressError}
-        </div>
-      )}
       {/* Progress Summary Bar */}
-      <div className="px-4 py-2 bg-muted/50 border-b flex items-center gap-6 text-sm">
-        <span className="font-medium">Progress:</span>
-        <span className="text-green-600">
-          {stats.completed} completed
-        </span>
-        <span className="text-amber-600">
-          {stats.inProgress} in progress
-        </span>
-        <span className="text-blue-600">
-          {stats.available} available
-        </span>
-        <span className="text-gray-500">
-          {stats.locked} locked
-        </span>
-        <span className="ml-auto text-muted-foreground">
-          {stats.total} quests total
-        </span>
+      <div className="px-3 md:px-4 py-2 bg-muted/50 border-b">
+        <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm flex-wrap">
+          <span className="font-medium hidden sm:inline">Progress:</span>
+          <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
+            <span className="text-green-600 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="hidden xs:inline">{stats.completed}</span>
+              <span className="xs:hidden">{stats.completed}</span>
+            </span>
+            <span className="text-amber-600 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span>{stats.inProgress}</span>
+            </span>
+            <span className="text-blue-600 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span>{stats.available}</span>
+            </span>
+            <span className="text-gray-500 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-gray-400" />
+              <span>{stats.locked}</span>
+            </span>
+          </div>
+          <span className="ml-auto text-muted-foreground text-xs">
+            {stats.total} total
+          </span>
+        </div>
       </div>
       <QuestFilters
         traders={traders}
