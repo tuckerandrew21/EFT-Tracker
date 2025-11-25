@@ -6,7 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// User model for authentication
 model User {
   id            String          @id @default(cuid())
   email         String          @unique
@@ -17,15 +16,13 @@ model User {
   questProgress QuestProgress[]
 }
 
-// Trader model (Prapor, Therapist, etc.)
 model Trader {
-  id        String  @id
-  name      String
-  color     String  // Hex color for UI
-  quests    Quest[]
+  id     String  @id
+  name   String
+  color  String
+  quests Quest[]
 }
 
-// Quest model
 model Quest {
   id            String            @id
   title         String
@@ -33,56 +30,48 @@ model Quest {
   levelRequired Int               @default(1)
   kappaRequired Boolean           @default(false)
   traderId      String
-  trader        Trader            @relation(fields: [traderId], references: [id])
-  objectives    Objective[]
-  progress      QuestProgress[]
-
-  // Dependencies - quests that must be completed before this one
-  dependsOn     QuestDependency[] @relation("DependentQuest")
-  // Quests that depend on this quest
-  dependedOnBy  QuestDependency[] @relation("RequiredQuest")
-
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+  objectives    Objective[]
+  trader        Trader            @relation(fields: [traderId], references: [id])
+  dependsOn     QuestDependency[] @relation("DependentQuest")
+  dependedOnBy  QuestDependency[] @relation("RequiredQuest")
+  progress      QuestProgress[]
 }
 
-// Quest dependency junction table
 model QuestDependency {
-  id              String @id @default(cuid())
-  dependentId     String // The quest that requires another
-  requiredId      String // The quest that must be completed first
-
-  dependentQuest  Quest  @relation("DependentQuest", fields: [dependentId], references: [id], onDelete: Cascade)
-  requiredQuest   Quest  @relation("RequiredQuest", fields: [requiredId], references: [id], onDelete: Cascade)
+  id             String @id @default(cuid())
+  dependentId    String
+  requiredId     String
+  dependentQuest Quest  @relation("DependentQuest", fields: [dependentId], references: [id], onDelete: Cascade)
+  requiredQuest  Quest  @relation("RequiredQuest", fields: [requiredId], references: [id], onDelete: Cascade)
 
   @@unique([dependentId, requiredId])
 }
 
-// Quest objective (for map filtering)
 model Objective {
   id          String  @id @default(cuid())
   description String
-  map         String? // Map name (Customs, Woods, etc.) - null if no specific map
+  map         String?
   questId     String
   quest       Quest   @relation(fields: [questId], references: [id], onDelete: Cascade)
 }
 
-// User's progress on a quest
 model QuestProgress {
   id        String      @id @default(cuid())
   status    QuestStatus @default(LOCKED)
   userId    String
   questId   String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quest     Quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
   updatedAt DateTime    @updatedAt
+  quest     Quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, questId])
 }
 
 enum QuestStatus {
-  LOCKED      // Prerequisites not met
-  AVAILABLE   // Can be started
-  IN_PROGRESS // Currently working on
-  COMPLETED   // Done
+  LOCKED
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETED
 }
