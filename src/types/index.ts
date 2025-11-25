@@ -69,8 +69,14 @@ export interface QuestFilters {
 export interface QuestNodeData extends Record<string, unknown> {
   quest: QuestWithProgress;
   isSelected: boolean;
+  isRoot: boolean; // No prerequisites - starting quest
+  isLeaf: boolean; // No dependents - terminal quest
+  isFocused: boolean; // Currently focused quest
+  isInFocusChain: boolean; // Part of focused quest's dependency chain
+  hasFocusMode: boolean; // Whether any quest is focused (for dimming)
   onStatusChange: (questId: string, status: QuestStatus) => void;
   onClick: (questId: string) => void;
+  onFocus: (questId: string) => void; // Focus on this quest's chain
 }
 
 // React Flow quest node type

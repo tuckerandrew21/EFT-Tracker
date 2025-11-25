@@ -4,6 +4,7 @@ import {
   filterQuestsByTrader,
   getQuestMaps,
   computeQuestStatus,
+  getQuestChain,
 } from "@/lib/quest-layout";
 import {
   mockQuests,
@@ -18,6 +19,7 @@ describe("quest-layout", () => {
     const mockOptions = {
       onStatusChange: vi.fn(),
       onClick: vi.fn(),
+      onFocus: vi.fn(),
       selectedQuestId: null,
     };
 
@@ -68,7 +70,7 @@ describe("quest-layout", () => {
       );
 
       expect(debutToCheckingEdge).toBeDefined();
-      expect(debutToCheckingEdge?.type).toBe("smoothstep");
+      expect(debutToCheckingEdge?.type).toBe("default"); // Bezier curves
     });
 
     it("should mark selected quest", () => {
@@ -88,16 +90,19 @@ describe("quest-layout", () => {
     it("should include callback functions in node data", () => {
       const onStatusChange = vi.fn();
       const onClick = vi.fn();
+      const onFocus = vi.fn();
 
       const graph = buildQuestGraph(mockQuestsWithProgress, {
         onStatusChange,
         onClick,
+        onFocus,
         selectedQuestId: null,
       });
 
       const node = graph.nodes[0];
       expect(node.data.onStatusChange).toBe(onStatusChange);
       expect(node.data.onClick).toBe(onClick);
+      expect(node.data.onFocus).toBe(onFocus);
     });
 
     it("should handle empty quest array", () => {
@@ -267,6 +272,33 @@ describe("quest-layout", () => {
 
       const status = computeQuestStatus(childQuest, questMap);
       expect(status).toBe("locked");
+    });
+  });
+
+  describe("getQuestChain", () => {
+    it("should include the focused quest itself", () => {
+      const chain = getQuestChain(QUEST_IDS.DEBUT, mockQuestsWithProgress);
+      expect(chain.has(QUEST_IDS.DEBUT)).toBe(true);
+    });
+
+    it("should include dependents of the focused quest", () => {
+      // Checking depends on Debut, so Checking should be in Debut's chain
+      const chain = getQuestChain(QUEST_IDS.DEBUT, mockQuestsWithProgress);
+      expect(chain.has(QUEST_IDS.CHECKING)).toBe(true);
+    });
+
+    it("should include prerequisites of the focused quest", () => {
+      // Debut is a prerequisite for Checking, so Debut should be in Checking's chain
+      const chain = getQuestChain(QUEST_IDS.CHECKING, mockQuestsWithProgress);
+      expect(chain.has(QUEST_IDS.DEBUT)).toBe(true);
+    });
+
+    it("should return only the quest when it has no dependencies", () => {
+      // BP Depot has no dependencies
+      const chain = getQuestChain(QUEST_IDS.BP_DEPOT, mockQuestsWithProgress);
+      expect(chain.has(QUEST_IDS.BP_DEPOT)).toBe(true);
+      // Should not include unrelated quests
+      expect(chain.has(QUEST_IDS.DEBUT)).toBe(false);
     });
   });
 });

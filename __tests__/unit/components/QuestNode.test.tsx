@@ -16,17 +16,30 @@ function createNodeProps(
   overrides: Partial<{
     onStatusChange: (questId: string, status: QuestStatus) => void;
     onClick: (questId: string) => void;
+    onFocus: (questId: string) => void;
     isSelected: boolean;
+    isRoot: boolean;
+    isLeaf: boolean;
+    isFocused: boolean;
+    isInFocusChain: boolean;
+    hasFocusMode: boolean;
   }> = {}
 ) {
   const onStatusChange = overrides.onStatusChange ?? vi.fn();
   const onClick = overrides.onClick ?? vi.fn();
+  const onFocus = overrides.onFocus ?? vi.fn();
 
   const data: QuestNodeData = {
     quest,
     isSelected: overrides.isSelected ?? false,
+    isRoot: overrides.isRoot ?? false,
+    isLeaf: overrides.isLeaf ?? false,
+    isFocused: overrides.isFocused ?? false,
+    isInFocusChain: overrides.isInFocusChain ?? false,
+    hasFocusMode: overrides.hasFocusMode ?? false,
     onStatusChange,
     onClick,
+    onFocus,
   };
 
   return {
@@ -128,12 +141,13 @@ describe("QuestNode", () => {
     });
 
     it("should apply in_progress status styling", () => {
-      const quest = createQuestWithProgress(mockQuests[0], "in_progress");
+      // Use a non-Kappa quest (BP Depot at index 4) to test in_progress styling
+      const quest = createQuestWithProgress(mockQuests[4], "in_progress");
       const props = createNodeProps(quest);
 
       const { container } = renderWithReactFlow(<QuestNode {...props} />);
 
-      // In progress quests have amber ring
+      // In progress quests have amber ring (non-Kappa quests get ring-amber-400)
       const nodeDiv = container.querySelector(".ring-amber-400");
       expect(nodeDiv).toBeInTheDocument();
     });
@@ -200,7 +214,8 @@ describe("QuestNode", () => {
 
   describe("selection", () => {
     it("should apply selected ring when selected", () => {
-      const quest = createQuestWithProgress(mockQuests[0], "available");
+      // Use a non-Kappa quest (BP Depot at index 4) to avoid Kappa ring override
+      const quest = createQuestWithProgress(mockQuests[4], "available");
       const props = createNodeProps(quest, { isSelected: true });
 
       const { container } = renderWithReactFlow(<QuestNode {...props} />);

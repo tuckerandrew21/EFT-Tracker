@@ -13,10 +13,13 @@ export const QUEST_NODE_WIDTH_MOBILE = 160;
 export const QUEST_NODE_HEIGHT_MOBILE = 60;
 
 function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
-  const { quest, onStatusChange, onClick } = data;
+  const { quest, onStatusChange, onClick, onFocus, isRoot, isLeaf, isFocused, isInFocusChain, hasFocusMode } = data;
   const traderColor = getTraderColor(quest.traderId);
   const statusColor = STATUS_COLORS[quest.computedStatus];
   const [isClicked, setIsClicked] = useState(false);
+
+  // Should this node be dimmed? (focus mode active but not in chain)
+  const isDimmed = hasFocusMode && !isInFocusChain && !isFocused;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -29,6 +32,12 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
     onStatusChange(quest.id, quest.computedStatus);
   };
 
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Double-click to focus on this quest's chain
+    onFocus(quest.id);
+  };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     // Right-click to select/view details
@@ -39,28 +48,38 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
     <>
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         className="!bg-gray-400 !w-2 !h-2"
       />
       <div
         onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
         className={cn(
-          "relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-150",
+          "relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200",
           "hover:shadow-md active:scale-95",
           isClicked && "scale-105",
           selected && "ring-2 ring-offset-2 ring-blue-500",
-          quest.computedStatus === "locked" && "opacity-50 cursor-not-allowed",
-          quest.computedStatus === "completed" && "opacity-80",
-          quest.computedStatus === "in_progress" && "ring-2 ring-amber-400",
-          quest.computedStatus === "available" && "shadow-sm hover:shadow-lg"
+          quest.computedStatus === "locked" && !isDimmed && "opacity-50 cursor-not-allowed",
+          quest.computedStatus === "completed" && !isDimmed && "opacity-60",
+          quest.computedStatus === "in_progress" && !isDimmed && "ring-2 ring-amber-400",
+          quest.computedStatus === "available" && !isDimmed && "shadow-sm hover:shadow-lg",
+          // Visual hierarchy indicators (only when not dimmed)
+          isRoot && !isDimmed && "border-l-4 border-l-emerald-500",
+          isLeaf && !isDimmed && "border-r-4 border-r-violet-500",
+          quest.kappaRequired && !isDimmed && "ring-2 ring-amber-400/70",
+          // Focus mode styling
+          isFocused && "ring-4 ring-blue-500 shadow-lg scale-105",
+          isInFocusChain && !isFocused && "ring-2 ring-blue-300",
+          isDimmed && "opacity-20 grayscale pointer-events-auto"
         )}
         style={{
           width: QUEST_NODE_WIDTH,
           height: QUEST_NODE_HEIGHT,
-          backgroundColor: statusColor.bg,
-          borderColor:
-            quest.computedStatus === "available"
+          backgroundColor: isDimmed ? "#F3F4F6" : statusColor.bg,
+          borderColor: isDimmed
+            ? "#E5E7EB"
+            : quest.computedStatus === "available"
               ? traderColor.primary
               : statusColor.border,
         }}
@@ -124,7 +143,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
       </div>
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         className="!bg-gray-400 !w-2 !h-2"
       />
     </>
