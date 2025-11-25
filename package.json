@@ -1,33 +1,56 @@
 {
-  "name": "project-intake-template",
-  "version": "1.0.0",
-  "description": "GitHub template repository with automated project setup system",
-  "type": "module",
+  "name": "eft-tracker",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "validate-config": "node .project-intake/scripts/validate-config.cjs",
-    "health-check": "node .project-intake/scripts/health-check.cjs",
-    "process-templates": "node .project-intake/scripts/process-templates.cjs",
-    "check-node-version": "node .project-intake/scripts/check-node-version.cjs",
-    "lint": "echo 'No linting configured. Add ESLint to your project and update this script.'",
-    "format:check": "echo 'No formatting check configured. Add Prettier to your project and update this script.'",
-    "typecheck": "echo 'No type checking configured. Add TypeScript to your project and update this script.'",
-    "test": "echo 'No tests configured. Add a test framework to your project and update this script.'",
-    "test:e2e": "echo 'No E2E tests configured. Add Playwright or Cypress to your project and update this script.'",
-    "build": "echo 'No build configured. Add build tools to your project and update this script.'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:seed": "tsx prisma/seed.ts"
   },
-  "keywords": [
-    "template",
-    "project-setup",
-    "automation",
-    "claude-code",
-    "best-practices",
-    "documentation",
-    "git-hooks",
-    "workflow"
-  ],
-  "author": "Andrew Tucker + Claude Code",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "@prisma/extension-accelerate": "^3.0.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/dagre": "^0.7.53",
+    "@xyflow/react": "^12.9.3",
+    "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dagre": "^0.8.5",
+    "dotenv": "^17.2.3",
+    "lucide-react": "^0.554.0",
+    "next": "16.0.4",
+    "next-auth": "^5.0.0-beta.30",
+    "pg": "^8.16.3",
+    "prisma": "^7.0.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.15.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.4",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.6",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "^5"
   }
 }
