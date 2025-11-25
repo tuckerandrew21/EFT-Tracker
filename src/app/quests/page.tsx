@@ -1,21 +1,22 @@
 import { auth } from "@/lib/auth";
+import { QuestsClient } from "./QuestsClient";
 
 export default async function QuestsPage() {
   const session = await auth();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Quest Tracker</h1>
-      <p className="text-muted-foreground mb-8">
-        {session
-          ? `Welcome back, ${session.user?.email}! Your progress will be saved.`
-          : "Sign in to save your quest progress."}
-      </p>
-      <div className="p-8 border rounded-lg bg-muted/50 text-center">
-        <p className="text-muted-foreground">
-          Quest tree visualization coming in Phase 2...
-        </p>
+    <div className="h-[calc(100vh-4rem)] flex flex-col">
+      <div className="px-4 py-3 border-b bg-background">
+        <div className="container mx-auto flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Quest Tracker</h1>
+          <p className="text-sm text-muted-foreground">
+            {session
+              ? `Tracking progress for ${session.user?.email}`
+              : "Sign in to save your progress"}
+          </p>
+        </div>
       </div>
+      <QuestsClient />
     </div>
   );
 }
