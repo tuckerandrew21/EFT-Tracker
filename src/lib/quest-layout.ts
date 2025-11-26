@@ -19,8 +19,8 @@ const LAYOUT_CONFIG = {
   rankdir: "LR" as const, // Left-to-right layout
   nodesep: 2, // Minimal vertical spacing
   ranksep: 8, // Minimal horizontal spacing
-  marginx: 2,
-  marginy: 2,
+  marginx: 10, // Small padding from left edge
+  marginy: 10, // Small padding from top edge
 };
 
 // Lane-based layout configuration
@@ -746,6 +746,24 @@ export function stackTraderLanes(
 
     // Move to next lane
     currentY += lane.laneHeight + LANE_CONFIG.LANE_SPACING;
+  }
+
+  // Normalize positions so first quest starts near (0, 0) with padding
+  const questNodes = allNodes.filter((n) => n.type === "quest");
+  if (questNodes.length > 0) {
+    const minX = Math.min(...questNodes.map((n) => n.position.x));
+    const minY = Math.min(...allNodes.map((n) => n.position.y));
+
+    // Normalize all nodes
+    const normalizedNodes = allNodes.map((node) => ({
+      ...node,
+      position: {
+        x: node.position.x - minX + LAYOUT_CONFIG.marginx,
+        y: node.position.y - minY + LAYOUT_CONFIG.marginy,
+      },
+    }));
+
+    return { nodes: normalizedNodes, edges: allEdges, laneYOffsets };
   }
 
   return { nodes: allNodes, edges: allEdges, laneYOffsets };

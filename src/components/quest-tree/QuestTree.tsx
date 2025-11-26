@@ -236,14 +236,9 @@ function QuestTreeInner({
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
-        fitView
-        fitViewOptions={{
-          padding: isMobile ? 0.1 : 0.2,
-          minZoom: 0.5, // Don't zoom out past readable level
-          maxZoom: isMobile ? 0.8 : 1,
-        }}
-        minZoom={0.05}
-        maxZoom={isMobile ? 1.5 : 2}
+        defaultViewport={{ x: 0, y: 0, zoom: isMobile ? 1.5 : 2 }}
+        minZoom={0.1}
+        maxZoom={isMobile ? 2 : 4}
         defaultEdgeOptions={{
           type: "default", // Bezier curves
         }}
