@@ -9,11 +9,11 @@ import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
 import type { QuestStatus, QuestWithProgress } from "@/types";
 
-// Status cycle map for click handling
+// Status cycle map for click handling (simplified: available <-> completed)
 const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
   locked: null, // Can't cycle from locked
-  available: "in_progress",
-  in_progress: "completed",
+  available: "completed",
+  in_progress: "completed", // Treat in_progress same as available
   completed: "available", // Reset
 };
 
@@ -100,10 +100,6 @@ export function QuestsClient() {
           toast.success("Quest Completed!", {
             description: quest.title,
           });
-        } else if (nextStatus === "in_progress") {
-          toast.info("Quest Started", {
-            description: quest.title,
-          });
         }
         await refetch();
       } else {
@@ -138,17 +134,14 @@ export function QuestsClient() {
     );
   }
 
-  // Calculate progress stats
+  // Calculate progress stats (in_progress counted as available)
   const stats = {
     total: questsWithProgress.length,
     completed: questsWithProgress.filter(
       (q) => q.computedStatus === "completed"
     ).length,
-    inProgress: questsWithProgress.filter(
-      (q) => q.computedStatus === "in_progress"
-    ).length,
     available: questsWithProgress.filter(
-      (q) => q.computedStatus === "available"
+      (q) => q.computedStatus === "available" || q.computedStatus === "in_progress"
     ).length,
     locked: questsWithProgress.filter((q) => q.computedStatus === "locked")
       .length,
@@ -163,12 +156,7 @@ export function QuestsClient() {
           <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
             <span className="text-green-600 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="hidden xs:inline">{stats.completed}</span>
-              <span className="xs:hidden">{stats.completed}</span>
-            </span>
-            <span className="text-amber-600 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <span>{stats.inProgress}</span>
+              <span>{stats.completed}</span>
             </span>
             <span className="text-blue-600 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-blue-500" />

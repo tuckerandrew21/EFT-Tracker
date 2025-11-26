@@ -107,10 +107,8 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
             !isDimmed &&
             "opacity-50 cursor-not-allowed",
           quest.computedStatus === "completed" && !isDimmed && "opacity-60",
-          quest.computedStatus === "in_progress" &&
-            !isDimmed &&
-            "ring-2 ring-amber-400",
-          quest.computedStatus === "available" &&
+          // in_progress treated same as available (no special styling)
+          (quest.computedStatus === "available" || quest.computedStatus === "in_progress") &&
             !isDimmed &&
             "shadow-sm hover:shadow-lg",
           // Visual hierarchy indicators (only when not dimmed)
