@@ -3,6 +3,7 @@
 Complete guide for setting up a production-ready CI/CD pipeline with GitHub Actions, including quality gates, security scanning, and best practices.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [GitHub Actions Workflows](#github-actions-workflows)
 - [Repository Settings](#repository-settings)
@@ -14,6 +15,7 @@ Complete guide for setting up a production-ready CI/CD pipeline with GitHub Acti
 ## Overview
 
 This repository uses a comprehensive CI/CD pipeline with:
+
 - **Automated testing** on every PR
 - **Code quality checks** (linting, formatting, type checking)
 - **Security scanning** (CodeQL, Dependabot, Dependency Review)
@@ -21,6 +23,7 @@ This repository uses a comprehensive CI/CD pipeline with:
 - **Automated PR validation** (titles, branch names, size checks)
 
 **Key Principles:**
+
 1. All changes go through pull requests
 2. All checks must pass before merging
 3. Clean, linear git history (squash merging)
@@ -36,6 +39,7 @@ This repository uses a comprehensive CI/CD pipeline with:
 **Triggers:** Pull requests and pushes to master
 
 **Jobs:**
+
 1. **Lint & Format** - ESLint and Prettier checks
 2. **Type Check** - TypeScript type checking
 3. **Test** - Unit, integration, and component tests with Vitest
@@ -46,6 +50,7 @@ This repository uses a comprehensive CI/CD pipeline with:
 8. **CI Success** - Summary check (required for branch protection)
 
 **Key Configuration:**
+
 ```yaml
 # No continue-on-error for critical checks
 # Parallel job execution for speed
@@ -57,14 +62,16 @@ This repository uses a comprehensive CI/CD pipeline with:
 **Triggers:** Pull request events (opened, synchronize, reopened, edited)
 
 **Permissions Required:**
+
 ```yaml
 permissions:
   contents: read
-  pull-requests: write  # For auto-commenting
-  issues: write         # For auto-labeling
+  pull-requests: write # For auto-commenting
+  issues: write # For auto-labeling
 ```
 
 **Checks:**
+
 1. **Validate PR Title** - Enforces conventional commit format
 2. **Check PR Size** - Warns on large PRs (>500 lines)
 3. **Check Merge Conflicts** - Ensures no conflicts with base branch
@@ -92,6 +99,7 @@ permissions:
 **Settings → Branches → Add rule for `master` (or `main`)**
 
 #### Required Settings:
+
 - ✅ **Require a pull request before merging**
   - ❌ Do not require approvals (for solo dev)
   - ✅ Dismiss stale pull request approvals when new commits are pushed
@@ -169,6 +177,7 @@ permissions:
 **Purpose:** Defines code ownership for automatic review assignments
 
 **Example:**
+
 ```
 # Default owner for everything
 * @your-username
@@ -198,6 +207,7 @@ Copy these files to your new repository:
 ```
 
 **Update in each file:**
+
 - Node.js version (if different)
 - Test commands
 - Build commands
@@ -270,6 +280,7 @@ Edit `.github/CODEOWNERS`:
 ## Branch Naming Convention
 
 **Required prefixes:**
+
 - `feature/` - New features
 - `fix/` or `bugfix/` - Bug fixes
 - `hotfix/` - Critical production fixes
@@ -279,6 +290,7 @@ Edit `.github/CODEOWNERS`:
 - `chore/` - Maintenance tasks
 
 **Examples:**
+
 - `feature/add-user-dashboard`
 - `fix/login-validation-error`
 - `docs/update-readme`
@@ -290,6 +302,7 @@ Edit `.github/CODEOWNERS`:
 **Format:** `type: Description starting with uppercase`
 
 **Types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -303,6 +316,7 @@ Edit `.github/CODEOWNERS`:
 - `revert:` - Revert previous commit
 
 **Examples:**
+
 - `feat: Add user authentication`
 - `fix: Resolve login validation error`
 - `docs: Update installation instructions`
@@ -345,8 +359,8 @@ Add to any workflow:
 on:
   pull_request:
     paths-ignore:
-      - 'docs/**'
-      - '*.md'
+      - "docs/**"
+      - "*.md"
 ```
 
 ---
@@ -368,6 +382,7 @@ on:
 ### Dependabot PRs Not Created
 
 **Solution:**
+
 1. Check Dependabot is enabled in security settings
 2. Verify `.github/dependabot.yml` configuration exists
 3. Check Actions permissions allow PR creation
@@ -390,7 +405,7 @@ Update in all workflow files:
 ```yaml
 - uses: actions/setup-node@v4
   with:
-    node-version: 20  # Update this
+    node-version: 20 # Update this
 ```
 
 ---

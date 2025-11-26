@@ -3,6 +3,7 @@
 Complete guide for setting up the VS Code Dev Container environment on a new device. This development environment is pre-configured with all tools, extensions, and optimizations needed for the EFT-Tracker project.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 - [Initial Setup](#initial-setup)
@@ -16,6 +17,7 @@ Complete guide for setting up the VS Code Dev Container environment on a new dev
 ## Overview
 
 This dev container provides a complete, reproducible development environment with:
+
 - **Node.js LTS** - Latest long-term support version
 - **1Password CLI** - Secure secret management
 - **Claude Code** - AI-powered development assistant
@@ -24,6 +26,7 @@ This dev container provides a complete, reproducible development environment wit
 - **VS Code Extensions** - Pre-configured for optimal development
 
 **Key Benefits:**
+
 1. Consistent environment across all devices
 2. Eliminates "works on my machine" issues
 3. Fast onboarding (2-3 minutes)
@@ -120,6 +123,7 @@ op inject -i .env.template -o .env
 ```
 
 **What this does:**
+
 - Reads `.env.template` with 1Password references (e.g., `op://DevSecrets/Github/PAT`)
 - Fetches actual secrets from your 1Password vault
 - Generates `.env` file with real values
@@ -128,13 +132,13 @@ op inject -i .env.template -o .env
 
 You need these items in your 1Password vault (in the "DevSecrets" vault):
 
-| Item Name | Fields Required | Description |
-|-----------|----------------|-------------|
-| **Github** | `PAT` | GitHub Personal Access Token |
-| **BraveSearch** | `api-key` | Brave Search API key |
-| **EFT-Tracker** | `DATABASE_URL` | PostgreSQL connection string (Neon) |
-| **EFT-Tracker** | `AUTH_SECRET` | NextAuth.js secret (32-byte random) |
-| **EFT-Tracker** | `NEXTAUTH_URL` | App URL (e.g., `http://localhost:3000`) |
+| Item Name       | Fields Required | Description                             |
+| --------------- | --------------- | --------------------------------------- |
+| **Github**      | `PAT`           | GitHub Personal Access Token            |
+| **BraveSearch** | `api-key`       | Brave Search API key                    |
+| **EFT-Tracker** | `DATABASE_URL`  | PostgreSQL connection string (Neon)     |
+| **EFT-Tracker** | `AUTH_SECRET`   | NextAuth.js secret (32-byte random)     |
+| **EFT-Tracker** | `NEXTAUTH_URL`  | App URL (e.g., `http://localhost:3000`) |
 
 **Creating Auth Secret:**
 
@@ -161,6 +165,7 @@ When VS Code opens, you'll see a notification in the bottom-right:
 Click **"Reopen in Container"**
 
 **Or manually via Command Palette:**
+
 1. Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
 2. Type: "Dev Containers: Reopen in Container"
 3. Press Enter
@@ -235,11 +240,13 @@ npm run dev
 ### How It Works
 
 1. **`.env.template`** - Contains 1Password references (safe to commit)
+
    ```bash
    DATABASE_URL=op://DevSecrets/EFT-Tracker/DATABASE_URL
    ```
 
 2. **`.env`** - Contains actual secrets (NEVER commit, in `.gitignore`)
+
    ```bash
    DATABASE_URL=postgresql://user:pass@host:5432/db
    ```
@@ -279,12 +286,14 @@ refresh-secrets
    - Add field with secret value
 
 2. **Update `.env.template`:**
+
    ```bash
    # Add reference
    NEW_SECRET=op://DevSecrets/ItemName/field-name
    ```
 
 3. **Regenerate `.env`:**
+
    ```bash
    op inject -i .env.template -o .env
    ```
@@ -322,6 +331,7 @@ Container (Ubuntu 24.04)
 #### 1. `eft-tracker-node-modules` Volume
 
 **Problem**:
+
 - On Windows with WSL2, `node_modules` from host contains Windows binaries
 - When mounted into Linux container, these fail with errors like:
   ```
@@ -329,11 +339,13 @@ Container (Ubuntu 24.04)
   ```
 
 **Solution**:
+
 - Mount `node_modules` as a Docker volume
 - npm installs Linux binaries directly in container
 - Source code stays on host (editable with VS Code)
 
 **Benefits**:
+
 - ✅ Linux-compatible binaries
 - ✅ No cross-platform conflicts
 - ✅ Fast npm operations
@@ -344,6 +356,7 @@ Container (Ubuntu 24.04)
 **Purpose**: Persist command history across container rebuilds
 
 **What it stores**:
+
 - `.bash_history`
 - `.zsh_history`
 - Command autocomplete data
@@ -354,11 +367,11 @@ Container (Ubuntu 24.04)
 
 These ports are automatically forwarded from container to host:
 
-| Port | Service | Access |
-|------|---------|--------|
-| 3000 | Next.js dev server | http://localhost:3000 |
-| 5000 | Alternative dev | http://localhost:5000 |
-| 8000 | API services | http://localhost:8000 |
+| Port | Service             | Access                |
+| ---- | ------------------- | --------------------- |
+| 3000 | Next.js dev server  | http://localhost:3000 |
+| 5000 | Alternative dev     | http://localhost:5000 |
+| 8000 | API services        | http://localhost:8000 |
 | 8080 | Additional services | http://localhost:8080 |
 
 **Accessing from host**: Just open `http://localhost:3000` in your browser
@@ -370,6 +383,7 @@ These ports are automatically forwarded from container to host:
 **When**: Runs once when container is first created
 
 **What it does**:
+
 ```bash
 1. Install 1Password CLI (v2.30.0)
 2. Install Claude Code globally
@@ -384,6 +398,7 @@ These ports are automatically forwarded from container to host:
 **When**: Runs every time container starts
 
 **What it does**:
+
 ```bash
 1. Check if .env exists
 2. If missing, display instructions
@@ -417,6 +432,7 @@ These ports are automatically forwarded from container to host:
 **Cause**: `.devcontainer/devcontainer.json` not found or invalid
 
 **Fix**:
+
 ```bash
 # Verify file exists
 ls -la .devcontainer/devcontainer.json
@@ -437,6 +453,7 @@ git checkout .devcontainer/devcontainer.json
 **Cause**: Windows binaries mounted from host (volume mount not working)
 
 **Fix**:
+
 ```bash
 # 1. Rebuild container
 VS Code Command Palette > "Dev Containers: Rebuild Container"
@@ -463,6 +480,7 @@ docker volume rm eft-tracker-node-modules
 **Fix**:
 
 **Option 1** (Recommended): Generate `.env` on host
+
 ```bash
 # Exit container, run on host machine
 exit
@@ -472,6 +490,7 @@ op inject -i .env.template -o .env
 ```
 
 **Option 2**: Sign in manually inside container
+
 ```bash
 # In container terminal
 op signin --account your-account.1password.com
@@ -485,11 +504,13 @@ op signin --account your-account.1password.com
 **Symptoms**: `op inject` command fails
 
 **Cause**:
+
 - Not signed into 1Password CLI
 - 1Password desktop app not running
 - Incorrect vault/item names in `.env.template`
 
 **Fix**:
+
 ```bash
 # Check 1Password status
 op whoami
@@ -518,6 +539,7 @@ op read "op://DevSecrets/Github/PAT"
 **Common Causes & Fixes**:
 
 1. **Docker not running**
+
    ```bash
    # Windows: Start Docker Desktop
    # Check status
@@ -525,6 +547,7 @@ op read "op://DevSecrets/Github/PAT"
    ```
 
 2. **Insufficient disk space**
+
    ```bash
    # Check Docker disk usage
    docker system df
@@ -534,6 +557,7 @@ op read "op://DevSecrets/Github/PAT"
    ```
 
 3. **Network issues (can't pull base image)**
+
    ```bash
    # Test Docker Hub connection
    docker pull mcr.microsoft.com/devcontainers/base:ubuntu-24.04
@@ -554,6 +578,7 @@ op read "op://DevSecrets/Github/PAT"
 **Cause**: Volume mounts are slower than native filesystem (this is normal)
 
 **Optimization**:
+
 ```bash
 # This is expected behavior
 # Subsequent installs will be faster (npm cache)
@@ -573,6 +598,7 @@ pnpm install
 **Cause**: Another process using port 3000
 
 **Fix**:
+
 ```bash
 # Find process using port 3000
 lsof -i :3000
@@ -591,6 +617,7 @@ PORT=3001 npm run dev
 **Cause**: Extensions failed to install during container creation
 
 **Fix**:
+
 ```bash
 # Rebuild container
 VS Code Command Palette > "Dev Containers: Rebuild Container Without Cache"
@@ -611,6 +638,7 @@ VS Code Command Palette > "Dev Containers: Rebuild Container Without Cache"
 **Cause**: Hot reload not working, or editing wrong copy
 
 **Fix**:
+
 ```bash
 # Verify you're editing inside the container
 # Check terminal prompt should show container name
@@ -640,6 +668,7 @@ cp .env.template /path/to/new-project/
 ```
 
 **Files copied**:
+
 ```
 .devcontainer/
 ├── devcontainer.json    # VS Code dev container config
@@ -656,7 +685,7 @@ Edit `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "name": "Your-Project-Name Dev Container",  // Update name
+  "name": "Your-Project-Name Dev Container", // Update name
 
   "mounts": [
     "source=devcontainer-bashhistory,target=/commandhistory,type=volume",
@@ -673,7 +702,7 @@ Edit `.devcontainer/devcontainer.json`:
       "extensions": [
         "anthropic.claude-code",
         "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
+        "dbaeumer.vscode-eslint"
         // Add project-specific extensions
       ]
     }
@@ -717,6 +746,7 @@ API_KEY=op://DevSecrets/YourProject/API_KEY
 ```
 
 **Best Practices**:
+
 - Use 1Password references format: `op://VaultName/ItemName/field-name`
 - Group secrets logically (Database, Auth, External APIs, etc.)
 - Add comments explaining each variable
@@ -974,6 +1004,7 @@ In Docker Desktop settings or `.docker/config.json`:
 ### 5. Allocate more resources to Docker
 
 **Docker Desktop Settings**:
+
 - **CPU**: 4+ cores
 - **RAM**: 8GB+ (12GB recommended for large projects)
 - **Disk**: 60GB+
@@ -999,6 +1030,7 @@ echo ".env" >> .gitignore
 ### 2. Use 1Password CLI, not environment files
 
 **Bad**:
+
 ```bash
 # Storing secrets in git
 echo "DATABASE_URL=postgresql://..." > .env.production
@@ -1006,6 +1038,7 @@ git add .env.production
 ```
 
 **Good**:
+
 ```bash
 # Using 1Password references
 # .env.template
@@ -1110,4 +1143,3 @@ tar -xzf devcontainer-backup.tar.gz
 
 **Last Updated:** 2025-11-26
 **Tested With:** Docker Desktop 4.25+, VS Code 1.85+, WSL2 (Windows), macOS 14+
-
