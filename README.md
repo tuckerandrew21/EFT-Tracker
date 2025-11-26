@@ -82,7 +82,7 @@ The easiest way to get started is using the VS Code Dev Container, which provide
 - Persistent bash history and command history
 - Isolated `node_modules` (prevents WSL2 binary conflicts)
 
-See [.devcontainer/README.md](.devcontainer/README.md) for detailed configuration and troubleshooting.
+See [docs/DEV_CONTAINER_SETUP.md](docs/DEV_CONTAINER_SETUP.md) for comprehensive setup guide, troubleshooting, and replication instructions for other devices.
 
 ## Docker Deployment
 
