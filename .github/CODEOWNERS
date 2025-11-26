@@ -1,0 +1,27 @@
+# Code Owners
+#
+# This file defines individuals or teams responsible for code in this repository.
+# When a PR is opened, these owners are automatically requested for review.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @andrew-tucker-razorvision
+
+# GitHub Actions workflows and CI/CD configuration
+/.github/ @andrew-tucker-razorvision
+
+# Database schema and migrations
+/prisma/ @andrew-tucker-razorvision
+
+# Environment configuration
+/.env.example @andrew-tucker-razorvision
+/.env.template @andrew-tucker-razorvision
+
+# Security and authentication
+/src/lib/auth.ts @andrew-tucker-razorvision
+/src/lib/rate-limit.ts @andrew-tucker-razorvision
+
+# Documentation
+/docs/ @andrew-tucker-razorvision
+*.md @andrew-tucker-razorvision
