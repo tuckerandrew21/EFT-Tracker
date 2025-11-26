@@ -20,7 +20,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { getTraderColor } from "@/lib/trader-colors";
-import type { Trader, QuestFilters as Filters, QuestStatus } from "@/types";
+import type { Trader, QuestFilters as Filters, QuestStatus, LevelRange } from "@/types";
+
+const LEVEL_RANGES: LevelRange[] = [
+  { min: 1, max: 10, label: "Level 1-10" },
+  { min: 11, max: 20, label: "Level 11-20" },
+  { min: 21, max: 30, label: "Level 21-30" },
+  { min: 31, max: 40, label: "Level 31-40" },
+  { min: 41, max: 79, label: "Level 41+" },
+];
 
 const MAPS = [
   "Factory",
@@ -166,6 +174,52 @@ const FilterControls = ({
       </Label>
     </div>
 
+    {/* Player Level Input */}
+    <div className={isMobile ? "w-full" : "w-[90px]"}>
+      <Label className="text-xs text-muted-foreground">My Level</Label>
+      <Input
+        type="number"
+        min={1}
+        max={79}
+        placeholder="1-79"
+        value={filters.playerLevel ?? ""}
+        onChange={(e) => {
+          const val = parseInt(e.target.value);
+          const level = isNaN(val) ? null : Math.min(79, Math.max(1, val));
+          onFilterChange({ playerLevel: level });
+        }}
+        className="h-9"
+      />
+    </div>
+
+    {/* Level Range Filter */}
+    <div className={isMobile ? "w-full" : "w-[140px]"}>
+      <Label className="text-xs text-muted-foreground">Level Range</Label>
+      <Select
+        value={filters.levelRange ? `${filters.levelRange.min}-${filters.levelRange.max}` : "all"}
+        onValueChange={(value) => {
+          if (value === "all") {
+            onFilterChange({ levelRange: null });
+          } else {
+            const range = LEVEL_RANGES.find(r => `${r.min}-${r.max}` === value);
+            onFilterChange({ levelRange: range || null });
+          }
+        }}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="All Levels" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Levels</SelectItem>
+          {LEVEL_RANGES.map((range) => (
+            <SelectItem key={`${range.min}-${range.max}`} value={`${range.min}-${range.max}`}>
+              {range.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
     {/* Reset Button */}
     {activeFilterCount > 0 && (
       <Button
@@ -207,6 +261,8 @@ export function QuestFilters({
       search: "",
       kappaOnly: false,
       map: null,
+      playerLevel: null,
+      levelRange: null,
     });
   };
 
@@ -216,6 +272,8 @@ export function QuestFilters({
     filters.search,
     filters.kappaOnly,
     filters.map,
+    filters.playerLevel,
+    filters.levelRange,
   ].filter(Boolean).length;
 
   return (

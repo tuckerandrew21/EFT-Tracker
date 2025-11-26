@@ -41,6 +41,8 @@ describe("useQuests", () => {
         search: "",
         kappaOnly: false,
         map: null,
+        playerLevel: null,
+        levelRange: null,
       });
     });
   });

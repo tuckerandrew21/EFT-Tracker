@@ -56,6 +56,13 @@ export interface QuestWithProgress extends Quest {
   computedStatus: QuestStatus;
 }
 
+// Level range filter options
+export interface LevelRange {
+  min: number;
+  max: number;
+  label: string;
+}
+
 // Filter options for quest list/tree
 export interface QuestFilters {
   traderId: string | null;
@@ -63,7 +70,12 @@ export interface QuestFilters {
   search: string;
   kappaOnly: boolean;
   map: string | null;
+  playerLevel: number | null;
+  levelRange: LevelRange | null;
 }
+
+// View mode for quest display
+export type ViewMode = "trader-lanes" | "level-timeline";
 
 // React Flow node data for quest nodes
 export interface QuestNodeData extends Record<string, unknown> {
@@ -74,6 +86,7 @@ export interface QuestNodeData extends Record<string, unknown> {
   isFocused: boolean; // Currently focused quest
   isInFocusChain: boolean; // Part of focused quest's dependency chain
   hasFocusMode: boolean; // Whether any quest is focused (for dimming)
+  playerLevel: number | null; // User's current PMC level for highlighting
   onStatusChange: (questId: string, status: QuestStatus) => void;
   onClick: (questId: string) => void;
   onFocus: (questId: string) => void; // Focus on this quest's chain

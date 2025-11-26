@@ -44,6 +44,7 @@ function createNodeProps(
     isFocused: overrides.isFocused ?? false,
     isInFocusChain: overrides.isInFocusChain ?? false,
     hasFocusMode: overrides.hasFocusMode ?? false,
+    playerLevel: null,
     onStatusChange,
     onClick,
     onFocus,
@@ -85,18 +86,20 @@ describe("QuestNode", () => {
 
       renderWithReactFlow(<QuestNode {...props} />);
 
+      // Compact format: "Lv.X" (no space)
       expect(
-        screen.getByText(`Lv. ${quest.levelRequired}`)
+        screen.getByText(`Lv.${quest.levelRequired}`)
       ).toBeInTheDocument();
     });
 
-    it("should render trader name", () => {
+    it("should have trader color styling (trader name not shown in compact design)", () => {
       const quest = createQuestWithProgress(mockQuests[0], "available");
       const props = createNodeProps(quest);
 
-      renderWithReactFlow(<QuestNode {...props} />);
+      const { container } = renderWithReactFlow(<QuestNode {...props} />);
 
-      expect(screen.getByText(quest.trader.name)).toBeInTheDocument();
+      // Trader info is shown via border color, not text
+      expect(container.querySelector(".cursor-pointer")).toBeInTheDocument();
     });
 
     it("should show Kappa badge when kappaRequired is true", () => {
@@ -122,8 +125,8 @@ describe("QuestNode", () => {
     });
 
     it("should export node dimensions", () => {
-      expect(QUEST_NODE_WIDTH).toBe(180);
-      expect(QUEST_NODE_HEIGHT).toBe(68);
+      expect(QUEST_NODE_WIDTH).toBe(110);
+      expect(QUEST_NODE_HEIGHT).toBe(38);
     });
   });
 
@@ -150,15 +153,16 @@ describe("QuestNode", () => {
       expect(nodeDiv).toBeInTheDocument();
     });
 
-    it("should apply in_progress status styling", () => {
+    it("should apply in_progress status styling (same as available)", () => {
       // Use a non-Kappa quest (BP Depot at index 4) to test in_progress styling
+      // in_progress is now treated the same as available (simplified status model)
       const quest = createQuestWithProgress(mockQuests[4], "in_progress");
       const props = createNodeProps(quest);
 
       const { container } = renderWithReactFlow(<QuestNode {...props} />);
 
-      // In progress quests have amber ring (non-Kappa quests get ring-amber-400)
-      const nodeDiv = container.querySelector(".ring-amber-400");
+      // In progress quests now have shadow styling like available quests
+      const nodeDiv = container.querySelector(".shadow-sm");
       expect(nodeDiv).toBeInTheDocument();
     });
 

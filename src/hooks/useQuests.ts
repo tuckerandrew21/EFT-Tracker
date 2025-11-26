@@ -24,6 +24,8 @@ const defaultFilters: QuestFilters = {
   search: "",
   kappaOnly: false,
   map: null,
+  playerLevel: null,
+  levelRange: null,
 };
 
 export function useQuests(): UseQuestsReturn {
@@ -60,11 +62,22 @@ export function useQuests(): UseQuestsReturn {
 
       const data = await res.json();
 
-      // Client-side status filtering if needed
+      // Client-side filtering
       let filteredQuests = data.quests;
+
+      // Status filtering
       if (filters.status) {
         filteredQuests = filteredQuests.filter(
           (q: QuestWithProgress) => q.computedStatus === filters.status
+        );
+      }
+
+      // Level range filtering
+      if (filters.levelRange) {
+        filteredQuests = filteredQuests.filter(
+          (q: QuestWithProgress) =>
+            q.levelRequired >= filters.levelRange!.min &&
+            q.levelRequired <= filters.levelRange!.max
         );
       }
 

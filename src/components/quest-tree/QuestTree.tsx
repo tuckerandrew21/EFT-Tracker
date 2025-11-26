@@ -3,14 +3,12 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import {
   ReactFlow,
-  Background,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
   useReactFlow,
   type NodeTypes,
-  BackgroundVariant,
   ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -19,6 +17,8 @@ import { QuestNode } from "./QuestNode";
 import { TraderNode } from "./TraderNode";
 import { buildTraderLaneGraph, getQuestChain } from "@/lib/quest-layout";
 import { getTraderColor } from "@/lib/trader-colors";
+import { Button } from "@/components/ui/button";
+import { Target } from "lucide-react";
 import type { QuestWithProgress, QuestStatus, QuestNodeData, Trader } from "@/types";
 
 // Register custom node types
@@ -45,6 +45,7 @@ interface QuestTreeProps {
   quests: QuestWithProgress[];
   traders: Trader[];
   selectedQuestId?: string | null;
+  playerLevel?: number | null;
   onQuestSelect: (questId: string) => void;
   onStatusChange: (questId: string, status: QuestStatus) => void;
 }
@@ -53,6 +54,7 @@ function QuestTreeInner({
   quests,
   traders,
   selectedQuestId,
+  playerLevel,
   onQuestSelect,
   onStatusChange,
 }: QuestTreeProps) {
@@ -94,6 +96,7 @@ function QuestTreeInner({
       selectedQuestId,
       focusedQuestId,
       focusChain,
+      playerLevel,
     });
     return {
       initialNodes: graph.nodes,
@@ -103,6 +106,7 @@ function QuestTreeInner({
     quests,
     traders,
     selectedQuestId,
+    playerLevel,
     focusedQuestId,
     focusChain,
     onStatusChange,
@@ -141,6 +145,29 @@ function QuestTreeInner({
     }
   }, [focusedQuestId]);
 
+  // Fit view to available quests only
+  const handleFitToAvailable = useCallback(() => {
+    const availableNodes = nodes.filter((n) => {
+      const data = n.data as QuestNodeData | undefined;
+      if (!data?.quest) return false;
+      const isAvailable = data.quest.computedStatus === "available";
+      // If player level set, also filter by level
+      if (playerLevel) {
+        return isAvailable && data.quest.levelRequired <= playerLevel;
+      }
+      return isAvailable;
+    });
+
+    if (availableNodes.length > 0) {
+      fitView({
+        nodes: availableNodes,
+        duration: 500,
+        padding: 0.3,
+        maxZoom: 1,
+      });
+    }
+  }, [nodes, playerLevel, fitView]);
+
   // MiniMap node color based on trader
   const getNodeColor = useCallback(
     (node: { data: Record<string, unknown> }) => {
@@ -155,31 +182,45 @@ function QuestTreeInner({
 
   return (
     <div className="w-full h-full touch-pan-x touch-pan-y relative">
-      {/* Focus mode indicator */}
-      {focusedQuestId && (
-        <div className="absolute top-2 left-2 z-10 bg-blue-500 text-white text-xs px-3 py-1.5 rounded-full shadow-md flex items-center gap-2">
-          <span>Focus Mode</span>
-          <button
-            onClick={() => setFocusedQuestId(null)}
-            className="hover:bg-blue-600 rounded-full p-0.5"
-            title="Exit focus mode (ESC)"
-          >
-            <svg
-              className="w-3 h-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      {/* Top action bar */}
+      <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
+        {/* Focus mode indicator */}
+        {focusedQuestId && (
+          <div className="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-full shadow-md flex items-center gap-2">
+            <span>Focus Mode</span>
+            <button
+              onClick={() => setFocusedQuestId(null)}
+              className="hover:bg-blue-600 rounded-full p-0.5"
+              title="Exit focus mode (ESC)"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+        {/* Fit to Available button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleFitToAvailable}
+          className="bg-background shadow-md"
+          title="Focus on available quests"
+        >
+          <Target className="h-4 w-4 mr-1" />
+          <span className="hidden sm:inline">Available</span>
+        </Button>
+      </div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -187,6 +228,9 @@ function QuestTreeInner({
         onEdgesChange={onEdgesChange}
         onPaneClick={handlePaneClick}
         nodeTypes={nodeTypes}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
         fitView
         fitViewOptions={{
           padding: isMobile ? 0.1 : 0.2,
@@ -202,10 +246,9 @@ function QuestTreeInner({
         zoomOnScroll={!isMobile}
         panOnDrag={true}
         zoomOnPinch={true}
-        zoomOnDoubleClick={false} // Disable default double-click zoom (we use it for focus)
+        zoomOnDoubleClick={false}
       >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-        <Controls
+                <Controls
           showInteractive={false}
           className="!shadow-md"
           position={isMobile ? "bottom-left" : "bottom-left"}

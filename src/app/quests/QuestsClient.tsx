@@ -5,9 +5,10 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { QuestTree, QuestFilters } from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
+import { ViewToggle, LevelTimelineView } from "@/components/quest-views";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
-import type { QuestStatus, QuestWithProgress } from "@/types";
+import type { QuestStatus, QuestWithProgress, ViewMode } from "@/types";
 
 // Status cycle map for click handling (simplified: available <-> completed)
 const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
@@ -29,6 +30,7 @@ export function QuestsClient() {
     error: progressError,
   } = useProgress();
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("trader-lanes");
 
   // Merge progress into quests
   const questsWithProgress: QuestWithProgress[] = quests.map((quest) => {
@@ -167,9 +169,12 @@ export function QuestsClient() {
               <span>{stats.locked}</span>
             </span>
           </div>
-          <span className="ml-auto text-muted-foreground text-xs">
-            {stats.total} total
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            <span className="text-muted-foreground text-xs">
+              {stats.total} total
+            </span>
+          </div>
         </div>
       </div>
       <QuestFilters
@@ -179,13 +184,22 @@ export function QuestsClient() {
       />
       <div className="flex-1 min-h-0">
         {questsWithProgress.length > 0 ? (
-          <QuestTree
-            quests={questsWithProgress}
-            traders={traders}
-            selectedQuestId={selectedQuestId}
-            onQuestSelect={handleQuestSelect}
-            onStatusChange={handleStatusChange}
-          />
+          viewMode === "trader-lanes" ? (
+            <QuestTree
+              quests={questsWithProgress}
+              traders={traders}
+              selectedQuestId={selectedQuestId}
+              playerLevel={filters.playerLevel}
+              onQuestSelect={handleQuestSelect}
+              onStatusChange={handleStatusChange}
+            />
+          ) : (
+            <LevelTimelineView
+              quests={questsWithProgress}
+              playerLevel={filters.playerLevel}
+              onStatusChange={handleStatusChange}
+            />
+          )
         ) : (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">

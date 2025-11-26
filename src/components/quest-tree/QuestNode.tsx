@@ -7,10 +7,10 @@ import { getTraderColor, STATUS_COLORS } from "@/lib/trader-colors";
 import type { QuestNode as QuestNodeType } from "@/types";
 
 // Responsive node sizes
-export const QUEST_NODE_WIDTH = 180;
-export const QUEST_NODE_HEIGHT = 68;
-export const QUEST_NODE_WIDTH_MOBILE = 160;
-export const QUEST_NODE_HEIGHT_MOBILE = 60;
+export const QUEST_NODE_WIDTH = 110;
+export const QUEST_NODE_HEIGHT = 38;
+export const QUEST_NODE_WIDTH_MOBILE = 100;
+export const QUEST_NODE_HEIGHT_MOBILE = 34;
 
 function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   const {
@@ -23,10 +23,15 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
     isFocused,
     isInFocusChain,
     hasFocusMode,
+    playerLevel,
   } = data;
   const traderColor = getTraderColor(quest.traderId);
   const statusColor = STATUS_COLORS[quest.computedStatus];
   const [isClicked, setIsClicked] = useState(false);
+
+  // Level-based highlighting
+  const isLevelAppropriate = playerLevel !== null && quest.levelRequired <= playerLevel;
+  const isUpcoming = playerLevel !== null && quest.levelRequired > playerLevel && quest.levelRequired <= playerLevel + 5;
 
   // Find cross-trader dependencies (prereqs from different traders)
   const crossTraderDeps = useMemo(() => {
@@ -92,14 +97,14 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
       <Handle
         type="target"
         position={Position.Left}
-        className="!bg-gray-400 !w-2 !h-2"
+        className="!bg-gray-400 !w-1.5 !h-1.5"
       />
       <div
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
         className={cn(
-          "relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200",
+          "relative cursor-pointer rounded border p-1 transition-all duration-150",
           "hover:shadow-md active:scale-95",
           isClicked && "scale-105",
           selected && "ring-2 ring-offset-2 ring-blue-500",
@@ -118,7 +123,10 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           // Focus mode styling
           isFocused && "ring-4 ring-blue-500 shadow-lg scale-105",
           isInFocusChain && !isFocused && "ring-2 ring-blue-300",
-          isDimmed && "opacity-20 grayscale pointer-events-auto"
+          isDimmed && "opacity-20 grayscale pointer-events-auto",
+          // Level-based highlighting (only for available quests)
+          isLevelAppropriate && quest.computedStatus === "available" && !isDimmed && !isFocused && "ring-2 ring-emerald-400 shadow-emerald-100",
+          isUpcoming && quest.computedStatus !== "completed" && !isDimmed && !isFocused && "ring-1 ring-amber-300"
         )}
         style={{
           width: QUEST_NODE_WIDTH,
@@ -134,7 +142,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
         {/* Kappa badge */}
         {quest.kappaRequired && (
           <div
-            className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+            className="absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center text-[7px] font-bold text-white"
             style={{ backgroundColor: "#FFD700" }}
             title="Required for Kappa"
           >
@@ -144,23 +152,23 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
 
         {/* Cross-trader dependency badges */}
         {crossTraderBadges.length > 0 && !isDimmed && (
-          <div className="absolute -top-2 left-2 flex gap-0.5">
-            {crossTraderBadges.slice(0, 3).map((badge) => {
+          <div className="absolute -top-1 left-1 flex gap-px">
+            {crossTraderBadges.slice(0, 2).map((badge) => {
               const badgeColor = getTraderColor(badge.traderId);
               return (
                 <div
                   key={badge.traderId}
-                  className="px-1.5 py-0.5 rounded text-[9px] font-medium text-white shadow-sm"
+                  className="px-0.5 rounded text-[7px] font-medium text-white"
                   style={{ backgroundColor: badgeColor.primary }}
                   title={`Requires quest(s) from ${badge.name}`}
                 >
-                  {badge.name.slice(0, 3)}
+                  {badge.name.slice(0, 2)}
                 </div>
               );
             })}
-            {crossTraderBadges.length > 3 && (
-              <div className="px-1 py-0.5 rounded text-[9px] font-medium bg-gray-500 text-white">
-                +{crossTraderBadges.length - 3}
+            {crossTraderBadges.length > 2 && (
+              <div className="px-0.5 rounded text-[7px] font-medium bg-gray-500 text-white">
+                +{crossTraderBadges.length - 2}
               </div>
             )}
           </div>
@@ -170,7 +178,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
         {quest.computedStatus === "completed" && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <svg
-              className="w-8 h-8 text-green-600 opacity-30"
+              className="w-5 h-5 text-green-600 opacity-30"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -187,35 +195,25 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
 
         {/* Quest title */}
         <div
-          className="font-medium text-sm leading-tight line-clamp-2 text-gray-900"
+          className="font-medium text-[10px] leading-tight line-clamp-1 text-gray-900"
           title={quest.title}
         >
           {quest.title}
         </div>
 
-        {/* Bottom row: Level + Trader */}
-        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between">
-          <span
-            className="text-xs px-1.5 py-0.5 rounded font-medium"
-            style={{
-              backgroundColor: traderColor.primary,
-              color: "white",
-            }}
-          >
-            Lv. {quest.levelRequired}
-          </span>
-          <span
-            className="text-xs font-medium truncate max-w-[80px]"
-            style={{ color: traderColor.primary }}
-          >
-            {quest.trader.name}
-          </span>
+        {/* Level badge */}
+        <div className={cn(
+          "text-[9px] mt-0.5",
+          isLevelAppropriate ? "text-emerald-600 font-medium" :
+          isUpcoming ? "text-amber-600" : "text-gray-500"
+        )}>
+          Lv.{quest.levelRequired}
         </div>
       </div>
       <Handle
         type="source"
         position={Position.Right}
-        className="!bg-gray-400 !w-2 !h-2"
+        className="!bg-gray-400 !w-1.5 !h-1.5"
       />
     </>
   );

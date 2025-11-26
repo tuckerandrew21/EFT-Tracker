@@ -14,7 +14,7 @@ function TraderNodeComponent({ data }: NodeProps<TraderNodeType>) {
     <>
       <div
         className={cn(
-          "rounded-lg border-2 p-2 flex flex-col items-center justify-center",
+          "rounded border p-1 flex flex-col items-center justify-center",
           "shadow-md font-medium bg-white"
         )}
         style={{
@@ -25,32 +25,21 @@ function TraderNodeComponent({ data }: NodeProps<TraderNodeType>) {
       >
         {/* Trader Name */}
         <span
-          className="font-bold text-sm truncate max-w-full"
+          className="font-bold text-[10px] truncate max-w-full"
           style={{ color }}
         >
           {traderName}
         </span>
 
         {/* Quest Progress Count */}
-        <span className="text-xs text-gray-600 mt-0.5">
+        <span className="text-[9px] text-gray-600">
           {completedCount}/{questCount}
         </span>
-
-        {/* Progress Bar */}
-        <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1 overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-300"
-            style={{
-              width: `${progress}%`,
-              backgroundColor: color,
-            }}
-          />
-        </div>
       </div>
       <Handle
         type="source"
         position={Position.Right}
-        className="!bg-gray-400 !w-2 !h-2"
+        className="!bg-gray-400 !w-1.5 !h-1.5"
       />
     </>
   );

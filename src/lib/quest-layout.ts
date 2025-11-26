@@ -17,20 +17,20 @@ import { getTraderColor } from "@/lib/trader-colors";
 
 const LAYOUT_CONFIG = {
   rankdir: "LR" as const, // Left-to-right layout
-  nodesep: 35, // Vertical spacing between nodes (tighter grouping)
-  ranksep: 160, // Horizontal spacing (more room for horizontal edges)
-  marginx: 50,
-  marginy: 30,
+  nodesep: 2, // Minimal vertical spacing
+  ranksep: 8, // Minimal horizontal spacing
+  marginx: 2,
+  marginy: 2,
 };
 
 // Lane-based layout configuration
 export const LANE_CONFIG = {
-  TRADER_NODE_WIDTH: 100,
-  TRADER_NODE_HEIGHT: 60,
-  BASE_LANE_HEIGHT: 100, // Minimum lane height
-  LANE_SPACING: 30, // Gap between lanes
-  TRADER_TO_QUEST_GAP: 60, // Gap after trader header
-  QUEST_VERTICAL_GAP: 15, // Gap between quests in same column (branching)
+  TRADER_NODE_WIDTH: 60,
+  TRADER_NODE_HEIGHT: 40,
+  BASE_LANE_HEIGHT: 45, // Minimum lane height
+  LANE_SPACING: 2, // Minimal gap between lanes
+  TRADER_TO_QUEST_GAP: 8, // Minimal gap after trader header
+  QUEST_VERTICAL_GAP: 2, // Minimal gap between quests
 };
 
 // Fixed trader order (optimized for common cross-dependencies)
@@ -53,6 +53,7 @@ interface BuildQuestGraphOptions {
   selectedQuestId?: string | null;
   focusedQuestId?: string | null;
   focusChain?: Set<string>;
+  playerLevel?: number | null;
 }
 
 export interface QuestGraph {
@@ -116,6 +117,7 @@ export function buildQuestGraph(
     selectedQuestId,
     focusedQuestId,
     focusChain,
+    playerLevel,
   } = options;
   const hasFocusMode = focusedQuestId !== null && focusedQuestId !== undefined;
 
@@ -225,6 +227,7 @@ export function buildQuestGraph(
         isFocused: quest.id === focusedQuestId,
         isInFocusChain,
         hasFocusMode,
+        playerLevel: playerLevel ?? null,
         onStatusChange,
         onClick,
         onFocus,
@@ -283,6 +286,57 @@ export function computeQuestStatus(
 // ============================================================================
 // TRADER LANE LAYOUT FUNCTIONS
 // ============================================================================
+
+/**
+ * Calculate the global depth for each quest considering ALL dependencies
+ * (both intra-trader and cross-trader). This ensures quests are positioned
+ * in the correct column based on when they can actually be started.
+ */
+export function calculateGlobalDepths(
+  quests: QuestWithProgress[]
+): Map<string, number> {
+  const depths = new Map<string, number>();
+  const questMap = new Map(quests.map((q) => [q.id, q]));
+
+  // Recursive function to calculate depth with memoization
+  function getDepth(questId: string, visited: Set<string>): number {
+    // Prevent infinite loops
+    if (visited.has(questId)) return 0;
+    visited.add(questId);
+
+    // Return cached result if available
+    if (depths.has(questId)) {
+      return depths.get(questId)!;
+    }
+
+    const quest = questMap.get(questId);
+    if (!quest) return 0;
+
+    // No dependencies = depth 0 (root quest)
+    if (!quest.dependsOn || quest.dependsOn.length === 0) {
+      depths.set(questId, 0);
+      return 0;
+    }
+
+    // Depth = max depth of all dependencies + 1
+    let maxDepPrereqDepth = 0;
+    for (const dep of quest.dependsOn) {
+      const prereqDepth = getDepth(dep.requiredQuest.id, new Set(visited));
+      maxDepPrereqDepth = Math.max(maxDepPrereqDepth, prereqDepth);
+    }
+
+    const depth = maxDepPrereqDepth + 1;
+    depths.set(questId, depth);
+    return depth;
+  }
+
+  // Calculate depth for all quests
+  for (const quest of quests) {
+    getDepth(quest.id, new Set());
+  }
+
+  return depths;
+}
 
 /**
  * Split quests by trader and categorize dependencies
@@ -403,12 +457,14 @@ interface TraderLaneLayout {
 
 /**
  * Layout a single trader's quest lane using Dagre
+ * Uses global depths to position quests correctly based on cross-trader dependencies
  */
 export function layoutTraderLane(
   group: TraderQuestGroup,
-  options: BuildQuestGraphOptions
+  options: BuildQuestGraphOptions,
+  globalDepths: Map<string, number>
 ): TraderLaneLayout {
-  const { onStatusChange, onClick, onFocus, selectedQuestId, focusedQuestId, focusChain } =
+  const { onStatusChange, onClick, onFocus, selectedQuestId, focusedQuestId, focusChain, playerLevel } =
     options;
   const hasFocusMode = focusedQuestId !== null && focusedQuestId !== undefined;
 
@@ -416,11 +472,19 @@ export function layoutTraderLane(
   const g = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
   g.setGraph({
     rankdir: "LR",
-    nodesep: 25, // Tighter vertical spacing within lane
+    nodesep: 2, // Minimal vertical spacing
     ranksep: LAYOUT_CONFIG.ranksep,
-    marginx: 10,
-    marginy: 10,
+    marginx: 0,
+    marginy: 0,
   });
+
+  // Find minimum depth in this trader's quests (to normalize positions)
+  let minDepthInLane = Infinity;
+  for (const quest of group.quests) {
+    const depth = globalDepths.get(quest.id) ?? 0;
+    minDepthInLane = Math.min(minDepthInLane, depth);
+  }
+  if (minDepthInLane === Infinity) minDepthInLane = 0;
 
   // Add quest nodes
   for (const quest of group.quests) {
@@ -428,6 +492,57 @@ export function layoutTraderLane(
       width: QUEST_NODE_WIDTH,
       height: QUEST_NODE_HEIGHT,
     });
+  }
+
+  // For quests with cross-trader deps, we need to add invisible spacer nodes
+  // to push them to the correct column based on their global depth.
+  // This handles both: quests with ONLY cross-trader deps, AND quests with
+  // both intra-trader AND cross-trader deps (Dagre uses max constraint).
+  const questsWithCrossTraderDeps = group.quests.filter((quest) => {
+    return group.crossTraderDeps.some((d) => d.targetQuestId === quest.id);
+  });
+
+  // Create a chain of spacer nodes for each depth level needed
+  const spacersByDepth = new Map<number, string>();
+  let maxSpacerDepth = 0;
+
+  for (const quest of questsWithCrossTraderDeps) {
+    const globalDepth = globalDepths.get(quest.id) ?? 0;
+    // Normalize to lane-relative depth
+    const localDepth = globalDepth - minDepthInLane;
+    if (localDepth > 0) {
+      maxSpacerDepth = Math.max(maxSpacerDepth, localDepth);
+    }
+  }
+
+  // Create spacer chain: spacer-0 -> spacer-1 -> spacer-2 -> ...
+  if (maxSpacerDepth > 0) {
+    for (let i = 0; i <= maxSpacerDepth; i++) {
+      const spacerId = `__spacer_${group.traderId}_${i}`;
+      spacersByDepth.set(i, spacerId);
+      g.setNode(spacerId, {
+        width: 1, // Invisible, minimal width
+        height: 1,
+      });
+      if (i > 0) {
+        const prevSpacerId = spacersByDepth.get(i - 1)!;
+        g.setEdge(prevSpacerId, spacerId);
+      }
+    }
+  }
+
+  // Connect quests with cross-trader deps to the appropriate spacer
+  // Dagre will use the maximum of all incoming edge constraints
+  for (const quest of questsWithCrossTraderDeps) {
+    const globalDepth = globalDepths.get(quest.id) ?? 0;
+    const localDepth = globalDepth - minDepthInLane;
+    if (localDepth > 0) {
+      // Connect from the spacer at depth-1 to this quest
+      const spacerId = spacersByDepth.get(localDepth - 1);
+      if (spacerId) {
+        g.setEdge(spacerId, quest.id);
+      }
+    }
   }
 
   // Add only intra-trader edges
@@ -529,6 +644,7 @@ export function layoutTraderLane(
         isFocused: quest.id === focusedQuestId,
         isInFocusChain,
         hasFocusMode,
+        playerLevel: playerLevel ?? null,
         onStatusChange,
         onClick,
         onFocus,
@@ -689,18 +805,21 @@ export function buildTraderLaneGraph(
   const { focusedQuestId, focusChain } = options;
   const hasFocusMode = focusedQuestId !== null && focusedQuestId !== undefined;
 
-  // Step 1: Split quests by trader
+  // Step 1: Calculate global depths for all quests
+  const globalDepths = calculateGlobalDepths(quests);
+
+  // Step 2: Split quests by trader
   const groups = splitQuestsByTrader(quests);
 
-  // Step 2: Compute trader order
+  // Step 3: Compute trader order
   const traderOrder = computeTraderOrder(groups);
 
-  // Step 3: Layout each trader lane
+  // Step 4: Layout each trader lane (with global depths for cross-trader positioning)
   const laneLayouts: TraderLaneLayout[] = [];
   for (const traderId of traderOrder) {
     const group = groups.get(traderId);
     if (group && group.quests.length > 0) {
-      laneLayouts.push(layoutTraderLane(group, options));
+      laneLayouts.push(layoutTraderLane(group, options, globalDepths));
     }
   }
 
