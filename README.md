@@ -82,7 +82,7 @@ The easiest way to get started is using the VS Code Dev Container, which provide
 - Persistent bash history and command history
 - Isolated `node_modules` (prevents WSL2 binary conflicts)
 
-See [.devcontainer/README.md](.devcontainer/README.md) for detailed configuration and troubleshooting.
+See [docs/DEV_CONTAINER_SETUP.md](docs/DEV_CONTAINER_SETUP.md) for comprehensive setup guide, troubleshooting, and replication instructions for other devices.
 
 ## Docker Deployment
 
@@ -215,6 +215,17 @@ Use the `/run-qa` slash command to execute the full test suite with detailed out
 ## Data Sources
 
 Quest data sourced from the [Escape from Tarkov Wiki](https://escapefromtarkov.fandom.com/wiki/Quests).
+
+## CI/CD Pipeline
+
+This project uses a comprehensive CI/CD pipeline with GitHub Actions, including:
+
+- Automated testing and linting on every PR
+- Security scanning (CodeQL, Dependabot)
+- Branch protection and quality gates
+- Conventional commit enforcement
+
+See [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) for complete setup guide and replication instructions.
 
 ## Contributing
 
