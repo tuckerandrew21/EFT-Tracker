@@ -3,11 +3,11 @@
  *
  * Tests the /api/progress and /api/progress/[questId] endpoints.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET, POST } from "@/app/api/progress/route";
 import { GET as getProgress, PATCH } from "@/app/api/progress/[questId]/route";
 import { prisma } from "@/lib/prisma";
-import type { Session } from "next-auth";
 
 // Mock prisma
 vi.mock("@/lib/prisma", () => ({

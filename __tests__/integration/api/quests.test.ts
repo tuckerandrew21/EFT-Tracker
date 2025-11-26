@@ -4,10 +4,10 @@
  * Tests the /api/quests endpoint with MSW mocking the database layer.
  * These tests verify the API route logic, query parameters, and response format.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { GET } from "@/app/api/quests/route";
 import { prisma } from "@/lib/prisma";
-import type { Session } from "next-auth";
 
 // Mock prisma
 vi.mock("@/lib/prisma", () => ({
