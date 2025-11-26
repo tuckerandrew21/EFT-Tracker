@@ -216,6 +216,16 @@ Use the `/run-qa` slash command to execute the full test suite with detailed out
 
 Quest data sourced from the [Escape from Tarkov Wiki](https://escapefromtarkov.fandom.com/wiki/Quests).
 
+## CI/CD Pipeline
+
+This project uses a comprehensive CI/CD pipeline with GitHub Actions, including:
+- Automated testing and linting on every PR
+- Security scanning (CodeQL, Dependabot)
+- Branch protection and quality gates
+- Conventional commit enforcement
+
+See [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) for complete setup guide and replication instructions.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
