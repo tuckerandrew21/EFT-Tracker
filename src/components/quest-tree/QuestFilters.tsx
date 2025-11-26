@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -60,6 +61,8 @@ interface QuestFiltersProps {
   traders: Trader[];
   filters: Filters;
   onFilterChange: (filters: Partial<Filters>) => void;
+  onApplyFilters: () => void;
+  hasPendingChanges: boolean;
 }
 
 interface FilterControlsProps {
@@ -67,6 +70,8 @@ interface FilterControlsProps {
   traders: Trader[];
   filters: Filters;
   onFilterChange: (filters: Partial<Filters>) => void;
+  onApplyFilters: () => void;
+  hasPendingChanges: boolean;
   activeFilterCount: number;
   handleReset: () => void;
 }
@@ -76,6 +81,8 @@ const FilterControls = ({
   traders,
   filters,
   onFilterChange,
+  onApplyFilters,
+  hasPendingChanges,
   activeFilterCount,
   handleReset,
 }: FilterControlsProps) => (
@@ -234,6 +241,24 @@ const FilterControls = ({
       </Select>
     </div>
 
+    {/* Apply Filters Button */}
+    <Button
+      variant="default"
+      size="sm"
+      onClick={onApplyFilters}
+      disabled={!hasPendingChanges}
+      className={
+        hasPendingChanges
+          ? `animate-pulse ${isMobile ? "w-full" : ""}`
+          : isMobile
+            ? "w-full"
+            : ""
+      }
+    >
+      Apply Filters
+      {hasPendingChanges && <Badge className="ml-1 bg-white text-primary">!</Badge>}
+    </Button>
+
     {/* Reset Button */}
     {activeFilterCount > 0 && (
       <Button
@@ -252,20 +277,24 @@ export function QuestFilters({
   traders,
   filters,
   onFilterChange,
+  onApplyFilters,
+  hasPendingChanges,
 }: QuestFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Debounce search input
+  // Debounce search input (increased to 500ms) and auto-apply
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchValue !== filters.search) {
         onFilterChange({ search: searchValue });
+        // Auto-apply search changes after a brief delay for state to update
+        setTimeout(() => onApplyFilters(), 100);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchValue, filters.search, onFilterChange]);
+  }, [searchValue, filters.search, onFilterChange, onApplyFilters]);
 
   const handleReset = () => {
     setSearchValue("");
@@ -278,6 +307,8 @@ export function QuestFilters({
       playerLevel: null,
       levelRange: null,
     });
+    // Immediately apply reset
+    onApplyFilters();
   };
 
   const activeFilterCount = [
@@ -315,6 +346,8 @@ export function QuestFilters({
         traders={traders}
         filters={filters}
         onFilterChange={onFilterChange}
+        onApplyFilters={onApplyFilters}
+        hasPendingChanges={hasPendingChanges}
         activeFilterCount={activeFilterCount}
         handleReset={handleReset}
       />
@@ -341,6 +374,8 @@ export function QuestFilters({
               traders={traders}
               filters={filters}
               onFilterChange={onFilterChange}
+              onApplyFilters={onApplyFilters}
+              hasPendingChanges={hasPendingChanges}
               activeFilterCount={activeFilterCount}
               handleReset={handleReset}
             />
