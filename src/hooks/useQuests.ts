@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type {
   QuestWithProgress,
   Trader,
@@ -15,6 +15,8 @@ interface UseQuestsReturn {
   error: string | null;
   filters: QuestFilters;
   setFilters: (filters: Partial<QuestFilters>) => void;
+  applyFilters: () => void;
+  hasPendingChanges: boolean;
   refetch: () => Promise<void>;
 }
 
@@ -33,7 +35,10 @@ export function useQuests(): UseQuestsReturn {
   const [traders, setTraders] = useState<Trader[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFiltersState] = useState<QuestFilters>(defaultFilters);
+  const [pendingFilters, setPendingFilters] =
+    useState<QuestFilters>(defaultFilters);
+  const [appliedFilters, setAppliedFilters] =
+    useState<QuestFilters>(defaultFilters);
 
   const fetchTraders = useCallback(async () => {
     try {
@@ -52,10 +57,11 @@ export function useQuests(): UseQuestsReturn {
 
     try {
       const params = new URLSearchParams();
-      if (filters.traderId) params.set("trader", filters.traderId);
-      if (filters.map) params.set("map", filters.map);
-      if (filters.kappaOnly) params.set("kappa", "true");
-      if (filters.search) params.set("search", filters.search);
+      if (appliedFilters.traderId)
+        params.set("trader", appliedFilters.traderId);
+      if (appliedFilters.map) params.set("map", appliedFilters.map);
+      if (appliedFilters.kappaOnly) params.set("kappa", "true");
+      if (appliedFilters.search) params.set("search", appliedFilters.search);
 
       const res = await fetch(`/api/quests?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch quests");
@@ -66,18 +72,18 @@ export function useQuests(): UseQuestsReturn {
       let filteredQuests = data.quests;
 
       // Status filtering
-      if (filters.status) {
+      if (appliedFilters.status) {
         filteredQuests = filteredQuests.filter(
-          (q: QuestWithProgress) => q.computedStatus === filters.status
+          (q: QuestWithProgress) => q.computedStatus === appliedFilters.status
         );
       }
 
       // Level range filtering
-      if (filters.levelRange) {
+      if (appliedFilters.levelRange) {
         filteredQuests = filteredQuests.filter(
           (q: QuestWithProgress) =>
-            q.levelRequired >= filters.levelRange!.min &&
-            q.levelRequired <= filters.levelRange!.max
+            q.levelRequired >= appliedFilters.levelRange!.min &&
+            q.levelRequired <= appliedFilters.levelRange!.max
         );
       }
 
@@ -87,11 +93,19 @@ export function useQuests(): UseQuestsReturn {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [appliedFilters]);
 
   const setFilters = useCallback((newFilters: Partial<QuestFilters>) => {
-    setFiltersState((prev) => ({ ...prev, ...newFilters }));
+    setPendingFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
+
+  const applyFilters = useCallback(() => {
+    setAppliedFilters(pendingFilters);
+  }, [pendingFilters]);
+
+  const hasPendingChanges = useMemo(() => {
+    return JSON.stringify(pendingFilters) !== JSON.stringify(appliedFilters);
+  }, [pendingFilters, appliedFilters]);
 
   const refetch = useCallback(async () => {
     await fetchQuests();
@@ -111,8 +125,10 @@ export function useQuests(): UseQuestsReturn {
     traders,
     loading,
     error,
-    filters,
+    filters: pendingFilters,
     setFilters,
+    applyFilters,
+    hasPendingChanges,
     refetch,
   };
 }

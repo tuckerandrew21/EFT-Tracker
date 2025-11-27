@@ -20,8 +20,17 @@ const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
 
 export function QuestsClient() {
   const { status: sessionStatus } = useSession();
-  const { quests, traders, loading, error, filters, setFilters, refetch } =
-    useQuests();
+  const {
+    quests,
+    traders,
+    loading,
+    error,
+    filters,
+    setFilters,
+    applyFilters,
+    hasPendingChanges,
+    refetch,
+  } = useQuests();
   const {
     progress,
     updateStatus,
@@ -182,6 +191,8 @@ export function QuestsClient() {
         traders={traders}
         filters={filters}
         onFilterChange={setFilters}
+        onApplyFilters={applyFilters}
+        hasPendingChanges={hasPendingChanges}
       />
       <div className="flex-1 min-h-0">
         {questsWithProgress.length > 0 ? (

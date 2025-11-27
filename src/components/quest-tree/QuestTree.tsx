@@ -13,12 +13,10 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { QuestNode } from "./QuestNode";
+import { QuestNode, QUEST_NODE_WIDTH, QUEST_NODE_HEIGHT } from "./QuestNode";
 import { TraderNode } from "./TraderNode";
 import { buildTraderLaneGraph, getQuestChain } from "@/lib/quest-layout";
 import { getTraderColor } from "@/lib/trader-colors";
-import { Button } from "@/components/ui/button";
-import { Target } from "lucide-react";
 import type {
   QuestWithProgress,
   QuestStatus,
@@ -128,6 +126,29 @@ function QuestTreeInner({
     setEdges(initialEdges);
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
+  // Calculate bounds to constrain panning
+  const translateExtent = useMemo(() => {
+    if (nodes.length === 0) return undefined;
+
+    const padding = 50; // Padding around all nodes
+    const questNodes = nodes.filter((n) => n.type === "quest");
+
+    if (questNodes.length === 0) return undefined;
+
+    const minX = Math.min(...questNodes.map((n) => n.position.x)) - padding;
+    const minY = Math.min(...nodes.map((n) => n.position.y)) - padding;
+    const maxX =
+      Math.max(...questNodes.map((n) => n.position.x + QUEST_NODE_WIDTH)) +
+      padding;
+    const maxY =
+      Math.max(...nodes.map((n) => n.position.y + QUEST_NODE_HEIGHT)) + padding;
+
+    return [
+      [minX, minY],
+      [maxX, maxY],
+    ] as [[number, number], [number, number]];
+  }, [nodes]);
+
   // Center on focused quest when focus changes
   useEffect(() => {
     if (focusedQuestId) {
@@ -149,29 +170,6 @@ function QuestTreeInner({
       setFocusedQuestId(null);
     }
   }, [focusedQuestId]);
-
-  // Fit view to available quests only
-  const handleFitToAvailable = useCallback(() => {
-    const availableNodes = nodes.filter((n) => {
-      const data = n.data as QuestNodeData | undefined;
-      if (!data?.quest) return false;
-      const isAvailable = data.quest.computedStatus === "available";
-      // If player level set, also filter by level
-      if (playerLevel) {
-        return isAvailable && data.quest.levelRequired <= playerLevel;
-      }
-      return isAvailable;
-    });
-
-    if (availableNodes.length > 0) {
-      fitView({
-        nodes: availableNodes,
-        duration: 500,
-        padding: 0.3,
-        maxZoom: 1,
-      });
-    }
-  }, [nodes, playerLevel, fitView]);
 
   // MiniMap node color based on trader
   const getNodeColor = useCallback(
@@ -214,17 +212,6 @@ function QuestTreeInner({
             </button>
           </div>
         )}
-        {/* Fit to Available button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleFitToAvailable}
-          className="bg-background shadow-md"
-          title="Focus on available quests"
-        >
-          <Target className="h-4 w-4 mr-1" />
-          <span className="hidden sm:inline">Available</span>
-        </Button>
       </div>
       <ReactFlow
         nodes={nodes}
@@ -236,14 +223,10 @@ function QuestTreeInner({
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
-        fitView
-        fitViewOptions={{
-          padding: isMobile ? 0.1 : 0.2,
-          minZoom: 0.5, // Don't zoom out past readable level
-          maxZoom: isMobile ? 0.8 : 1,
-        }}
-        minZoom={0.05}
-        maxZoom={isMobile ? 1.5 : 2}
+        defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
+        translateExtent={translateExtent}
+        minZoom={0.1}
+        maxZoom={isMobile ? 2 : 4}
         defaultEdgeOptions={{
           type: "default", // Bezier curves
         }}
