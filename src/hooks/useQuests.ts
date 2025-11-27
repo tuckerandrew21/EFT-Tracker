@@ -57,7 +57,8 @@ export function useQuests(): UseQuestsReturn {
 
     try {
       const params = new URLSearchParams();
-      if (appliedFilters.traderId) params.set("trader", appliedFilters.traderId);
+      if (appliedFilters.traderId)
+        params.set("trader", appliedFilters.traderId);
       if (appliedFilters.map) params.set("map", appliedFilters.map);
       if (appliedFilters.kappaOnly) params.set("kappa", "true");
       if (appliedFilters.search) params.set("search", appliedFilters.search);

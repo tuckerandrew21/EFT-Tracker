@@ -250,7 +250,9 @@ const FilterControls = ({
       className={isMobile ? "w-full" : ""}
     >
       Apply Filters
-      {hasPendingChanges && <Badge className="ml-1 bg-white text-primary">!</Badge>}
+      {hasPendingChanges && (
+        <Badge className="ml-1 bg-white text-primary">!</Badge>
+      )}
     </Button>
 
     {/* Reset Button */}

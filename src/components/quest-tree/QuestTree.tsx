@@ -13,15 +13,10 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import {
-  QuestNode,
-  QUEST_NODE_WIDTH,
-  QUEST_NODE_HEIGHT,
-} from "./QuestNode";
+import { QuestNode, QUEST_NODE_WIDTH, QUEST_NODE_HEIGHT } from "./QuestNode";
 import { TraderNode } from "./TraderNode";
 import { buildTraderLaneGraph, getQuestChain } from "@/lib/quest-layout";
 import { getTraderColor } from "@/lib/trader-colors";
-import { Button } from "@/components/ui/button";
 import type {
   QuestWithProgress,
   QuestStatus,
@@ -146,8 +141,7 @@ function QuestTreeInner({
       Math.max(...questNodes.map((n) => n.position.x + QUEST_NODE_WIDTH)) +
       padding;
     const maxY =
-      Math.max(...nodes.map((n) => n.position.y + QUEST_NODE_HEIGHT)) +
-      padding;
+      Math.max(...nodes.map((n) => n.position.y + QUEST_NODE_HEIGHT)) + padding;
 
     return [
       [minX, minY],
