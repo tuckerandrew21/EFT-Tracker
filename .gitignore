@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Claude MCP Memory (local knowledge graph)
 /.claude/memory.jsonl
+# Test artifacts
+playwright-report/
+test-results/
