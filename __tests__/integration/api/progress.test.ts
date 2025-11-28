@@ -404,13 +404,13 @@ describe("/api/progress/[questId]", () => {
       expect(data.progress.status).toBe("IN_PROGRESS");
     });
 
-    it("should reject invalid status transition (AVAILABLE -> COMPLETED)", async () => {
+    it("should reject invalid status transition (LOCKED -> COMPLETED)", async () => {
       vi.mocked(auth).mockResolvedValue(mockSession as any);
       vi.mocked(prisma.questProgress.findUnique).mockResolvedValue({
         id: "progress-1",
         userId: "user-123",
         questId: "quest-1",
-        status: "AVAILABLE",
+        status: "LOCKED",
       } as never);
 
       const request = new Request(
