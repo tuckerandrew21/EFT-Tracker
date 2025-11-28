@@ -166,7 +166,8 @@ async function main() {
     }
 
     // Apply any title corrections
-    const originalTitle = quest.locales?.en || quest.title || `Quest ${quest.id}`;
+    const originalTitle =
+      quest.locales?.en || quest.title || `Quest ${quest.id}`;
     const correctedTitle = TITLE_CORRECTIONS[originalTitle] || originalTitle;
 
     await prisma.quest.create({
