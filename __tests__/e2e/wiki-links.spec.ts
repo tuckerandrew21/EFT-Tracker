@@ -79,12 +79,9 @@ test.describe("Quest Node Interactions", () => {
     // Find first wiki link
     const wikiLink = page.locator('a[aria-label*="wiki"]').first();
 
-    // Check attributes
+    // Check attributes (note: href removed to prevent page refresh, uses window.open instead)
     await expect(wikiLink).toHaveAttribute("target", "_blank");
     await expect(wikiLink).toHaveAttribute("rel", "noopener noreferrer");
-    await expect(wikiLink).toHaveAttribute(
-      "href",
-      /escapefromtarkov\.fandom\.com/
-    );
+    await expect(wikiLink).toHaveAttribute("role", "button");
   });
 });
