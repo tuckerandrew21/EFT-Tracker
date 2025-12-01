@@ -212,7 +212,10 @@ function QuestTreeInner({
       <div className="absolute top-2 left-2 z-10 flex items-center gap-2">
         {/* Focus mode indicator */}
         {focusedQuestId && (
-          <div className="text-xs px-3 py-1.5 rounded-full shadow-md flex items-center gap-2" style={{ backgroundColor: '#9a8866', color: '#1b1919' }}>
+          <div
+            className="text-xs px-3 py-1.5 rounded-full shadow-md flex items-center gap-2"
+            style={{ backgroundColor: "#9a8866", color: "#1b1919" }}
+          >
             <span>Focus Mode</span>
             <button
               onClick={() => setFocusedQuestId(null)}

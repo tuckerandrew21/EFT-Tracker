@@ -377,25 +377,48 @@ export function QuestFilters({
                 <div className="mt-4 pt-4 border-t">
                   <div className="flex items-center gap-3 text-xs mb-3">
                     <span className="font-medium">Progress:</span>
-                    <span className="flex items-center gap-1" style={{ color: '#00a700' }}>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00a700' }} />
+                    <span
+                      className="flex items-center gap-1"
+                      style={{ color: "#00a700" }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: "#00a700" }}
+                      />
                       {stats.completed}
                     </span>
-                    <span className="flex items-center gap-1" style={{ color: '#0292c0' }}>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0292c0' }} />
+                    <span
+                      className="flex items-center gap-1"
+                      style={{ color: "#0292c0" }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: "#0292c0" }}
+                      />
                       {stats.available}
                     </span>
-                    <span className="flex items-center gap-1" style={{ color: '#636363' }}>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#636363' }} />
+                    <span
+                      className="flex items-center gap-1"
+                      style={{ color: "#636363" }}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: "#636363" }}
+                      />
                       {stats.locked}
                     </span>
-                    <span className="text-muted-foreground">/ {totalQuests}</span>
+                    <span className="text-muted-foreground">
+                      / {totalQuests}
+                    </span>
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">
                       View Mode
                     </Label>
-                    <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
+                    <ViewToggle
+                      viewMode={viewMode}
+                      onViewModeChange={onViewModeChange}
+                    />
                   </div>
                 </div>
               </div>
@@ -406,21 +429,42 @@ export function QuestFilters({
         {/* Row 2: Stats + ViewToggle + Total (visible outside sheet) */}
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5">
-            <span className="flex items-center gap-0.5" style={{ color: '#00a700' }}>
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00a700' }} />
+            <span
+              className="flex items-center gap-0.5"
+              style={{ color: "#00a700" }}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#00a700" }}
+              />
               {stats.completed}
             </span>
-            <span className="flex items-center gap-0.5" style={{ color: '#0292c0' }}>
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0292c0' }} />
+            <span
+              className="flex items-center gap-0.5"
+              style={{ color: "#0292c0" }}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#0292c0" }}
+              />
               {stats.available}
             </span>
-            <span className="flex items-center gap-0.5" style={{ color: '#636363' }}>
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#636363' }} />
+            <span
+              className="flex items-center gap-0.5"
+              style={{ color: "#636363" }}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: "#636363" }}
+              />
               {stats.locked}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
+            <ViewToggle
+              viewMode={viewMode}
+              onViewModeChange={onViewModeChange}
+            />
             <span className="text-muted-foreground">{totalQuests} total</span>
           </div>
         </div>
@@ -430,7 +474,10 @@ export function QuestFilters({
       <div className="hidden md:flex flex-wrap items-center gap-3 w-full">
         {/* Search Input */}
         <div className="flex-1 min-w-[180px] max-w-[280px]">
-          <Label htmlFor="search" className="text-xs text-muted-foreground mb-1 block">
+          <Label
+            htmlFor="search"
+            className="text-xs text-muted-foreground mb-1 block"
+          >
             Search
           </Label>
           <Input
@@ -445,16 +492,34 @@ export function QuestFilters({
 
         {/* Stats */}
         <div className="flex items-center gap-2 text-xs border-l pl-3">
-          <span className="flex items-center gap-1" style={{ color: '#00a700' }}>
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00a700' }} />
+          <span
+            className="flex items-center gap-1"
+            style={{ color: "#00a700" }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: "#00a700" }}
+            />
             {stats.completed}
           </span>
-          <span className="flex items-center gap-1" style={{ color: '#0292c0' }}>
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0292c0' }} />
+          <span
+            className="flex items-center gap-1"
+            style={{ color: "#0292c0" }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: "#0292c0" }}
+            />
             {stats.available}
           </span>
-          <span className="flex items-center gap-1" style={{ color: '#636363' }}>
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#636363' }} />
+          <span
+            className="flex items-center gap-1"
+            style={{ color: "#636363" }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: "#636363" }}
+            />
             {stats.locked}
           </span>
           <span className="text-muted-foreground">/ {totalQuests}</span>

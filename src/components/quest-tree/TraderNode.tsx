@@ -49,7 +49,7 @@ function TraderNodeComponent({ data }: NodeProps<TraderNodeType>) {
         type="source"
         position={Position.Right}
         className="!w-1.5 !h-1.5"
-        style={{ backgroundColor: '#636363' }}
+        style={{ backgroundColor: "#636363" }}
       />
     </>
   );

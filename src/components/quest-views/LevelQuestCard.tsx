@@ -124,7 +124,10 @@ export function LevelQuestCard({
             );
           })}
           {crossTraderBadges.length > 2 && (
-            <div className="px-1 rounded text-[8px] font-medium text-white" style={{ backgroundColor: '#636363' }}>
+            <div
+              className="px-1 rounded text-[8px] font-medium text-white"
+              style={{ backgroundColor: "#636363" }}
+            >
               +{crossTraderBadges.length - 2}
             </div>
           )}
@@ -134,7 +137,7 @@ export function LevelQuestCard({
       {/* Quest title */}
       <div
         className="font-medium text-sm leading-tight line-clamp-2"
-        style={{ color: '#c7c5b3' }}
+        style={{ color: "#c7c5b3" }}
         title={quest.title}
       >
         {quest.title}
@@ -152,10 +155,10 @@ export function LevelQuestCard({
           className="text-[10px]"
           style={{
             color: isLevelAppropriate
-              ? '#00a700'
+              ? "#00a700"
               : isUpcoming
-                ? '#ca8a00'
-                : '#636363',
+                ? "#ca8a00"
+                : "#636363",
             fontWeight: isLevelAppropriate ? 500 : 400,
           }}
         >
@@ -168,7 +171,7 @@ export function LevelQuestCard({
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <svg
             className="w-6 h-6 opacity-30"
-            style={{ color: '#00a700' }}
+            style={{ color: "#00a700" }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

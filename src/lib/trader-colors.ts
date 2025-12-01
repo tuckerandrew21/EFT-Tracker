@@ -39,24 +39,24 @@ export function getTraderColor(traderId: string): TraderColor {
 // Status colors updated for dark EFT theme
 export const STATUS_COLORS = {
   locked: {
-    primary: "#636363",    /* gray-light */
-    bg: "#424242",         /* gray */
-    border: "#636363"
+    primary: "#636363" /* gray-light */,
+    bg: "#424242" /* gray */,
+    border: "#636363",
   },
   available: {
-    primary: "#0292c0",    /* blue-light */
+    primary: "#0292c0" /* blue-light */,
     bg: "rgba(2, 146, 192, 0.2)",
-    border: "#0292c0"
+    border: "#0292c0",
   },
   in_progress: {
-    primary: "#ca8a00",    /* orange */
+    primary: "#ca8a00" /* orange */,
     bg: "rgba(202, 138, 0, 0.2)",
-    border: "#ca8a00"
+    border: "#ca8a00",
   },
   completed: {
-    primary: "#00a700",    /* green */
+    primary: "#00a700" /* green */,
     bg: "rgba(0, 167, 0, 0.2)",
-    border: "#00a700"
+    border: "#00a700",
   },
 } as const;
 
