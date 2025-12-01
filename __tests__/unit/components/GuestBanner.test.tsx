@@ -75,7 +75,9 @@ describe("GuestBanner", () => {
       render(<GuestBanner />);
 
       expect(
-        screen.getByText(/You're browsing as a guest\. Your progress won't be saved\./)
+        screen.getByText(
+          /You're browsing as a guest\. Your progress won't be saved\./
+        )
       ).toBeInTheDocument();
     });
 
