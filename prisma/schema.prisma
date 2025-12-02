@@ -7,15 +7,16 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  password      String
-  name          String?
-  playerLevel   Int?
-  questsPerTree Int?            @default(5)  // null = show all
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  questProgress QuestProgress[]
+  id                     String          @id @default(cuid())
+  email                  String          @unique
+  password               String
+  name                   String?
+  playerLevel            Int?
+  questsPerTree          Int?            @default(5)  // null = show all
+  bypassLevelRequirement Boolean         @default(false)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  questProgress          QuestProgress[]
 }
 
 model Trader {

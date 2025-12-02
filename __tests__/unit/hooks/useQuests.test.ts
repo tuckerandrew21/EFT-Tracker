@@ -41,9 +41,10 @@ describe("useQuests", () => {
         search: "",
         kappaOnly: false,
         map: null,
-        playerLevel: null,
+        playerLevel: 1,
         levelRange: null,
         questsPerTree: 3,
+        bypassLevelRequirement: false,
       });
     });
   });

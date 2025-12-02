@@ -73,6 +73,7 @@ export interface QuestFilters {
   playerLevel: number | null;
   levelRange: LevelRange | null;
   questsPerTree: number | null; // null = show all
+  bypassLevelRequirement: boolean; // Show all quests regardless of level
 }
 
 // View mode for quest display

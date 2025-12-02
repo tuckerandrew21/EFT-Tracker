@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { QuestTree, QuestFilters } from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
-import { ViewToggle, LevelTimelineView } from "@/components/quest-views";
+import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
+import { LevelTimelineView } from "@/components/quest-views";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
+import { getIncompletePrerequisites } from "@/lib/quest-layout";
 import type { QuestStatus, QuestWithProgress, ViewMode } from "@/types";
 
 // Status cycle map for click handling (simplified: available <-> completed)
@@ -41,6 +43,12 @@ export function QuestsClient() {
   } = useProgress();
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("trader-lanes");
+
+  // Skip quest dialog state
+  const [skipDialogOpen, setSkipDialogOpen] = useState(false);
+  const [skipTargetQuest, setSkipTargetQuest] =
+    useState<QuestWithProgress | null>(null);
+  const [skipLoading, setSkipLoading] = useState(false);
 
   // Merge progress into quests
   const questsWithProgress: QuestWithProgress[] = quests.map((quest) => {
@@ -83,6 +91,53 @@ export function QuestsClient() {
     setSelectedQuestId((prev) => (prev === questId ? null : questId));
   }, []);
 
+  // Get prerequisites for the skip dialog
+  const skipPrerequisites = useMemo(() => {
+    if (!skipTargetQuest) return [];
+    return getIncompletePrerequisites(
+      skipTargetQuest.id,
+      allQuestsWithProgress
+    );
+  }, [skipTargetQuest, allQuestsWithProgress]);
+
+  // Handle confirming the skip (complete all prerequisites)
+  const handleSkipConfirm = useCallback(async () => {
+    if (!skipTargetQuest || skipPrerequisites.length === 0) return;
+
+    setSkipLoading(true);
+    try {
+      // Complete all prerequisites in order
+      for (const prereq of skipPrerequisites) {
+        const success = await updateStatus(prereq.id, "completed");
+        if (!success) {
+          toast.error("Failed to Update", {
+            description: `Could not complete ${prereq.title}. Please try again.`,
+          });
+          setSkipLoading(false);
+          return;
+        }
+      }
+
+      toast.success(
+        `${skipPrerequisites.length} quest${skipPrerequisites.length > 1 ? "s" : ""} completed!`,
+        {
+          description: `${skipTargetQuest.title} is now available.`,
+        }
+      );
+
+      setSkipDialogOpen(false);
+      setSkipTargetQuest(null);
+      await refetch();
+    } catch {
+      toast.error("Failed to Update", {
+        description:
+          "Could not complete prerequisite quests. Please try again.",
+      });
+    } finally {
+      setSkipLoading(false);
+    }
+  }, [skipTargetQuest, skipPrerequisites, updateStatus, refetch]);
+
   const handleStatusChange = useCallback(
     async (questId: string) => {
       const quest = questsWithProgress.find((q) => q.id === questId);
@@ -90,11 +145,23 @@ export function QuestsClient() {
 
       const currentStatus = quest.computedStatus;
 
-      // If locked, show info toast
+      // If locked, open skip dialog instead of showing toast
       if (currentStatus === "locked") {
-        toast.info("Quest Locked", {
-          description: "Complete prerequisite quests first.",
-        });
+        // If not authenticated, prompt to login first
+        if (sessionStatus !== "authenticated") {
+          toast.warning("Sign In Required", {
+            description: "Please sign in to track your progress.",
+            action: {
+              label: "Sign In",
+              onClick: () => (window.location.href = "/login"),
+            },
+          });
+          return;
+        }
+
+        // Open the skip quest dialog
+        setSkipTargetQuest(quest);
+        setSkipDialogOpen(true);
         return;
       }
 
@@ -171,6 +238,14 @@ export function QuestsClient() {
 
   return (
     <div className="flex-1 flex flex-col">
+      <SkipQuestDialog
+        open={skipDialogOpen}
+        onOpenChange={setSkipDialogOpen}
+        targetQuest={skipTargetQuest}
+        prerequisites={skipPrerequisites}
+        onConfirm={handleSkipConfirm}
+        isLoading={skipLoading}
+      />
       <QuestFilters
         traders={traders}
         filters={filters}

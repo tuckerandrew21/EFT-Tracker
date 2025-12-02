@@ -22,9 +22,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   const {
     quest,
     nodeHeight = QUEST_NODE_HEIGHT, // Use dynamic height if provided, otherwise default
-    onStatusChange,
     onClick,
-    onFocus,
     isRoot,
     isLeaf,
     isFocused,
@@ -112,9 +110,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           "relative cursor-pointer rounded border-2 p-1 transition-all duration-150",
           "hover:shadow-md active:scale-95",
           selected && "ring-2 ring-offset-2 ring-blue-500",
-          quest.computedStatus === "locked" &&
-            !isDimmed &&
-            "opacity-50 cursor-not-allowed",
+          quest.computedStatus === "locked" && !isDimmed && "opacity-50",
           quest.computedStatus === "completed" && !isDimmed && "opacity-60",
           // in_progress treated same as available (no special styling)
           (quest.computedStatus === "available" ||
