@@ -48,6 +48,7 @@ Two browser automation MCP servers are available. Use the appropriate one based 
 ### Playwright (`mcp__playwright__*`) - PRIMARY TOOL
 
 Use for:
+
 - **E2E testing** - Taking snapshots, verifying UI state, testing user flows
 - **Cross-browser testing** - When Safari/Firefox compatibility matters
 - **Visual verification** - Screenshots and accessibility snapshots
@@ -55,6 +56,7 @@ Use for:
 - **Debugging the app** - `browser_snapshot` provides accessibility tree for reliable element targeting
 
 Key tools:
+
 - `browser_navigate` - Go to URL
 - `browser_snapshot` - Get accessibility tree (preferred over screenshots for interaction)
 - `browser_click`, `browser_type`, `browser_fill_form` - Interactions
@@ -65,12 +67,14 @@ Key tools:
 ### Puppeteer (`mcp__puppeteer__*`) - SECONDARY TOOL
 
 Use for:
+
 - **Quick one-off scripts** - Simple automation that only needs Chrome
 - **PDF generation** - When generating documents
 - **Direct JavaScript execution** - When you need `puppeteer_evaluate` for complex DOM manipulation
 - **Lightweight scraping** - Quick data extraction tasks
 
 Key tools:
+
 - `puppeteer_navigate` - Go to URL
 - `puppeteer_screenshot` - Take screenshot
 - `puppeteer_click`, `puppeteer_fill` - Basic interactions
@@ -78,15 +82,15 @@ Key tools:
 
 ### Decision Matrix
 
-| Task | Use |
-|------|-----|
-| Testing the EFT-Tracker app | Playwright |
-| Verifying UI changes | Playwright (`browser_snapshot`) |
-| Cross-browser check | Playwright |
-| Quick wiki scrape | Puppeteer |
-| Generate PDF report | Puppeteer |
-| Complex form testing | Playwright |
-| Debug element selectors | Playwright (`browser_snapshot`) |
+| Task                        | Use                             |
+| --------------------------- | ------------------------------- |
+| Testing the EFT-Tracker app | Playwright                      |
+| Verifying UI changes        | Playwright (`browser_snapshot`) |
+| Cross-browser check         | Playwright                      |
+| Quick wiki scrape           | Puppeteer                       |
+| Generate PDF report         | Puppeteer                       |
+| Complex form testing        | Playwright                      |
+| Debug element selectors     | Playwright (`browser_snapshot`) |
 
 ### Running E2E Tests
 
