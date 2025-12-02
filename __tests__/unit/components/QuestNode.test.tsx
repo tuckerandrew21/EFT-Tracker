@@ -135,8 +135,8 @@ describe("QuestNode", () => {
 
       const { container } = renderWithReactFlow(<QuestNode {...props} />);
 
-      // Locked quests have opacity-50 and cursor-not-allowed classes
-      const nodeDiv = container.querySelector(".cursor-not-allowed");
+      // Locked quests have opacity-50 class (cursor-pointer to allow skip-to-quest feature)
+      const nodeDiv = container.querySelector(".opacity-50");
       expect(nodeDiv).toBeInTheDocument();
     });
 

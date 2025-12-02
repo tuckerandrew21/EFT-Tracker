@@ -204,22 +204,44 @@ const FilterControls = ({
       </Label>
     </div>
 
-    {/* Player Level Input */}
-    <div className={isMobile ? "w-full" : "w-[90px]"}>
-      <Label className="text-xs text-muted-foreground">My Level</Label>
-      <Input
-        type="number"
-        min={1}
-        max={79}
-        placeholder="1-79"
-        value={filters.playerLevel ?? ""}
-        onChange={(e) => {
-          const val = parseInt(e.target.value);
-          const level = isNaN(val) ? null : Math.min(79, Math.max(1, val));
-          onFilterChange({ playerLevel: level });
-        }}
-        className="h-9"
-      />
+    {/* Player Level Input with Bypass Checkbox */}
+    <div
+      className={
+        isMobile ? "w-full flex gap-2 items-end" : "flex gap-2 items-end"
+      }
+    >
+      <div className={isMobile ? "flex-1" : "w-[90px]"}>
+        <Label className="text-xs text-muted-foreground">My Level</Label>
+        <Input
+          type="number"
+          min={1}
+          max={79}
+          placeholder="1-79"
+          value={filters.playerLevel ?? ""}
+          onChange={(e) => {
+            const val = parseInt(e.target.value);
+            const level = isNaN(val) ? null : Math.min(79, Math.max(1, val));
+            onFilterChange({ playerLevel: level });
+          }}
+          className="h-9"
+          disabled={filters.bypassLevelRequirement}
+        />
+      </div>
+      <div className="flex items-center gap-1.5 pb-0.5">
+        <Switch
+          id={isMobile ? "bypass-level-mobile" : "bypass-level"}
+          checked={filters.bypassLevelRequirement}
+          onCheckedChange={(checked) =>
+            onFilterChange({ bypassLevelRequirement: checked })
+          }
+        />
+        <Label
+          htmlFor={isMobile ? "bypass-level-mobile" : "bypass-level"}
+          className="text-xs cursor-pointer whitespace-nowrap"
+        >
+          Bypass
+        </Label>
+      </div>
     </div>
 
     {/* Level Range Filter */}
@@ -327,16 +349,15 @@ export function QuestFilters({
   const { data: session, status: sessionStatus } = useSession();
   const [searchValue, setSearchValue] = useState(filters.search);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const initialLevelLoaded = useRef(false);
+  const initialPrefsLoaded = useRef(false);
   const lastSavedLevel = useRef<number | null>(null);
-  const initialQuestsPerTreeLoaded = useRef(false);
   const lastSavedQuestsPerTree = useRef<number | null>(5);
+  const lastSavedBypassLevel = useRef<boolean>(false);
 
   // Load user's saved preferences on mount (only for logged-in users)
   useEffect(() => {
-    if (sessionStatus === "authenticated" && !initialLevelLoaded.current) {
-      initialLevelLoaded.current = true;
-      initialQuestsPerTreeLoaded.current = true;
+    if (sessionStatus === "authenticated" && !initialPrefsLoaded.current) {
+      initialPrefsLoaded.current = true;
       fetch("/api/user")
         .then((res) => res.json())
         .then((data) => {
@@ -348,6 +369,10 @@ export function QuestFilters({
           if (data.user?.questsPerTree != null) {
             lastSavedQuestsPerTree.current = data.user.questsPerTree;
             updates.questsPerTree = data.user.questsPerTree;
+          }
+          if (data.user?.bypassLevelRequirement != null) {
+            lastSavedBypassLevel.current = data.user.bypassLevelRequirement;
+            updates.bypassLevelRequirement = data.user.bypassLevelRequirement;
           }
           if (Object.keys(updates).length > 0) {
             onFilterChange(updates);
@@ -384,7 +409,7 @@ export function QuestFilters({
   // Debounce level saving (1 second delay)
   useEffect(() => {
     if (sessionStatus !== "authenticated") return;
-    if (!initialLevelLoaded.current) return; // Don't save during initial load
+    if (!initialPrefsLoaded.current) return; // Don't save during initial load
 
     const timer = setTimeout(() => {
       savePlayerLevel(filters.playerLevel);
@@ -418,7 +443,7 @@ export function QuestFilters({
   // Debounce questsPerTree saving (1 second delay)
   useEffect(() => {
     if (sessionStatus !== "authenticated") return;
-    if (!initialQuestsPerTreeLoaded.current) return; // Don't save during initial load
+    if (!initialPrefsLoaded.current) return; // Don't save during initial load
 
     const timer = setTimeout(() => {
       saveQuestsPerTree(filters.questsPerTree);
@@ -426,6 +451,44 @@ export function QuestFilters({
 
     return () => clearTimeout(timer);
   }, [filters.questsPerTree, sessionStatus, saveQuestsPerTree]);
+
+  // Auto-save bypassLevelRequirement when it changes (debounced, only for logged-in users)
+  const saveBypassLevelRequirement = useCallback(
+    async (bypass: boolean) => {
+      if (!session?.user) return;
+      if (bypass === lastSavedBypassLevel.current) return; // No change
+
+      try {
+        const res = await fetch("/api/user", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bypassLevelRequirement: bypass }),
+        });
+        if (res.ok) {
+          lastSavedBypassLevel.current = bypass;
+        }
+      } catch (err) {
+        console.error("Failed to save bypass level requirement:", err);
+      }
+    },
+    [session?.user]
+  );
+
+  // Debounce bypassLevelRequirement saving (1 second delay)
+  useEffect(() => {
+    if (sessionStatus !== "authenticated") return;
+    if (!initialPrefsLoaded.current) return; // Don't save during initial load
+
+    const timer = setTimeout(() => {
+      saveBypassLevelRequirement(filters.bypassLevelRequirement);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [
+    filters.bypassLevelRequirement,
+    sessionStatus,
+    saveBypassLevelRequirement,
+  ]);
 
   // Debounce search input (increased to 500ms) and auto-apply
   useEffect(() => {
@@ -448,9 +511,10 @@ export function QuestFilters({
       search: "",
       kappaOnly: false,
       map: null,
-      playerLevel: null,
+      playerLevel: 1, // Reset to default level 1
       levelRange: null,
       questsPerTree: 5, // Reset to default
+      bypassLevelRequirement: false, // Reset to default
     });
     // Immediately apply reset
     onApplyFilters();
@@ -462,9 +526,10 @@ export function QuestFilters({
     filters.search,
     filters.kappaOnly,
     filters.map,
-    filters.playerLevel,
+    filters.playerLevel !== 1 ? filters.playerLevel : null, // Count if not default
     filters.levelRange,
     filters.questsPerTree !== 5 ? filters.questsPerTree : null, // Count if not default
+    filters.bypassLevelRequirement ? true : null, // Count if enabled
   ].filter(Boolean).length;
 
   return (

@@ -19,6 +19,7 @@ export async function GET() {
         name: true,
         playerLevel: true,
         questsPerTree: true,
+        bypassLevelRequirement: true,
       },
     });
 
@@ -51,6 +52,7 @@ const updateUserSchema = z.object({
     .max(100, "Maximum 100 quests per tree")
     .nullable()
     .optional(),
+  bypassLevelRequirement: z.boolean().optional(),
   name: z.string().min(1).max(100).optional(),
 });
 
@@ -74,6 +76,9 @@ export async function PATCH(request: Request) {
         ...(data.questsPerTree !== undefined && {
           questsPerTree: data.questsPerTree,
         }),
+        ...(data.bypassLevelRequirement !== undefined && {
+          bypassLevelRequirement: data.bypassLevelRequirement,
+        }),
         ...(data.name !== undefined && { name: data.name }),
       },
       select: {
@@ -82,6 +87,7 @@ export async function PATCH(request: Request) {
         name: true,
         playerLevel: true,
         questsPerTree: true,
+        bypassLevelRequirement: true,
       },
     });
 

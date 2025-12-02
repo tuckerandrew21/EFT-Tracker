@@ -52,11 +52,8 @@ const TRADER_ORDER = [
  */
 export function calculateNodeHeight(title: string): number {
   const baseHeight = 38;
-  const nodeWidth = 110;
-  const padding = 16; // Total horizontal padding
-  const maxWidth = nodeWidth - padding;
 
-  // Approximate characters per line at 10px font
+  // Approximate characters per line at 10px font for 110px width node with 16px padding
   const charsPerLine = 20;
   const estimatedLines = Math.ceil(title.length / charsPerLine);
 
@@ -126,6 +123,48 @@ export function getQuestChain(
   getDependents(questId);
 
   return chain;
+}
+
+/**
+ * Get all incomplete prerequisites for a quest (recursively).
+ * Returns quests that need to be completed before this quest can be started.
+ * Does NOT include the target quest itself.
+ */
+export function getIncompletePrerequisites(
+  questId: string,
+  quests: QuestWithProgress[]
+): QuestWithProgress[] {
+  const questMap = new Map(quests.map((q) => [q.id, q]));
+  const prerequisites: QuestWithProgress[] = [];
+  const seen = new Set<string>();
+
+  function collectPrereqs(id: string) {
+    const quest = questMap.get(id);
+    if (!quest) return;
+
+    for (const dep of quest.dependsOn || []) {
+      const prereqId = dep.requiredQuest.id;
+      if (seen.has(prereqId)) continue;
+      seen.add(prereqId);
+
+      const prereqQuest = questMap.get(prereqId);
+      if (prereqQuest && prereqQuest.computedStatus !== "completed") {
+        prerequisites.push(prereqQuest);
+      }
+      // Recursively get prerequisites of prerequisites
+      collectPrereqs(prereqId);
+    }
+  }
+
+  collectPrereqs(questId);
+
+  // Sort by trader then by title for consistent display
+  return prerequisites.sort((a, b) => {
+    if (a.trader.name !== b.trader.name) {
+      return a.trader.name.localeCompare(b.trader.name);
+    }
+    return a.title.localeCompare(b.title);
+  });
 }
 
 export function buildQuestGraph(
@@ -324,18 +363,24 @@ export function calculateTraderLocalDepths(
 /**
  * Filter quests to only include those within the first N columns (depths).
  * maxColumns: number of columns to show (1 = only root quests, 2 = roots + their direct dependents, etc.)
+ * globalDepths: Optional pre-computed global depths that consider cross-trader dependencies.
+ *               If provided, uses global depths for filtering (recommended for accurate cross-trader handling).
+ *               If not provided, falls back to local depths (same-trader only).
  */
 export function filterQuestsByColumns(
   quests: QuestWithProgress[],
   traderId: string,
-  maxColumns: number | null
+  maxColumns: number | null,
+  globalDepths?: Map<string, number>
 ): QuestWithProgress[] {
   if (maxColumns === null) return quests;
 
-  const depths = calculateTraderLocalDepths(quests, traderId);
   const traderQuests = quests.filter(
     (q) => q.traderId.toLowerCase() === traderId.toLowerCase()
   );
+
+  // Use global depths if provided, otherwise fall back to local depths
+  const depths = globalDepths ?? calculateTraderLocalDepths(quests, traderId);
 
   // Include quests with depth < maxColumns (0-indexed, so depth 0-4 for maxColumns=5)
   return traderQuests.filter((q) => {
@@ -967,12 +1012,14 @@ export function buildTraderLaneGraph(
   const groups = splitQuestsByTrader(quests);
 
   // Step 2.5: Apply column-based filtering if maxColumns is set
+  // Use global depths so cross-trader dependencies are correctly accounted for
   if (maxColumns !== null && maxColumns !== undefined) {
     for (const [traderId, group] of groups) {
       const filteredQuests = filterQuestsByColumns(
         quests,
         traderId,
-        maxColumns
+        maxColumns,
+        globalDepths // Pass global depths to properly filter cross-trader quests
       );
 
       // Update group with filtered quests

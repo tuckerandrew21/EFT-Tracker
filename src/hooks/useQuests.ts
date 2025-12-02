@@ -27,9 +27,10 @@ const defaultFilters: QuestFilters = {
   search: "",
   kappaOnly: false,
   map: null,
-  playerLevel: null,
+  playerLevel: 1, // Default to level 1 for all users
   levelRange: null,
   questsPerTree: 3, // Default to showing 3 columns (depth levels) per trader
+  bypassLevelRequirement: false, // Show all quests regardless of level when true
 };
 
 export function useQuests(): UseQuestsReturn {
@@ -93,8 +94,8 @@ export function useQuests(): UseQuestsReturn {
         );
       }
 
-      // Level range filtering
-      if (appliedFilters.levelRange) {
+      // Level range filtering (skip if bypassLevelRequirement is enabled)
+      if (appliedFilters.levelRange && !appliedFilters.bypassLevelRequirement) {
         filteredQuests = filteredQuests.filter(
           (q: QuestWithProgress) =>
             q.levelRequired >= appliedFilters.levelRange!.min &&
