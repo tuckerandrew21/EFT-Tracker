@@ -104,7 +104,10 @@ export function useQuests(): UseQuestsReturn {
       }
 
       // Hide quests more than 5 levels above player level (skip if bypassLevelRequirement is enabled)
-      if (appliedFilters.playerLevel && !appliedFilters.bypassLevelRequirement) {
+      if (
+        appliedFilters.playerLevel &&
+        !appliedFilters.bypassLevelRequirement
+      ) {
         filteredQuests = filteredQuests.filter(
           (q: QuestWithProgress) =>
             q.levelRequired <= appliedFilters.playerLevel! + 5
