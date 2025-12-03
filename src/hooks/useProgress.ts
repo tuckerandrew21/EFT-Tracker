@@ -19,6 +19,9 @@ interface UseProgressReturn {
   refreshProgress: () => Promise<void>;
   unlockedQuests: string[];
   clearUnlocked: () => void;
+  savingQuestIds: Set<string>;
+  lastSynced: Date | null;
+  isOnline: boolean;
 }
 
 export function useProgress(): UseProgressReturn {
@@ -27,9 +30,29 @@ export function useProgress(): UseProgressReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [unlockedQuests, setUnlockedQuests] = useState<string[]>([]);
+  const [savingQuestIds, setSavingQuestIds] = useState<Set<string>>(new Set());
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
 
   // Track previous state for rollback
   const previousProgress = useRef<Map<string, QuestStatus>>(new Map());
+
+  // Track online/offline status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    // Set initial state
+    setIsOnline(navigator.onLine);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const fetchProgress = useCallback(async () => {
     if (sessionStatus !== "authenticated") {
@@ -62,6 +85,7 @@ export function useProgress(): UseProgressReturn {
       }
 
       setProgress(progressMap);
+      setLastSynced(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -78,6 +102,9 @@ export function useProgress(): UseProgressReturn {
 
       // Save current state for potential rollback
       previousProgress.current = new Map(progress);
+
+      // Mark quest as saving
+      setSavingQuestIds((prev) => new Set(prev).add(questId));
 
       // Optimistic update
       setProgress((prev) => {
@@ -114,12 +141,21 @@ export function useProgress(): UseProgressReturn {
           });
         }
 
+        // Update last synced time on success
+        setLastSynced(new Date());
         return true;
       } catch (err) {
         // Rollback on error
         setProgress(previousProgress.current);
         setError(err instanceof Error ? err.message : "Failed to update");
         return false;
+      } finally {
+        // Remove quest from saving set
+        setSavingQuestIds((prev) => {
+          const next = new Set(prev);
+          next.delete(questId);
+          return next;
+        });
       }
     },
     [progress, sessionStatus]
@@ -159,5 +195,8 @@ export function useProgress(): UseProgressReturn {
     refreshProgress,
     unlockedQuests,
     clearUnlocked,
+    savingQuestIds,
+    lastSynced,
+    isOnline,
   };
 }

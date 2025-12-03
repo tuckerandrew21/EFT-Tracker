@@ -53,6 +53,7 @@ interface QuestTreeProps {
   selectedQuestId?: string | null;
   playerLevel?: number | null;
   maxColumns?: number | null; // Limit number of columns (depth) shown per trader
+  savingQuestIds?: Set<string>; // Set of quest IDs currently being saved
   onQuestSelect: (questId: string) => void;
   onStatusChange: (questId: string, status: QuestStatus) => void;
 }
@@ -64,6 +65,7 @@ function QuestTreeInner({
   selectedQuestId,
   playerLevel,
   maxColumns,
+  savingQuestIds,
   onQuestSelect,
   onStatusChange,
 }: QuestTreeProps) {
@@ -108,6 +110,7 @@ function QuestTreeInner({
       focusChain,
       playerLevel,
       maxColumns,
+      savingQuestIds,
     });
     return {
       initialNodes: graph.nodes,
@@ -120,6 +123,7 @@ function QuestTreeInner({
     selectedQuestId,
     playerLevel,
     maxColumns,
+    savingQuestIds,
     focusedQuestId,
     focusChain,
     onStatusChange,

@@ -45,6 +45,7 @@ function createNodeProps(
     isInFocusChain: overrides.isInFocusChain ?? false,
     hasFocusMode: overrides.hasFocusMode ?? false,
     playerLevel: null,
+    isSaving: false,
     onStatusChange,
     onClick,
     onFocus,

@@ -3,10 +3,15 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { QuestTree, QuestFilters } from "@/components/quest-tree";
+import {
+  QuestTree,
+  QuestFilters,
+  SyncStatusIndicator,
+} from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
 import { LevelTimelineView } from "@/components/quest-views";
+import { WelcomeModal } from "@/components/onboarding";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
 import { getIncompletePrerequisites } from "@/lib/quest-layout";
@@ -33,6 +38,7 @@ export function QuestsClient() {
     applyFilters,
     hasPendingChanges,
     refetch,
+    hiddenByLevelCount,
   } = useQuests();
   const {
     progress,
@@ -40,6 +46,9 @@ export function QuestsClient() {
     unlockedQuests,
     clearUnlocked,
     error: progressError,
+    savingQuestIds,
+    lastSynced,
+    isOnline,
   } = useProgress();
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("trader-lanes");
@@ -49,6 +58,9 @@ export function QuestsClient() {
   const [skipTargetQuest, setSkipTargetQuest] =
     useState<QuestWithProgress | null>(null);
   const [skipLoading, setSkipLoading] = useState(false);
+
+  // Onboarding state
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // Merge progress into quests
   const questsWithProgress: QuestWithProgress[] = quests.map((quest) => {
@@ -86,6 +98,23 @@ export function QuestsClient() {
       toast.error("Progress Error", { description: progressError });
     }
   }, [progressError]);
+
+  // Check for first-time user and show welcome modal
+  useEffect(() => {
+    // Only check after initial loading is complete
+    if (loading) return;
+
+    const hasSeenWelcome = localStorage.getItem("eft-tracker-onboarding");
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, [loading]);
+
+  // Handle completing onboarding
+  const handleOnboardingComplete = useCallback(() => {
+    localStorage.setItem("eft-tracker-onboarding", "completed");
+    setShowWelcome(false);
+  }, []);
 
   const handleQuestSelect = useCallback((questId: string) => {
     setSelectedQuestId((prev) => (prev === questId ? null : questId));
@@ -238,6 +267,11 @@ export function QuestsClient() {
 
   return (
     <div className="flex-1 flex flex-col">
+      <WelcomeModal
+        open={showWelcome}
+        onOpenChange={setShowWelcome}
+        onGetStarted={handleOnboardingComplete}
+      />
       <SkipQuestDialog
         open={skipDialogOpen}
         onOpenChange={setSkipDialogOpen}
@@ -260,6 +294,7 @@ export function QuestsClient() {
           locked: stats.locked,
         }}
         totalQuests={stats.total}
+        hiddenByLevelCount={hiddenByLevelCount}
       />
       <div className="flex-1 min-h-0">
         {questsWithProgress.length > 0 ? (
@@ -271,6 +306,7 @@ export function QuestsClient() {
               selectedQuestId={selectedQuestId}
               playerLevel={filters.playerLevel}
               maxColumns={filters.questsPerTree}
+              savingQuestIds={savingQuestIds}
               onQuestSelect={handleQuestSelect}
               onStatusChange={handleStatusChange}
             />
@@ -289,6 +325,16 @@ export function QuestsClient() {
           </div>
         )}
       </div>
+      {/* Sync status footer - only show when user is authenticated */}
+      {sessionStatus === "authenticated" && (
+        <div className="shrink-0 px-4 py-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <SyncStatusIndicator
+            lastSynced={lastSynced}
+            isOnline={isOnline}
+            isSaving={savingQuestIds.size > 0}
+          />
+        </div>
+      )}
     </div>
   );
 }
