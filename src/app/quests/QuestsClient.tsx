@@ -3,7 +3,11 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { QuestTree, QuestFilters } from "@/components/quest-tree";
+import {
+  QuestTree,
+  QuestFilters,
+  SyncStatusIndicator,
+} from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
 import { LevelTimelineView } from "@/components/quest-views";
@@ -42,6 +46,9 @@ export function QuestsClient() {
     unlockedQuests,
     clearUnlocked,
     error: progressError,
+    savingQuestIds,
+    lastSynced,
+    isOnline,
   } = useProgress();
   const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("trader-lanes");
@@ -299,6 +306,7 @@ export function QuestsClient() {
               selectedQuestId={selectedQuestId}
               playerLevel={filters.playerLevel}
               maxColumns={filters.questsPerTree}
+              savingQuestIds={savingQuestIds}
               onQuestSelect={handleQuestSelect}
               onStatusChange={handleStatusChange}
             />
@@ -317,6 +325,16 @@ export function QuestsClient() {
           </div>
         )}
       </div>
+      {/* Sync status footer - only show when user is authenticated */}
+      {sessionStatus === "authenticated" && (
+        <div className="shrink-0 px-4 py-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <SyncStatusIndicator
+            lastSynced={lastSynced}
+            isOnline={isOnline}
+            isSaving={savingQuestIds.size > 0}
+          />
+        </div>
+      )}
     </div>
   );
 }

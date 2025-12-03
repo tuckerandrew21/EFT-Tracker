@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTraderColor, STATUS_COLORS, EFT_COLORS } from "@/lib/trader-colors";
 import type { QuestNode as QuestNodeType } from "@/types";
@@ -29,6 +29,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
     isInFocusChain,
     hasFocusMode,
     playerLevel,
+    isSaving,
   } = data;
   const traderColor = getTraderColor(quest.traderId);
   const statusColor = STATUS_COLORS[quest.computedStatus];
@@ -209,8 +210,15 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           </div>
         )}
 
+        {/* Saving spinner overlay */}
+        {isSaving && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20 rounded">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          </div>
+        )}
+
         {/* Completed checkmark overlay */}
-        {quest.computedStatus === "completed" && (
+        {quest.computedStatus === "completed" && !isSaving && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <svg
               className="w-5 h-5 opacity-40"
