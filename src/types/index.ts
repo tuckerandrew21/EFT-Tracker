@@ -98,6 +98,7 @@ export interface QuestNodeData extends Record<string, unknown> {
   isInFocusChain: boolean; // Part of focused quest's dependency chain
   hasFocusMode: boolean; // Whether any quest is focused (for dimming)
   playerLevel: number | null; // User's current PMC level for highlighting
+  isSaving: boolean; // Whether quest is currently being saved
   onStatusChange: (questId: string, status: QuestStatus) => void;
   onClick: (questId: string) => void;
   onFocus: (questId: string) => void; // Focus on this quest's chain
