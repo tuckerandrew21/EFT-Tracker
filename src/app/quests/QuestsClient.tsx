@@ -7,6 +7,7 @@ import { QuestTree, QuestFilters } from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
 import { LevelTimelineView } from "@/components/quest-views";
+import { WelcomeModal } from "@/components/onboarding";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
 import { getIncompletePrerequisites } from "@/lib/quest-layout";
@@ -51,6 +52,9 @@ export function QuestsClient() {
     useState<QuestWithProgress | null>(null);
   const [skipLoading, setSkipLoading] = useState(false);
 
+  // Onboarding state
+  const [showWelcome, setShowWelcome] = useState(false);
+
   // Merge progress into quests
   const questsWithProgress: QuestWithProgress[] = quests.map((quest) => {
     const userStatus = progress.get(quest.id);
@@ -87,6 +91,23 @@ export function QuestsClient() {
       toast.error("Progress Error", { description: progressError });
     }
   }, [progressError]);
+
+  // Check for first-time user and show welcome modal
+  useEffect(() => {
+    // Only check after initial loading is complete
+    if (loading) return;
+
+    const hasSeenWelcome = localStorage.getItem("eft-tracker-onboarding");
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, [loading]);
+
+  // Handle completing onboarding
+  const handleOnboardingComplete = useCallback(() => {
+    localStorage.setItem("eft-tracker-onboarding", "completed");
+    setShowWelcome(false);
+  }, []);
 
   const handleQuestSelect = useCallback((questId: string) => {
     setSelectedQuestId((prev) => (prev === questId ? null : questId));
@@ -239,6 +260,11 @@ export function QuestsClient() {
 
   return (
     <div className="flex-1 flex flex-col">
+      <WelcomeModal
+        open={showWelcome}
+        onOpenChange={setShowWelcome}
+        onGetStarted={handleOnboardingComplete}
+      />
       <SkipQuestDialog
         open={skipDialogOpen}
         onOpenChange={setSkipDialogOpen}
