@@ -91,6 +91,17 @@ Daily startup check for pending work
 - Shows unpushed commits
 - Syncs to latest master
 
+#### `/endday`
+
+End of day checklist before leaving
+
+- Checks for uncommitted changes
+- Checks for unpushed commits
+- Lists open PRs and their CI status
+- Checks for stashed changes
+- Checks if dev server is still running
+- Offers to close out pending items
+
 ### Code Improvement
 
 #### `/refactor`
@@ -266,6 +277,7 @@ Add your command to this README.
 - `/quick-pr` - Fast PR creation
 - `/fix-lint` - Auto-fix lint issues
 - `/newday` - Daily startup check
+- `/endday` - End of day checklist
 
 ## Examples
 
