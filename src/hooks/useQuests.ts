@@ -123,7 +123,10 @@ export function useQuests(): UseQuestsReturn {
   }, [appliedFilters]);
 
   const setFilters = useCallback((newFilters: Partial<QuestFilters>) => {
-    setPendingFilters((prev) => ({ ...prev, ...newFilters }));
+    // Update ref synchronously so applyFilters() can read the latest value immediately
+    const updated = { ...pendingFiltersRef.current, ...newFilters };
+    pendingFiltersRef.current = updated;
+    setPendingFilters(updated);
   }, []);
 
   const applyFilters = useCallback(() => {
