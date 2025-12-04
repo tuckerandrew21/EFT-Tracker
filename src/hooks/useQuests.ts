@@ -13,6 +13,7 @@ interface UseQuestsReturn {
   allQuests: QuestWithProgress[]; // Unfiltered quests for accurate depth calculation
   traders: Trader[];
   loading: boolean;
+  initialLoading: boolean; // True only during first load, prevents remounting during refetch
   error: string | null;
   filters: QuestFilters;
   setFilters: (filters: Partial<QuestFilters>) => void;
@@ -38,6 +39,7 @@ export function useQuests(): UseQuestsReturn {
   const [allQuests, setAllQuests] = useState<QuestWithProgress[]>([]); // Unfiltered for depth calc
   const [traders, setTraders] = useState<Trader[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true); // Only true during first load
   const [error, setError] = useState<string | null>(null);
   const [pendingFilters, setPendingFilters] =
     useState<QuestFilters>(defaultFilters);
@@ -115,8 +117,10 @@ export function useQuests(): UseQuestsReturn {
 
       setHiddenByLevelCount(levelHiddenCount);
       setQuests(filteredQuests);
+      setInitialLoading(false); // First load complete
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
+      setInitialLoading(false); // Also mark initial load complete on error
     } finally {
       setLoading(false);
     }
@@ -156,6 +160,7 @@ export function useQuests(): UseQuestsReturn {
     allQuests,
     traders,
     loading,
+    initialLoading,
     error,
     filters: pendingFilters,
     setFilters,
