@@ -34,6 +34,7 @@ export function QuestsClient() {
     allQuests,
     traders,
     loading,
+    initialLoading,
     error,
     filters,
     setFilters,
@@ -264,7 +265,9 @@ export function QuestsClient() {
     return () => setStats(null); // Clear on unmount
   }, [stats, setStats, loading, error]);
 
-  if (loading) {
+  // Only show skeleton on initial page load, not on filter-triggered refetches
+  // This prevents QuestFilters from unmounting and causing infinite API loops
+  if (initialLoading) {
     return <QuestTreeSkeleton />;
   }
 
