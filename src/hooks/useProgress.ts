@@ -141,6 +141,17 @@ export function useProgress(): UseProgressReturn {
           });
         }
 
+        // Handle auto-locked quests (when prerequisites are unchecked)
+        if (data.lockedQuests && data.lockedQuests.length > 0) {
+          setProgress((prev) => {
+            const next = new Map(prev);
+            for (const lockedId of data.lockedQuests) {
+              next.set(lockedId, "locked");
+            }
+            return next;
+          });
+        }
+
         // Update last synced time on success
         setLastSynced(new Date());
         return true;

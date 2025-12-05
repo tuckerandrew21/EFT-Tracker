@@ -146,22 +146,31 @@ export async function GET(request: Request) {
       // Compute status based on dependencies
       let computedStatus = "available";
 
+      // Check if all dependencies are met based on their requirement types
+      const hasUnmetDeps = quest.dependsOn.some((dep: QuestDependency) => {
+        const depQuest = quests.find(
+          (q: QuestWithRelations) => q.id === dep.requiredQuest.id
+        );
+        const depProgress = depQuest?.progress?.[0];
+        const actualStatus = depProgress?.status || null;
+        const requirementStatus = dep.requirementStatus || ["complete"];
+
+        return !isDependencyMet(requirementStatus, actualStatus);
+      });
+
+      const shouldBeLocked = quest.dependsOn.length > 0 && hasUnmetDeps;
+
       if (progress) {
-        computedStatus = progress.status.toLowerCase();
+        const storedStatus = progress.status.toLowerCase();
+        // If dependencies are no longer met, show as locked regardless of stored status
+        // This handles the case when prerequisites are unchecked after quest was completed/available
+        if (shouldBeLocked) {
+          computedStatus = "locked";
+        } else {
+          computedStatus = storedStatus;
+        }
       } else {
-        // Check if all dependencies are met based on their requirement types
-        const hasUnmetDeps = quest.dependsOn.some((dep: QuestDependency) => {
-          const depQuest = quests.find(
-            (q: QuestWithRelations) => q.id === dep.requiredQuest.id
-          );
-          const depProgress = depQuest?.progress?.[0];
-          const actualStatus = depProgress?.status || null;
-          const requirementStatus = dep.requirementStatus || ["complete"];
-
-          return !isDependencyMet(requirementStatus, actualStatus);
-        });
-
-        if (quest.dependsOn.length > 0 && hasUnmetDeps) {
+        if (shouldBeLocked) {
           computedStatus = "locked";
         }
       }
