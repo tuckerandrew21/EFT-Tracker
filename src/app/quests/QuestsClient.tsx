@@ -66,9 +66,20 @@ export function QuestsClient() {
   const [showWelcome, setShowWelcome] = useState(false);
 
   // Merge progress into quests (memoized to prevent infinite re-renders)
+  // Note: If API says quest is "locked" (unmet dependencies), use that regardless of
+  // stored progress. This handles cases where a quest was completed but prereqs were
+  // later unchecked.
   const questsWithProgress = useMemo(
     () =>
       quests.map((quest) => {
+        // If API determined this quest should be locked due to unmet dependencies,
+        // always use that status - don't override with stale progress from the Map
+        if (quest.computedStatus === "locked") {
+          return {
+            ...quest,
+            computedStatus: "locked" as const,
+          };
+        }
         const userStatus = progress.get(quest.id);
         return {
           ...quest,
@@ -82,6 +93,13 @@ export function QuestsClient() {
   const allQuestsWithProgress = useMemo(
     () =>
       allQuests.map((quest) => {
+        // Same logic as above - prioritize API's "locked" status
+        if (quest.computedStatus === "locked") {
+          return {
+            ...quest,
+            computedStatus: "locked" as const,
+          };
+        }
         const userStatus = progress.get(quest.id);
         return {
           ...quest,

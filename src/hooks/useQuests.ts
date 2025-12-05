@@ -142,8 +142,10 @@ export function useQuests(): UseQuestsReturn {
   }, [pendingFilters, appliedFilters]);
 
   const refetch = useCallback(async () => {
-    await fetchQuests();
-  }, [fetchQuests]);
+    // Refetch both filtered quests and all quests to keep them in sync
+    // This ensures allQuests (used for skip dialog prerequisites) has fresh data
+    await Promise.all([fetchQuests(), fetchAllQuests()]);
+  }, [fetchQuests, fetchAllQuests]);
 
   // Initial fetch
   useEffect(() => {

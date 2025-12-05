@@ -111,8 +111,9 @@ export async function PATCH(
       },
     });
 
-    // Check for quests to auto-unlock based on the new status
+    // Check for quests to auto-unlock or auto-lock based on the new status
     let unlockedQuests: string[] = [];
+    let lockedQuests: string[] = [];
 
     // If quest was completed, check for quests requiring "complete" or "complete/failed"
     if (newStatus === "COMPLETED") {
@@ -130,10 +131,22 @@ export async function PATCH(
         "IN_PROGRESS"
       );
     }
+    // If quest was reset to AVAILABLE from COMPLETED, re-lock dependent quests
+    else if (newStatus === "AVAILABLE" && currentStatus === "COMPLETED") {
+      console.log(
+        `[DEBUG] Transition from COMPLETED to AVAILABLE for quest ${questId}`
+      );
+      lockedQuests = await autoLockDependentQuests(session.user.id, questId);
+      console.log(
+        `[DEBUG] lockedQuests from autoLockDependentQuests:`,
+        lockedQuests
+      );
+    }
 
     return NextResponse.json({
       progress: updatedProgress,
       unlockedQuests,
+      lockedQuests,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -223,6 +236,90 @@ async function checkAllDependenciesMet(
   }
 
   return true;
+}
+
+/**
+ * Auto-lock quests that depend on the quest that just changed status.
+ * This handles the case when a completed quest is reset to available,
+ * which may break the dependency chain for downstream quests.
+ */
+async function autoLockDependentQuests(
+  userId: string,
+  changedQuestId: string
+): Promise<string[]> {
+  console.log(
+    `[DEBUG] autoLockDependentQuests called for quest ${changedQuestId}`
+  );
+
+  // Find all quests that depend on the changed quest
+  const dependentQuests = await prisma.questDependency.findMany({
+    where: { requiredId: changedQuestId },
+    include: {
+      dependentQuest: {
+        include: {
+          dependsOn: true,
+        },
+      },
+    },
+  });
+
+  console.log(
+    `[DEBUG] Found ${dependentQuests.length} dependent quests:`,
+    dependentQuests.map((d) => d.dependentQuest.title)
+  );
+
+  const lockedQuestIds: string[] = [];
+
+  for (const dep of dependentQuests) {
+    const quest = dep.dependentQuest;
+    console.log(`[DEBUG] Checking quest: ${quest.title} (${quest.id})`);
+
+    // Check if this quest's dependencies are still met
+    const allDepsMet = await checkAllDependenciesMet(
+      userId,
+      quest.dependsOn as QuestDependencyWithStatus[]
+    );
+    console.log(`[DEBUG] allDepsMet for ${quest.title}: ${allDepsMet}`);
+
+    if (!allDepsMet) {
+      // Check current progress status
+      const currentProgress = await prisma.questProgress.findUnique({
+        where: {
+          userId_questId: {
+            userId,
+            questId: quest.id,
+          },
+        },
+      });
+      console.log(
+        `[DEBUG] currentProgress for ${quest.title}:`,
+        currentProgress?.status
+      );
+
+      // Only re-lock if currently AVAILABLE (not IN_PROGRESS or COMPLETED)
+      if (currentProgress?.status === "AVAILABLE") {
+        await prisma.questProgress.update({
+          where: {
+            userId_questId: {
+              userId,
+              questId: quest.id,
+            },
+          },
+          data: { status: "LOCKED" },
+        });
+        lockedQuestIds.push(quest.id);
+
+        // Recursively lock quests that depend on this newly locked quest
+        const cascadeLockedIds = await autoLockDependentQuests(
+          userId,
+          quest.id
+        );
+        lockedQuestIds.push(...cascadeLockedIds);
+      }
+    }
+  }
+
+  return lockedQuestIds;
 }
 
 /**
