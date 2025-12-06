@@ -456,23 +456,29 @@ export function calculateGlobalDepths(
 ): Map<string, number> {
   const depths = new Map<string, number>();
   const questMap = new Map(quests.map((q) => [q.id, q]));
+  // Single Set for cycle detection - reused across all calculations
+  const visiting = new Set<string>();
 
   // Recursive function to calculate depth with memoization
-  function getDepth(questId: string, visited: Set<string>): number {
-    // Prevent infinite loops
-    if (visited.has(questId)) return 0;
-    visited.add(questId);
-
+  function getDepth(questId: string): number {
     // Return cached result if available
     if (depths.has(questId)) {
       return depths.get(questId)!;
     }
 
+    // Prevent infinite loops (cycle detection)
+    if (visiting.has(questId)) return 0;
+    visiting.add(questId);
+
     const quest = questMap.get(questId);
-    if (!quest) return 0;
+    if (!quest) {
+      visiting.delete(questId);
+      return 0;
+    }
 
     // No dependencies = depth 0 (root quest)
     if (!quest.dependsOn || quest.dependsOn.length === 0) {
+      visiting.delete(questId);
       depths.set(questId, 0);
       return 0;
     }
@@ -480,18 +486,19 @@ export function calculateGlobalDepths(
     // Depth = max depth of all dependencies + 1
     let maxDepPrereqDepth = 0;
     for (const dep of quest.dependsOn) {
-      const prereqDepth = getDepth(dep.requiredQuest.id, new Set(visited));
+      const prereqDepth = getDepth(dep.requiredQuest.id);
       maxDepPrereqDepth = Math.max(maxDepPrereqDepth, prereqDepth);
     }
 
     const depth = maxDepPrereqDepth + 1;
+    visiting.delete(questId);
     depths.set(questId, depth);
     return depth;
   }
 
   // Calculate depth for all quests
   for (const quest of quests) {
-    getDepth(quest.id, new Set());
+    getDepth(quest.id);
   }
 
   return depths;
