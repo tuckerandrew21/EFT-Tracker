@@ -18,6 +18,13 @@ export const QUEST_NODE_HEIGHT = 58;
 export const QUEST_NODE_WIDTH_MOBILE = 130;
 export const QUEST_NODE_HEIGHT_MOBILE = 58;
 
+// Static styles extracted to module-level constants (prevents object recreation)
+const HANDLE_STYLE = { backgroundColor: STATUS_COLORS.locked.primary };
+const KAPPA_BADGE_STYLE = { backgroundColor: "#FFD700" };
+const WIKI_LINK_STYLE = { color: STATUS_COLORS.locked.primary };
+const TITLE_STYLE = { color: EFT_COLORS.goldOne };
+const CHECKMARK_STYLE = { color: STATUS_COLORS.completed.primary };
+
 function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   const {
     quest,
@@ -78,6 +85,39 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   // Should this node be dimmed? (focus mode active but not in chain)
   const isDimmed = hasFocusMode && !isInFocusChain && !isFocused;
 
+  // Memoize style objects to prevent breaking memo equality checks
+  const nodeStyle = useMemo(
+    () => ({
+      width: QUEST_NODE_WIDTH,
+      minHeight: QUEST_NODE_HEIGHT,
+      backgroundColor: isDimmed ? "#424242" : statusColor.bg,
+      borderColor: isDimmed
+        ? "#636363"
+        : quest.computedStatus === "available"
+          ? traderColor.primary
+          : statusColor.border,
+    }),
+    [
+      isDimmed,
+      statusColor.bg,
+      statusColor.border,
+      quest.computedStatus,
+      traderColor.primary,
+    ]
+  );
+
+  const levelBadgeStyle = useMemo(
+    () => ({
+      color: isLevelAppropriate
+        ? STATUS_COLORS.completed.primary
+        : isUpcoming
+          ? STATUS_COLORS.in_progress.primary
+          : STATUS_COLORS.locked.primary,
+      fontWeight: isLevelAppropriate ? 600 : 400,
+    }),
+    [isLevelAppropriate, isUpcoming]
+  );
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     // Right-click to select/view details
@@ -105,7 +145,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           type="target"
           position={Position.Left}
           className="!w-1.5 !h-1.5"
-          style={{ backgroundColor: STATUS_COLORS.locked.primary }}
+          style={HANDLE_STYLE}
         />
       )}
       <div
@@ -141,22 +181,13 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
             !isFocused &&
             "ring-1 ring-amber-300"
         )}
-        style={{
-          width: QUEST_NODE_WIDTH,
-          minHeight: QUEST_NODE_HEIGHT, // Minimum height, but grow with content
-          backgroundColor: isDimmed ? "#424242" : statusColor.bg,
-          borderColor: isDimmed
-            ? "#636363"
-            : quest.computedStatus === "available"
-              ? traderColor.primary
-              : statusColor.border,
-        }}
+        style={nodeStyle}
       >
         {/* Kappa badge */}
         {quest.kappaRequired && (
           <div
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center text-[7px] font-bold text-white"
-            style={{ backgroundColor: "#FFD700" }}
+            style={KAPPA_BADGE_STYLE}
             title="Required for Kappa"
           >
             K
@@ -174,7 +205,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
                 onClick={handleWikiLinkClick}
                 onMouseDown={handleWikiLinkMouseDown}
                 className="absolute -bottom-1 -right-1 p-2 opacity-60 hover:opacity-100 transition-colors duration-150 z-10 rounded focus:outline-none focus:ring-2 focus:ring-offset-1 pointer-events-auto"
-                style={{ color: STATUS_COLORS.locked.primary }}
+                style={WIKI_LINK_STYLE}
                 aria-label={`Open ${quest.title} wiki page`}
               >
                 <ExternalLink className="w-[18px] h-[18px]" />
@@ -205,7 +236,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
             {crossTraderBadges.length > 2 && (
               <div
                 className="px-0.5 rounded text-[7px] font-medium text-white"
-                style={{ backgroundColor: STATUS_COLORS.locked.primary }}
+                style={HANDLE_STYLE}
               >
                 +{crossTraderBadges.length - 2}
               </div>
@@ -225,7 +256,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <svg
               className="w-5 h-5 opacity-40"
-              style={{ color: STATUS_COLORS.completed.primary }}
+              style={CHECKMARK_STYLE}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -243,24 +274,14 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
         {/* Quest title */}
         <div
           className="font-semibold text-[14px] leading-tight line-clamp-2"
-          style={{ color: EFT_COLORS.goldOne }}
+          style={TITLE_STYLE}
           title={quest.title}
         >
           {quest.title}
         </div>
 
         {/* Level badge */}
-        <div
-          className="text-[12px] mt-1"
-          style={{
-            color: isLevelAppropriate
-              ? STATUS_COLORS.completed.primary
-              : isUpcoming
-                ? STATUS_COLORS.in_progress.primary
-                : STATUS_COLORS.locked.primary,
-            fontWeight: isLevelAppropriate ? 600 : 400,
-          }}
-        >
+        <div className="text-[12px] mt-1" style={levelBadgeStyle}>
           Lv.{quest.levelRequired}
         </div>
       </div>
@@ -270,7 +291,7 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           type="source"
           position={Position.Right}
           className="!w-1.5 !h-1.5"
-          style={{ backgroundColor: STATUS_COLORS.locked.primary }}
+          style={HANDLE_STYLE}
         />
       )}
     </>

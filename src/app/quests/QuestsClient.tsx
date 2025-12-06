@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useStats } from "@/contexts/StatsContext";
@@ -65,6 +65,12 @@ export function QuestsClient() {
   // Onboarding state
   const [showWelcome, setShowWelcome] = useState(false);
 
+  // Refs for stable callback references (prevents re-renders from invalidating memoization)
+  const questsWithProgressRef = useRef<QuestWithProgress[]>([]);
+  const sessionStatusRef = useRef(sessionStatus);
+  const updateStatusRef = useRef(updateStatus);
+  const refetchRef = useRef(refetch);
+
   // Merge progress into quests (memoized to prevent infinite re-renders)
   // Note: If API says quest is "locked" (unmet dependencies), use that regardless of
   // stored progress. This handles cases where a quest was completed but prereqs were
@@ -108,6 +114,23 @@ export function QuestsClient() {
       }),
     [allQuests, progress]
   );
+
+  // Keep refs in sync with current values (for stable callback references)
+  useEffect(() => {
+    questsWithProgressRef.current = questsWithProgress;
+  }, [questsWithProgress]);
+
+  useEffect(() => {
+    sessionStatusRef.current = sessionStatus;
+  }, [sessionStatus]);
+
+  useEffect(() => {
+    updateStatusRef.current = updateStatus;
+  }, [updateStatus]);
+
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   // Show notification when quests are unlocked
   useEffect(() => {
@@ -196,35 +219,17 @@ export function QuestsClient() {
     }
   }, [skipTargetQuest, skipPrerequisites, updateStatus, refetch]);
 
-  const handleStatusChange = useCallback(
-    async (questId: string) => {
-      const quest = questsWithProgress.find((q) => q.id === questId);
-      if (!quest) return;
+  // Stable callback reference using refs - prevents QuestTree useMemo from recalculating
+  const handleStatusChange = useCallback(async (questId: string) => {
+    const quest = questsWithProgressRef.current.find((q) => q.id === questId);
+    if (!quest) return;
 
-      const currentStatus = quest.computedStatus;
+    const currentStatus = quest.computedStatus;
 
-      // If locked, open skip dialog instead of showing toast
-      if (currentStatus === "locked") {
-        // If not authenticated, prompt to login first
-        if (sessionStatus !== "authenticated") {
-          toast.warning("Sign In Required", {
-            description: "Please sign in to track your progress.",
-            action: {
-              label: "Sign In",
-              onClick: () => (window.location.href = "/login"),
-            },
-          });
-          return;
-        }
-
-        // Open the skip quest dialog
-        setSkipTargetQuest(quest);
-        setSkipDialogOpen(true);
-        return;
-      }
-
-      // If not authenticated, prompt to login
-      if (sessionStatus !== "authenticated") {
+    // If locked, open skip dialog instead of showing toast
+    if (currentStatus === "locked") {
+      // If not authenticated, prompt to login first
+      if (sessionStatusRef.current !== "authenticated") {
         toast.warning("Sign In Required", {
           description: "Please sign in to track your progress.",
           action: {
@@ -235,27 +240,43 @@ export function QuestsClient() {
         return;
       }
 
-      // Get next status in cycle
-      const nextStatus = STATUS_CYCLE[currentStatus];
-      if (!nextStatus) return;
+      // Open the skip quest dialog
+      setSkipTargetQuest(quest);
+      setSkipDialogOpen(true);
+      return;
+    }
 
-      const success = await updateStatus(questId, nextStatus);
-      if (success) {
-        // Show success toast for completed quests
-        if (nextStatus === "completed") {
-          toast.success("Quest Completed!", {
-            description: quest.title,
-          });
-        }
-        await refetch();
-      } else {
-        toast.error("Failed to Update", {
-          description: "Could not update quest status. Please try again.",
+    // If not authenticated, prompt to login
+    if (sessionStatusRef.current !== "authenticated") {
+      toast.warning("Sign In Required", {
+        description: "Please sign in to track your progress.",
+        action: {
+          label: "Sign In",
+          onClick: () => (window.location.href = "/login"),
+        },
+      });
+      return;
+    }
+
+    // Get next status in cycle
+    const nextStatus = STATUS_CYCLE[currentStatus];
+    if (!nextStatus) return;
+
+    const success = await updateStatusRef.current(questId, nextStatus);
+    if (success) {
+      // Show success toast for completed quests
+      if (nextStatus === "completed") {
+        toast.success("Quest Completed!", {
+          description: quest.title,
         });
       }
-    },
-    [questsWithProgress, sessionStatus, updateStatus, refetch]
-  );
+      await refetchRef.current();
+    } else {
+      toast.error("Failed to Update", {
+        description: "Could not update quest status. Please try again.",
+      });
+    }
+  }, []); // Empty deps - uses refs for all values
 
   // Calculate progress stats (in_progress counted as available)
   // Must be before early returns to follow React hooks rules
