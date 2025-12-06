@@ -1,5 +1,31 @@
 # EFT-Tracker Project Notes
 
+## Change Request Workflow
+
+**IMPORTANT:** For non-trivial changes (bug fixes, features, refactors), follow this workflow:
+
+1. **Research deeply** - Explore the codebase to understand the issue/feature fully
+   - Read relevant files and understand existing patterns
+   - Identify all affected components
+   - Consider edge cases and potential side effects
+
+2. **Create a write-up** - Document findings before implementing:
+   - Root cause analysis (for bugs) or design approach (for features)
+   - Proposed solution with specific files/functions to modify
+   - Any trade-offs or alternative approaches considered
+
+3. **Create GitHub issue** - File an issue with the write-up for tracking
+
+4. **Request review** - Present the write-up to the user for approval
+   - Wait for explicit approval before proceeding
+   - Address any concerns or questions
+
+5. **Implement with approval** - Only after user approves, make the changes
+   - Follow the approved approach
+   - Test thoroughly before presenting results
+
+This ensures alignment on approach before investing time in implementation.
+
 ## Development Workflow
 
 ### After Pushing Code
@@ -51,10 +77,35 @@ Use for E2E testing, visual verification, and debugging:
 - `browser_snapshot` - Get accessibility tree (preferred for interaction)
 - `browser_click`, `browser_type`, `browser_fill_form` - Interactions
 - `browser_take_screenshot` - Visual capture
+- `browser_tabs` with `action: 'list'` - List all open tabs
+- `browser_close` - Close current page/session
 
 **Note:** This project's E2E tests use the Playwright test runner (`npx playwright test`), which is separate from the MCP tools. The MCP tools are for ad-hoc browser automation during development.
 
 **Screenshot Cleanup:** When taking screenshots during development debugging (stored in `.playwright-mcp/`), remember to delete them when closing the related issue or PR. These are temporary files and should not accumulate in the working directory.
+
+### Playwright Session Management
+
+The MCP Playwright server uses a **persistent browser profile** by default, which can cause "Browser is already in use" errors if sessions aren't closed properly.
+
+**Best practices:**
+
+1. Always call `browser_close` when done with browser automation
+2. Before starting new automation, try `browser_tabs` with `action: 'list'` to check session state
+3. If you get "Browser is already in use" error, the profile is locked
+
+**Recovery steps for locked sessions:**
+
+1. First try `browser_close` - may work even if other commands fail
+2. If that fails, manually close Chrome windows opened by Playwright
+3. As last resort, delete the lock: `Remove-Item -Recurse "$env:LOCALAPPDATA\ms-playwright\mcp-chrome-*" -Force`
+4. The user may need to restart Claude Code if the MCP server is stuck
+
+**To prevent tab accumulation:**
+
+- Don't call `browser_navigate` repeatedly without closing - reuse the existing tab
+- Use `browser_tabs` with `action: 'select'` to switch to existing tabs instead of creating new ones
+- Close tabs you're done with using `browser_tabs` with `action: 'close'`
 
 ### Visual Change Self-Evaluation
 
