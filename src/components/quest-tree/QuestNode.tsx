@@ -178,17 +178,20 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           isInFocusChain && !isFocused && "ring-2 ring-blue-300",
           isDimmed && "opacity-40 pointer-events-auto",
           // Level-based highlighting (only for available quests, not when keyboard selected)
+          // Kappa quests use badge indicator, so skip ring highlighting for them
           isLevelAppropriate &&
             quest.computedStatus === "available" &&
             !isDimmed &&
             !isFocused &&
             !isKeyboardSelected &&
+            !quest.kappaRequired &&
             "ring-2 ring-emerald-400 shadow-emerald-100",
           isUpcoming &&
             quest.computedStatus !== "completed" &&
             !isDimmed &&
             !isFocused &&
             !isKeyboardSelected &&
+            !quest.kappaRequired && // Kappa quests use badge, not ring
             "ring-1 ring-amber-300",
           // Keyboard navigation selection (orange ring to distinguish from focus) - applied last to take precedence
           isKeyboardSelected &&
@@ -206,50 +209,6 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           >
             K
           </div>
-        )}
-
-        {/* Info button - opens quest details (min 44px touch target) */}
-        {!isDimmed && onDetails && (
-          <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                onClick={handleInfoClick}
-                onMouseDown={handleInfoMouseDown}
-                className="absolute -bottom-2 -left-2 p-3 opacity-100 sm:opacity-60 sm:hover:opacity-100 transition-colors duration-150 z-10 rounded focus:outline-none focus:ring-2 focus:ring-offset-1 pointer-events-auto"
-                style={WIKI_LINK_STYLE}
-                aria-label={`View ${quest.title} details`}
-              >
-                <Info className="w-[18px] h-[18px]" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" sideOffset={4}>
-              <p className="text-xs">View Details</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
-
-        {/* Wiki link (min 44px touch target) */}
-        {quest.wikiLink && !isDimmed && (
-          <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-              <a
-                role="button"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleWikiLinkClick}
-                onMouseDown={handleWikiLinkMouseDown}
-                className="absolute -bottom-2 -right-2 p-3 opacity-100 sm:opacity-60 sm:hover:opacity-100 transition-colors duration-150 z-10 rounded focus:outline-none focus:ring-2 focus:ring-offset-1 pointer-events-auto"
-                style={WIKI_LINK_STYLE}
-                aria-label={`Open ${quest.title} wiki page`}
-              >
-                <ExternalLink className="w-[18px] h-[18px]" />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent side="top" sideOffset={4}>
-              <p className="text-xs">View on Tarkov Wiki</p>
-            </TooltipContent>
-          </Tooltip>
         )}
 
         {/* Cross-trader dependency badges */}
@@ -315,9 +274,56 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
           {quest.title}
         </div>
 
-        {/* Level badge */}
-        <div className="text-[12px] mt-1" style={levelBadgeStyle}>
-          Lv.{quest.levelRequired}
+        {/* Level badge and action buttons row */}
+        <div className="flex items-center justify-between mt-1">
+          <div className="text-[12px]" style={levelBadgeStyle}>
+            Lv.{quest.levelRequired}
+          </div>
+          {/* Action buttons - info and wiki link */}
+          <div className="flex items-center gap-1">
+            {/* Info button - opens quest details */}
+            {!isDimmed && onDetails && (
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={handleInfoClick}
+                    onMouseDown={handleInfoMouseDown}
+                    className="p-0.5 opacity-60 hover:opacity-100 transition-colors duration-150 rounded focus:outline-none focus:ring-1 focus:ring-offset-1 pointer-events-auto"
+                    style={WIKI_LINK_STYLE}
+                    aria-label={`View ${quest.title} details`}
+                  >
+                    <Info className="w-[14px] h-[14px]" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={4}>
+                  <p className="text-xs">View Details</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {/* Wiki link */}
+            {quest.wikiLink && !isDimmed && (
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <a
+                    role="button"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleWikiLinkClick}
+                    onMouseDown={handleWikiLinkMouseDown}
+                    className="p-0.5 opacity-60 hover:opacity-100 transition-colors duration-150 rounded focus:outline-none focus:ring-1 focus:ring-offset-1 pointer-events-auto"
+                    style={WIKI_LINK_STYLE}
+                    aria-label={`Open ${quest.title} wiki page`}
+                  >
+                    <ExternalLink className="w-[14px] h-[14px]" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent side="top" sideOffset={4}>
+                  <p className="text-xs">View on Tarkov Wiki</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
       {/* Only show right handle if quest has dependents (not a leaf node) */}

@@ -355,6 +355,8 @@ describe("Level Highlighting", () => {
     const availableQuest = quests.find(
       (q) => q.id === MIXED_STATUS_IDS.AVAILABLE
     )!;
+    // Set kappaRequired to false - Kappa quests use badge indicator instead of ring
+    availableQuest.kappaRequired = false;
 
     // Player is level 5, quest requires level 1 (appropriate)
     const props = createNodeProps(availableQuest, { playerLevel: 5 });
@@ -369,6 +371,8 @@ describe("Level Highlighting", () => {
     const quests = createMixedStatusQuests();
     // Locked quest at level 15
     const lockedQuest = quests.find((q) => q.id === MIXED_STATUS_IDS.LOCKED)!;
+    // Set kappaRequired to false - Kappa quests use badge indicator instead of ring
+    lockedQuest.kappaRequired = false;
 
     // Player is level 12, quest requires level 15 (upcoming: within 5 levels)
     const props = createNodeProps(lockedQuest, { playerLevel: 12 });
