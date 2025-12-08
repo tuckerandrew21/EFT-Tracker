@@ -839,22 +839,33 @@ export function layoutTraderLane(
   );
 
   // Convert to nodes (positions relative to lane origin)
-  const nodes: QuestNode[] = group.quests.map((quest) => {
+  // First pass: calculate positions
+  const nodePositions = group.quests.map((quest) => {
     const nodeWithPosition = g.node(quest.id);
+    return {
+      quest,
+      x: nodeWithPosition.x - QUEST_NODE_WIDTH / 2,
+      // Convert from Dagre center position to top-left
+      y: nodeWithPosition.y - QUEST_NODE_HEIGHT / 2,
+    };
+  });
+
+  // Find the minimum Y to normalize all positions so first quest starts at y=0
+  const minQuestY = Math.min(...nodePositions.map((p) => p.y));
+
+  // Second pass: create nodes with normalized positions
+  const nodes: QuestNode[] = nodePositions.map(({ quest, x, y }) => {
     const isInFocusChain = focusChain?.has(quest.id) ?? false;
 
     // Calculate dynamic height for this quest
     const nodeHeight = calculateNodeHeight(quest.title);
 
-    // Normalize Y position relative to lane center
-    const normalizedY = nodeWithPosition.y - minY;
-
     return {
       id: quest.id,
       type: "quest",
       position: {
-        x: nodeWithPosition.x - QUEST_NODE_WIDTH / 2,
-        y: normalizedY,
+        x,
+        y: y - minQuestY, // Normalize so topmost quest is at y=0
       },
       data: {
         quest,
