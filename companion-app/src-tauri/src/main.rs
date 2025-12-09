@@ -226,9 +226,13 @@ fn main() {
     env_logger::init();
 
     let eft_detector = Arc::new(EftDetector::new());
-    let sync_manager = Arc::new(Mutex::new(SyncManager::new(
+    // Use localhost for development, production URL for release builds
+    let api_base = if cfg!(debug_assertions) {
+        "http://localhost:3000".to_string()
+    } else {
         "https://eft-tracker.vercel.app".to_string()
-    )));
+    };
+    let sync_manager = Arc::new(Mutex::new(SyncManager::new(api_base)));
 
     let app_state = AppState {
         eft_detector,
@@ -242,6 +246,7 @@ fn main() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
         ))
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .manage(app_state)
