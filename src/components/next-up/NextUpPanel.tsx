@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { Lightbulb, ChevronRight, Star, Map, Zap } from "lucide-react";
+import {
+  Lightbulb,
+  ChevronRight,
+  Star,
+  Map as MapIcon,
+  Zap,
+} from "lucide-react";
 import { getTraderColor } from "@/lib/trader-colors";
 import type { QuestWithProgress } from "@/types";
 
@@ -132,7 +138,7 @@ export function NextUpPanel({
       case "chain":
         return <ChevronRight className="w-3 h-3 text-blue-400" />;
       case "map":
-        return <Map className="w-3 h-3 text-purple-400" />;
+        return <MapIcon className="w-3 h-3 text-purple-400" />;
     }
   };
 
