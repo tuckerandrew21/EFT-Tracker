@@ -7,16 +7,17 @@ datasource db {
 }
 
 model User {
-  id                     String          @id @default(cuid())
-  email                  String          @unique
+  id                     String           @id @default(cuid())
+  email                  String           @unique
   password               String
   name                   String?
   playerLevel            Int?
-  questsPerTree          Int?            @default(5)  // null = show all
-  bypassLevelRequirement Boolean         @default(false)
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
+  questsPerTree          Int?             @default(5)  // null = show all
+  bypassLevelRequirement Boolean          @default(false)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
   questProgress          QuestProgress[]
+  companionTokens        CompanionToken[]
 }
 
 model Trader {
@@ -63,13 +64,14 @@ model Objective {
 }
 
 model QuestProgress {
-  id        String      @id @default(cuid())
-  status    QuestStatus @default(LOCKED)
-  userId    String
-  questId   String
-  updatedAt DateTime    @updatedAt
-  quest     Quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String      @id @default(cuid())
+  status     QuestStatus @default(LOCKED)
+  userId     String
+  questId    String
+  syncSource SyncSource  @default(WEB)
+  updatedAt  DateTime    @updatedAt
+  quest      Quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, questId])
 }
@@ -79,4 +81,31 @@ enum QuestStatus {
   AVAILABLE
   IN_PROGRESS
   COMPLETED
+}
+
+enum SyncSource {
+  WEB       // Updated via web interface
+  COMPANION // Updated via desktop companion app
+}
+
+enum GameMode {
+  PVP
+  PVE
+}
+
+model CompanionToken {
+  id         String    @id @default(cuid())
+  token      String    @unique  // Hashed token (bcrypt)
+  tokenHint  String              // Last 4 chars of original token for display
+  userId     String
+  deviceName String
+  gameMode   GameMode  @default(PVP)
+  lastSeen   DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
 }
