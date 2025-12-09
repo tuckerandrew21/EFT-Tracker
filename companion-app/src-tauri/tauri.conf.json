@@ -30,7 +30,7 @@
       "menuOnLeftClick": false
     },
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://*.eft-tracker.com https://eft-tracker.vercel.app; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:3000 https://*.eft-tracker.com https://eft-tracker.vercel.app; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {

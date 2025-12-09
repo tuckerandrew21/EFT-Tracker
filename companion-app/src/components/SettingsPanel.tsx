@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   ArrowLeft,
   FolderSearch,
+  FolderOpen,
   Power,
   Bell,
   Volume2,
@@ -10,6 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { enable, disable } from "@tauri-apps/plugin-autostart";
+import { open } from "@tauri-apps/plugin-dialog";
 import type { AppSettings } from "../hooks/useStore";
 
 interface SettingsPanelProps {
@@ -47,6 +49,30 @@ export function SettingsPanel({
     } else {
       setPathError("Invalid EFT installation path");
       setPathValid(false);
+    }
+  };
+
+  const handleBrowse = async () => {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: "Select EFT Installation Folder",
+      });
+      if (selected && typeof selected === "string") {
+        setCustomPath(selected);
+        setPathError(null);
+        setPathValid(false);
+        // Auto-validate after selecting
+        const valid = await onSetEftPath(selected);
+        if (valid) {
+          setPathValid(true);
+        } else {
+          setPathError("Invalid EFT installation path");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to open folder picker:", error);
     }
   };
 
@@ -117,6 +143,13 @@ export function SettingsPanel({
                   placeholder="C:\Battlestate Games\EFT"
                   className="flex-1 bg-tarkov-bg border border-tarkov-border rounded-lg py-2 px-3 text-tarkov-text placeholder-tarkov-muted/50 focus:outline-none focus:border-tarkov-accent text-sm"
                 />
+                <button
+                  onClick={handleBrowse}
+                  className="p-2 bg-tarkov-border hover:bg-tarkov-muted/30 text-tarkov-text rounded-lg"
+                  title="Browse for folder"
+                >
+                  <FolderOpen className="w-5 h-5" />
+                </button>
                 <button
                   onClick={handlePathChange}
                   className="bg-tarkov-accent hover:bg-tarkov-accent/80 text-tarkov-bg font-medium rounded-lg px-4 py-2 text-sm"
