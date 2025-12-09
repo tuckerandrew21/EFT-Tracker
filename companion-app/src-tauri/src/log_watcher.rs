@@ -46,6 +46,7 @@ pub struct QuestEvent {
 
 /// Log file state for tracking read position
 struct LogFileState {
+    #[allow(dead_code)]
     path: PathBuf,
     position: u64,
     last_modified: std::time::SystemTime,
@@ -180,15 +181,19 @@ impl LogWatcher {
             Regex::new(r"Got notification \| ChatMessageReceived").unwrap();
 
         // Pattern to extract quest info from the notification JSON
-        // Looking for templateId (quest ID) and type (TaskStarted, TaskFinished, TaskFailed)
+        // Actual EFT log format:
+        //   "text": "quest started",
+        //   "templateId": "5d4bec3486f7743cac246665 successMessageText",
+        // The quest ID is the first part before " successMessageText"
+        // Note: Using [\s\S]*? instead of .*? to match across newlines
         let quest_pattern = Regex::new(
-            r#""templateId"\s*:\s*"([^"]+)".*?"type"\s*:\s*"(Task(?:Started|Finished|Failed))""#,
+            r#""text"\s*:\s*"quest (started|finished|failed)"[\s\S]*?"templateId"\s*:\s*"([a-f0-9]{24})"#,
         )
         .unwrap();
 
-        // Alternative pattern if type comes before templateId
+        // Alternative pattern if templateId comes before text
         let quest_pattern_alt = Regex::new(
-            r#""type"\s*:\s*"(Task(?:Started|Finished|Failed))".*?"templateId"\s*:\s*"([^"]+)""#,
+            r#""templateId"\s*:\s*"([a-f0-9]{24})[\s\S]*?"text"\s*:\s*"quest (started|finished|failed)""#,
         )
         .unwrap();
 
@@ -342,10 +347,10 @@ impl LogWatcher {
         quest_pattern_alt: &Regex,
         log_path: &Path,
     ) -> Option<QuestEvent> {
-        // Try primary pattern
+        // Try primary pattern: "text": "quest started" ... "templateId": "<quest_id>"
         if let Some(caps) = quest_pattern.captures(content) {
-            let quest_id = caps.get(1)?.as_str().to_string();
-            let status_str = caps.get(2)?.as_str();
+            let status_str = caps.get(1)?.as_str();
+            let quest_id = caps.get(2)?.as_str().to_string();
             let status = Self::parse_status(status_str)?;
 
             return Some(QuestEvent {
@@ -356,10 +361,10 @@ impl LogWatcher {
             });
         }
 
-        // Try alternative pattern
+        // Try alternative pattern: "templateId": "<quest_id>" ... "text": "quest started"
         if let Some(caps) = quest_pattern_alt.captures(content) {
-            let status_str = caps.get(1)?.as_str();
-            let quest_id = caps.get(2)?.as_str().to_string();
+            let quest_id = caps.get(1)?.as_str().to_string();
+            let status_str = caps.get(2)?.as_str();
             let status = Self::parse_status(status_str)?;
 
             return Some(QuestEvent {
@@ -376,9 +381,9 @@ impl LogWatcher {
     /// Parse status string to enum
     fn parse_status(status: &str) -> Option<QuestEventStatus> {
         match status {
-            "TaskStarted" => Some(QuestEventStatus::Started),
-            "TaskFinished" => Some(QuestEventStatus::Finished),
-            "TaskFailed" => Some(QuestEventStatus::Failed),
+            "started" => Some(QuestEventStatus::Started),
+            "finished" => Some(QuestEventStatus::Finished),
+            "failed" => Some(QuestEventStatus::Failed),
             _ => None,
         }
     }
@@ -397,15 +402,15 @@ mod tests {
     #[test]
     fn test_status_parsing() {
         assert_eq!(
-            LogWatcher::parse_status("TaskStarted"),
+            LogWatcher::parse_status("started"),
             Some(QuestEventStatus::Started)
         );
         assert_eq!(
-            LogWatcher::parse_status("TaskFinished"),
+            LogWatcher::parse_status("finished"),
             Some(QuestEventStatus::Finished)
         );
         assert_eq!(
-            LogWatcher::parse_status("TaskFailed"),
+            LogWatcher::parse_status("failed"),
             Some(QuestEventStatus::Failed)
         );
         assert_eq!(LogWatcher::parse_status("Invalid"), None);
@@ -416,5 +421,24 @@ mod tests {
         assert_eq!(QuestEventStatus::Started.as_str(), "STARTED");
         assert_eq!(QuestEventStatus::Finished.as_str(), "FINISHED");
         assert_eq!(QuestEventStatus::Failed.as_str(), "FAILED");
+    }
+
+    #[test]
+    fn test_quest_pattern_matching() {
+        // Test the regex patterns match actual EFT log format
+        // Note: Using [\s\S]*? instead of .*? to match across newlines
+        let quest_pattern = Regex::new(
+            r#""text"\s*:\s*"quest (started|finished|failed)"[\s\S]*?"templateId"\s*:\s*"([a-f0-9]{24})"#,
+        )
+        .unwrap();
+
+        let sample_log = r#"    "text": "quest started",
+    "templateId": "5d4bec3486f7743cac246665 successMessageText","#;
+
+        let caps = quest_pattern.captures(sample_log);
+        assert!(caps.is_some());
+        let caps = caps.unwrap();
+        assert_eq!(caps.get(1).unwrap().as_str(), "started");
+        assert_eq!(caps.get(2).unwrap().as_str(), "5d4bec3486f7743cac246665");
     }
 }

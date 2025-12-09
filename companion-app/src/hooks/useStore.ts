@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Store } from "@tauri-apps/plugin-store";
+import { LazyStore } from "@tauri-apps/plugin-store";
 
-const store = new Store("settings.json");
+const store = new LazyStore("settings.json");
 
 export interface AppSettings {
   companionToken: string | null;

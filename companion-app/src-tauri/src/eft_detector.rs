@@ -78,8 +78,6 @@ impl EftDetector {
             return false;
         }
 
-        // Check for Logs directory (or it should be created when game runs)
-        let logs_path = path.join("Logs");
         // Logs folder might not exist if game hasn't been run yet, that's ok
         // But the EFT_Data folder should always exist
         let data_path = path.join("EscapeFromTarkov_Data");
