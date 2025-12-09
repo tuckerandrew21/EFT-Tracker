@@ -4,7 +4,7 @@
 //! Supports offline operation with local queue persistence.
 
 use chrono::{DateTime, Utc};
-use log::{error, info, warn};
+use log::{error, info};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -35,7 +35,7 @@ impl From<QuestEvent> for SyncEvent {
 }
 
 /// Sync result from API
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SyncResult {
     pub synced: usize,
     pub errors: Vec<SyncError>,
@@ -43,7 +43,7 @@ pub struct SyncResult {
     pub unlocked_quests: Vec<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct SyncError {
     #[serde(rename = "questId")]
     pub quest_id: String,
@@ -51,7 +51,7 @@ pub struct SyncError {
 }
 
 /// Token validation response
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TokenValidationResponse {
     pub valid: bool,
     #[serde(rename = "userId")]
