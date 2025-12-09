@@ -4,7 +4,7 @@
 //! Uses a polling approach (5-second intervals) since EFT may have the files locked.
 
 use chrono::{DateTime, Utc};
-use log::{debug, error, info, warn};
+use log::{debug, info, warn};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
