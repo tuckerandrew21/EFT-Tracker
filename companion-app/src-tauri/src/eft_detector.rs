@@ -28,8 +28,14 @@ const DEFAULT_PATHS: &[&str] = &[
 /// Registry paths where BSG Launcher stores EFT path
 const REGISTRY_PATHS: &[(&str, &str)] = &[
     // BSG Launcher stores the install path here
-    ("SOFTWARE\\Battlestate Games\\EscapeFromTarkov", "InstallPath"),
-    ("SOFTWARE\\WOW6432Node\\Battlestate Games\\EscapeFromTarkov", "InstallPath"),
+    (
+        "SOFTWARE\\Battlestate Games\\EscapeFromTarkov",
+        "InstallPath",
+    ),
+    (
+        "SOFTWARE\\WOW6432Node\\Battlestate Games\\EscapeFromTarkov",
+        "InstallPath",
+    ),
 ];
 
 pub struct EftDetector {
@@ -141,9 +147,8 @@ impl EftDetector {
 
     /// Get the logs directory path
     pub fn get_logs_path(&self) -> Option<String> {
-        self.get_eft_path().map(|p| {
-            Path::new(&p).join("Logs").to_string_lossy().to_string()
-        })
+        self.get_eft_path()
+            .map(|p| Path::new(&p).join("Logs").to_string_lossy().to_string())
     }
 }
 

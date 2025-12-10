@@ -104,10 +104,9 @@ impl LogWatcher {
         };
 
         // Start watching the logs directory
-        watcher_instance._watcher.watch(
-            Path::new(&logs_path),
-            RecursiveMode::NonRecursive,
-        )?;
+        watcher_instance
+            ._watcher
+            .watch(Path::new(&logs_path), RecursiveMode::NonRecursive)?;
 
         // Initial scan of existing log files
         watcher_instance.initial_scan()?;
@@ -177,8 +176,7 @@ impl LogWatcher {
     {
         // Regex patterns for parsing quest events
         // Pattern: "Got notification | ChatMessageReceived" followed by JSON
-        let notification_pattern =
-            Regex::new(r"Got notification \| ChatMessageReceived").unwrap();
+        let notification_pattern = Regex::new(r"Got notification \| ChatMessageReceived").unwrap();
 
         // Pattern to extract quest info from the notification JSON
         // Actual EFT log format:
@@ -278,11 +276,13 @@ impl LogWatcher {
 
         // Get or create file state
         let mut states = file_states.lock().unwrap();
-        let state = states.entry(path.to_path_buf()).or_insert_with(|| LogFileState {
-            path: path.to_path_buf(),
-            position: 0,
-            last_modified: modified,
-        });
+        let state = states
+            .entry(path.to_path_buf())
+            .or_insert_with(|| LogFileState {
+                path: path.to_path_buf(),
+                position: 0,
+                last_modified: modified,
+            });
 
         // Skip if file hasn't changed
         if state.position >= file_size {
@@ -568,11 +568,11 @@ mod tests {
 
     #[test]
     fn test_notification_pattern() {
-        let notification_pattern =
-            Regex::new(r"Got notification \| ChatMessageReceived").unwrap();
+        let notification_pattern = Regex::new(r"Got notification \| ChatMessageReceived").unwrap();
 
         // Should match
-        assert!(notification_pattern.is_match("2024.01.15 10:30:45|Got notification | ChatMessageReceived {"));
+        assert!(notification_pattern
+            .is_match("2024.01.15 10:30:45|Got notification | ChatMessageReceived {"));
         assert!(notification_pattern.is_match("Got notification | ChatMessageReceived"));
 
         // Should not match

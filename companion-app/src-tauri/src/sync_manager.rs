@@ -153,17 +153,13 @@ impl SyncManager {
             }));
         }
 
-        let token = self.token.as_ref()
-            .ok_or("No companion token configured")?;
+        let token = self.token.as_ref().ok_or("No companion token configured")?;
 
         // Collect events to sync (up to 100)
-        let events: Vec<SyncEvent> = self.event_queue
-            .iter()
-            .take(100)
-            .cloned()
-            .collect();
+        let events: Vec<SyncEvent> = self.event_queue.iter().take(100).cloned().collect();
 
-        let response = self.client
+        let response = self
+            .client
             .post(format!("{}/api/companion/sync", self.api_base))
             .header("Authorization", format!("Bearer {}", token))
             .json(&json!({
@@ -180,7 +176,9 @@ impl SyncManager {
         let status = response.status();
 
         if status.is_success() {
-            let result: SyncResult = response.json().await
+            let result: SyncResult = response
+                .json()
+                .await
                 .map_err(|e| format!("Failed to parse response: {}", e))?;
 
             // Remove synced events from queue
@@ -193,7 +191,11 @@ impl SyncManager {
             self.total_errors += result.errors.len();
             self.last_sync = Some(Utc::now());
 
-            info!("Synced {} events, {} errors", synced_count, result.errors.len());
+            info!(
+                "Synced {} events, {} errors",
+                synced_count,
+                result.errors.len()
+            );
 
             Ok(json!({
                 "synced": synced_count,
@@ -212,7 +214,8 @@ impl SyncManager {
 
     /// Validate a companion token with the server
     pub async fn validate_token(&self, token: &str) -> Result<Value, String> {
-        let response = self.client
+        let response = self
+            .client
             .get(format!("{}/api/companion/status", self.api_base))
             .header("Authorization", format!("Bearer {}", token))
             .send()
@@ -222,7 +225,9 @@ impl SyncManager {
         let status = response.status();
 
         if status.is_success() {
-            let validation: TokenValidationResponse = response.json().await
+            let validation: TokenValidationResponse = response
+                .json()
+                .await
                 .map_err(|e| format!("Failed to parse response: {}", e))?;
 
             Ok(json!({
