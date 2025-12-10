@@ -13,10 +13,15 @@ use winreg::RegKey;
 
 /// Default installation paths to check if registry lookup fails
 const DEFAULT_PATHS: &[&str] = &[
+    "C:\\Battlestate Games\\Escape from Tarkov",
     "C:\\Battlestate Games\\EFT",
-    "C:\\Games\\EFT",
+    "D:\\Battlestate Games\\Escape from Tarkov",
     "D:\\Battlestate Games\\EFT",
+    "C:\\Games\\Escape from Tarkov",
+    "C:\\Games\\EFT",
+    "D:\\Games\\Escape from Tarkov",
     "D:\\Games\\EFT",
+    "E:\\Battlestate Games\\Escape from Tarkov",
     "E:\\Battlestate Games\\EFT",
 ];
 

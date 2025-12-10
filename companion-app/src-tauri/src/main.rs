@@ -66,14 +66,42 @@ async fn start_watching(
         let sync_manager = sync_manager.clone();
         let app_handle = app_handle.clone();
 
-        tokio::spawn(async move {
-            let mut manager = sync_manager.lock().await;
-            if let Err(e) = manager.queue_event(event.clone()).await {
-                error!("Failed to queue event: {}", e);
-            }
+        // Use tauri's async runtime to spawn the task
+        // This avoids the "no reactor running" panic when called from std::thread
+        tauri::async_runtime::spawn(async move {
+            let should_auto_sync = {
+                let mut manager = sync_manager.lock().await;
+                match manager.queue_event(event.clone()).await {
+                    Ok(should_sync) => should_sync,
+                    Err(e) => {
+                        error!("Failed to queue event: {}", e);
+                        false
+                    }
+                }
+            };
 
             // Emit event to frontend
             let _ = app_handle.emit("quest-event", &event);
+
+            // Auto-sync after a short delay to batch rapid events
+            if should_auto_sync {
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+
+                let mut manager = sync_manager.lock().await;
+                if manager.pending_count() > 0 {
+                    info!("Auto-syncing {} pending events", manager.pending_count());
+                    match manager.sync_pending().await {
+                        Ok(result) => {
+                            let _ = app_handle.emit("sync-complete", &result);
+                            info!("Auto-sync complete: {:?}", result);
+                        }
+                        Err(e) => {
+                            error!("Auto-sync failed: {}", e);
+                            let _ = app_handle.emit("sync-error", &e);
+                        }
+                    }
+                }
+            }
         });
     }).map_err(|e| e.to_string())?;
 

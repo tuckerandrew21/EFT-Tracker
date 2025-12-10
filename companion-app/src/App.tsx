@@ -99,7 +99,6 @@ function App() {
       }
     }
     validateStoredToken();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsLoading, settings.companionToken, settings.autoWatch, eftPath]);
 
   // Listen for quest events from Rust
