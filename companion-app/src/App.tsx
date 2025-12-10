@@ -121,6 +121,34 @@ function App() {
     };
   }, [settings.notificationSound]);
 
+  // Listen for auto-sync completion events from Rust backend
+  useEffect(() => {
+    const unlistenComplete = listen<{ synced: number; errors: unknown[]; pendingCount: number }>("sync-complete", async (event) => {
+      console.log("Auto-sync complete:", event.payload);
+      // Refresh sync status immediately after auto-sync
+      const status = await getSyncStatus();
+      setSyncStatus(status);
+
+      // Show toast notification
+      const { synced, errors } = event.payload;
+      if (errors.length > 0) {
+        toast.error(`Auto-synced ${synced}, ${errors.length} errors`);
+      } else if (synced > 0) {
+        toast.success(`Auto-synced ${synced} quest${synced !== 1 ? "s" : ""}`);
+      }
+    });
+
+    const unlistenError = listen<string>("sync-error", (event) => {
+      console.error("Auto-sync error:", event.payload);
+      toast.error(`Auto-sync failed: ${event.payload}`);
+    });
+
+    return () => {
+      unlistenComplete.then((fn) => fn());
+      unlistenError.then((fn) => fn());
+    };
+  }, [toast]);
+
   // Periodic sync status refresh
   useEffect(() => {
     const interval = setInterval(async () => {
