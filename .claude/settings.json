@@ -1,5 +1,6 @@
 {
   "$schema": "https://claude.ai/schemas/settings-v1.json",
+  "model": "sonnet",
   "permissions": {
     "allow": [
       "Bash",
