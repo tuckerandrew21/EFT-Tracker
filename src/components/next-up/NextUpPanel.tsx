@@ -156,9 +156,21 @@ export function NextUpPanel({
       <div className="space-y-2">
         {suggestions.map(({ quest, reason, icon }) => {
           const colors = getTraderColor(quest.traderId);
+          // Get the primary map for this quest (most common map in objectives)
+          const mapCounts = new Map<string, number>();
+          for (const obj of quest.objectives || []) {
+            if (obj.map) {
+              mapCounts.set(obj.map, (mapCounts.get(obj.map) || 0) + 1);
+            }
+          }
+          const primaryMap = Array.from(mapCounts.entries()).sort(
+            (a, b) => b[1] - a[1]
+          )[0]?.[0];
+
           return (
             <button
               key={quest.id}
+              type="button"
               onClick={() => onQuestClick?.(quest.id)}
               className="w-full text-left p-2 rounded hover:bg-muted transition-colors group"
             >
@@ -168,10 +180,28 @@ export function NextUpPanel({
                   style={{ backgroundColor: colors.primary }}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                  <div className="text-sm font-medium leading-tight group-hover:text-primary transition-colors">
                     {quest.title}
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {/* Trader and Map info */}
+                  <div className="flex items-center gap-1.5 text-[11px] mt-0.5">
+                    <span
+                      className="font-medium"
+                      style={{ color: colors.primary }}
+                    >
+                      {quest.trader.name}
+                    </span>
+                    {primaryMap && (
+                      <>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-muted-foreground">
+                          {primaryMap}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {/* Reason row */}
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
                     {getIcon(icon)}
                     <span>{reason}</span>
                   </div>
