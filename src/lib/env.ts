@@ -49,6 +49,9 @@ const envSchema = z.object({
  * const dbUrl = env.DATABASE_URL; // Type-safe and validated
  * ```
  */
-export const env = envSchema.parse(process.env);
+export const env =
+  process.env.NODE_ENV === "test" || process.env.SKIP_ENV_VALIDATION === "1"
+    ? (process.env as z.infer<typeof envSchema>)
+    : envSchema.parse(process.env);
 
 export type Env = z.infer<typeof envSchema>;
