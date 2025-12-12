@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/companion/quests
@@ -38,7 +39,7 @@ export async function GET() {
       count: quests.length,
     });
   } catch (error) {
-    console.error("Failed to fetch quest names:", error);
+    logger.error({ err: error }, "Failed to fetch quest names");
     return NextResponse.json(
       { error: "Failed to fetch quest names" },
       { status: 500 }

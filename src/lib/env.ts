@@ -34,6 +34,12 @@ const envSchema = z.object({
 
   // Optional: Search features
   BRAVE_API_KEY: z.string().optional(),
+
+  // Optional: Logging
+  LOG_LEVEL: z
+    .enum(["error", "warn", "info", "debug"])
+    .default("info")
+    .optional(),
 });
 
 /**

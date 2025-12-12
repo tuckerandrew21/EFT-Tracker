@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { logger } from "@/lib/logger";
 
 const unlinkByIdSchema = z.object({
   tokenId: z.string().min(1, "Token ID is required"),
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error revoking companion token:", error);
+    logger.error({ err: error }, "Error revoking companion token:");
     return NextResponse.json(
       { error: "Failed to revoke companion token" },
       { status: 500 }
@@ -127,7 +128,7 @@ export async function DELETE(request: Request) {
       message: "Companion token revoked successfully",
     });
   } catch (error) {
-    console.error("Error self-revoking companion token:", error);
+    logger.error({ err: error }, "Error self-revoking companion token:");
     return NextResponse.json(
       { error: "Failed to revoke companion token" },
       { status: 500 }

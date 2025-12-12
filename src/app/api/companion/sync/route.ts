@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import type { Prisma, QuestStatus } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestDependencyWithStatus = Prisma.QuestDependencyGetPayload<{
   select: { requiredId: true; requirementStatus: true };
@@ -301,9 +302,9 @@ export async function POST(request: Request) {
           results.unlockedQuests.push(...unlocked);
         }
       } catch (eventError) {
-        console.error(
-          `Error processing event for quest ${event.questId}:`,
-          eventError
+        logger.error(
+          { err: eventError, questId: event.questId },
+          `Error processing event for quest ${event.questId}`
         );
         results.errors.push({
           questId: event.questId,
@@ -321,7 +322,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error syncing companion progress:", error);
+    logger.error({ err: error }, "Error syncing companion progress:");
     return NextResponse.json(
       { error: "Failed to sync progress" },
       { status: 500 }

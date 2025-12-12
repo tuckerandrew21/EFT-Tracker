@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestWithDependencies = Prisma.QuestGetPayload<{
   include: {
@@ -201,7 +202,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error in catch-up sync:", error);
+    logger.error({ err: error }, "Error in catch-up sync:");
     return NextResponse.json(
       { error: "Failed to sync progress" },
       { status: 500 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestDependency = Prisma.QuestDependencyGetPayload<{
   select: { requiredId: true };
@@ -29,7 +30,7 @@ export async function GET() {
 
     return NextResponse.json({ progress });
   } catch (error) {
-    console.error("Error fetching progress:", error);
+    logger.error({ err: error }, "Error fetching progress");
     return NextResponse.json(
       { error: "Failed to fetch progress" },
       { status: 500 }
@@ -116,7 +117,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error creating progress:", error);
+    logger.error({ err: error }, "Error creating progress");
     return NextResponse.json(
       { error: "Failed to create progress" },
       { status: 500 }
@@ -143,7 +144,7 @@ export async function DELETE() {
       count: result.count,
     });
   } catch (error) {
-    console.error("Error resetting progress:", error);
+    logger.error({ err: error }, "Error resetting progress");
     return NextResponse.json(
       { error: "Failed to reset progress" },
       { status: 500 }
