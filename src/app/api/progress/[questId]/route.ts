@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestDependencyWithStatus = Prisma.QuestDependencyGetPayload<{
   select: { requiredId: true; requirementStatus: true };
@@ -133,13 +134,14 @@ export async function PATCH(
     }
     // If quest was reset to AVAILABLE from COMPLETED, re-lock dependent quests
     else if (newStatus === "AVAILABLE" && currentStatus === "COMPLETED") {
-      console.log(
-        `[DEBUG] Transition from COMPLETED to AVAILABLE for quest ${questId}`
+      logger.debug(
+        { questId },
+        `Transition from COMPLETED to AVAILABLE for quest ${questId}`
       );
       lockedQuests = await autoLockDependentQuests(session.user.id, questId);
-      console.log(
-        `[DEBUG] lockedQuests from autoLockDependentQuests:`,
-        lockedQuests
+      logger.debug(
+        { lockedQuests },
+        `lockedQuests from autoLockDependentQuests`
       );
     }
 
@@ -156,7 +158,7 @@ export async function PATCH(
       );
     }
 
-    console.error("Error updating progress:", error);
+    logger.error({ err: error }, "Error updating progress");
     return NextResponse.json(
       { error: "Failed to update progress" },
       { status: 500 }
@@ -247,8 +249,9 @@ async function autoLockDependentQuests(
   userId: string,
   changedQuestId: string
 ): Promise<string[]> {
-  console.log(
-    `[DEBUG] autoLockDependentQuests called for quest ${changedQuestId}`
+  logger.debug(
+    { changedQuestId },
+    `autoLockDependentQuests called for quest ${changedQuestId}`
   );
 
   // Find all quests that depend on the changed quest
@@ -263,23 +266,29 @@ async function autoLockDependentQuests(
     },
   });
 
-  console.log(
-    `[DEBUG] Found ${dependentQuests.length} dependent quests:`,
-    dependentQuests.map((d) => d.dependentQuest.title)
+  logger.debug(
+    {
+      count: dependentQuests.length,
+      quests: dependentQuests.map((d) => d.dependentQuest.title),
+    },
+    `Found ${dependentQuests.length} dependent quests`
   );
 
   const lockedQuestIds: string[] = [];
 
   for (const dep of dependentQuests) {
     const quest = dep.dependentQuest;
-    console.log(`[DEBUG] Checking quest: ${quest.title} (${quest.id})`);
+    logger.debug({ questId: quest.id, title: quest.title }, `Checking quest`);
 
     // Check if this quest's dependencies are still met
     const allDepsMet = await checkAllDependenciesMet(
       userId,
       quest.dependsOn as QuestDependencyWithStatus[]
     );
-    console.log(`[DEBUG] allDepsMet for ${quest.title}: ${allDepsMet}`);
+    logger.debug(
+      { questId: quest.id, title: quest.title, allDepsMet },
+      `allDepsMet for quest`
+    );
 
     if (!allDepsMet) {
       // Check current progress status
@@ -291,9 +300,13 @@ async function autoLockDependentQuests(
           },
         },
       });
-      console.log(
-        `[DEBUG] currentProgress for ${quest.title}:`,
-        currentProgress?.status
+      logger.debug(
+        {
+          questId: quest.id,
+          title: quest.title,
+          status: currentProgress?.status,
+        },
+        `currentProgress for quest`
       );
 
       // Only re-lock if currently AVAILABLE (not IN_PROGRESS or COMPLETED)
@@ -439,7 +452,7 @@ export async function GET(
 
     return NextResponse.json({ progress });
   } catch (error) {
-    console.error("Error fetching progress:", error);
+    logger.error({ err: error }, "Error fetching progress");
     return NextResponse.json(
       { error: "Failed to fetch progress" },
       { status: 500 }

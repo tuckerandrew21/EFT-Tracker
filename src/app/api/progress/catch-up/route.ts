@@ -201,7 +201,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error in catch-up sync:", error);
+    logger.error({ err: error }, "Error in catch-up sync:");
     return NextResponse.json(
       { error: "Failed to sync progress" },
       { status: 500 }

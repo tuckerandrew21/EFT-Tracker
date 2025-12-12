@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 // GET /api/user - Get current user settings
 export async function GET() {
@@ -29,7 +30,7 @@ export async function GET() {
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logger.error({ err: error }, "Error fetching user");
     return NextResponse.json(
       { error: "Failed to fetch user" },
       { status: 500 }
@@ -100,7 +101,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    console.error("Error updating user:", error);
+    logger.error({ err: error }, "Error updating user");
     return NextResponse.json(
       { error: "Failed to update user" },
       { status: 500 }

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error revoking companion token:", error);
+    logger.error({ err: error }, "Error revoking companion token:");
     return NextResponse.json(
       { error: "Failed to revoke companion token" },
       { status: 500 }
@@ -127,7 +127,7 @@ export async function DELETE(request: Request) {
       message: "Companion token revoked successfully",
     });
   } catch (error) {
-    console.error("Error self-revoking companion token:", error);
+    logger.error({ err: error }, "Error self-revoking companion token:");
     return NextResponse.json(
       { error: "Failed to revoke companion token" },
       { status: 500 }

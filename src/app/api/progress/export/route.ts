@@ -71,7 +71,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Error exporting progress:", error);
+    logger.error({ err: error }, "Error exporting progress:");
     return NextResponse.json(
       { error: "Failed to export progress" },
       { status: 500 }

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Registration error:", error);
+    logger.error({ err: error }, "Registration error");
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

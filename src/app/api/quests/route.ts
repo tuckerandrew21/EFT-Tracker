@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestWithRelations = Prisma.QuestGetPayload<{
   include: {
@@ -240,7 +241,7 @@ export async function GET(request: Request) {
       total: questsWithStatus.length,
     });
   } catch (error) {
-    console.error("Error fetching quests:", error);
+    logger.error({ err: error }, "Error fetching quests");
     return NextResponse.json(
       { error: "Failed to fetch quests" },
       { status: 500 }

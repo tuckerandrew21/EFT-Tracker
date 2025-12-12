@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { logger } from "@/lib/logger";
 
 const linkSchema = z.object({
   deviceName: z.string().min(1, "Device name is required").max(100),
@@ -70,7 +71,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("Error creating companion token:", error);
+    logger.error({ err: error }, "Error creating companion token");
     return NextResponse.json(
       { error: "Failed to create companion token" },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function GET() {
 
     return NextResponse.json({ tokens });
   } catch (error) {
-    console.error("Error listing companion tokens:", error);
+    logger.error({ err: error }, "Error listing companion tokens");
     return NextResponse.json(
       { error: "Failed to list companion tokens" },
       { status: 500 }

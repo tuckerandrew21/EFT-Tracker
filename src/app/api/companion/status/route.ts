@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { logger } from "@/lib/logger";
 
 /**
  * Validate companion token from Authorization header.
@@ -109,7 +110,7 @@ export async function GET(request: Request) {
       stats,
     });
   } catch (error) {
-    console.error("Error checking companion status:", error);
+    logger.error({ err: error }, "Error checking companion status:");
     return NextResponse.json(
       { error: "Failed to check status" },
       { status: 500 }

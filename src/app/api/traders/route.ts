@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type TraderWithCount = Prisma.TraderGetPayload<{
   include: {
@@ -33,7 +34,7 @@ export async function GET() {
       traders: tradersWithCount,
     });
   } catch (error) {
-    console.error("Error fetching traders:", error);
+    logger.error({ err: error }, "Error fetching traders");
     return NextResponse.json(
       { error: "Failed to fetch traders" },
       { status: 500 }
