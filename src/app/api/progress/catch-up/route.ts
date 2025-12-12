@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 type QuestWithDependencies = Prisma.QuestGetPayload<{
   include: {

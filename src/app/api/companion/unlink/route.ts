@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { logger } from "@/lib/logger";
 
 const unlinkByIdSchema = z.object({
   tokenId: z.string().min(1, "Token ID is required"),
