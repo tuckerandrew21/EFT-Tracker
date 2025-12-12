@@ -201,6 +201,63 @@ npx playwright test homepage.spec.ts
 
 Example: `feature/add-user-dashboard`
 
+### Develop Branch Workflow
+
+This project uses a `develop` branch workflow for safer iteration before production deployment:
+
+**Branch Structure:**
+
+```text
+feature/* → develop → master → production (Coolify)
+```
+
+**When to use develop vs master:**
+
+- **Use develop for:**
+  - New features and experiments
+  - Larger changes that need testing
+  - Changes you want to iterate on before production
+  - Regular development work
+
+- **Use master directly (hotfix) for:**
+  - Critical bug fixes
+  - Tiny documentation tweaks
+  - Changes that need immediate production deployment
+
+**Standard workflow:**
+
+```bash
+# Create feature branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/my-feature
+
+# Make changes, commit, push
+git add .
+git commit -m "feat: description"
+git push -u origin feature/my-feature
+
+# Create PR targeting develop (not master)
+gh pr create --base develop --title "feat: description" --body "..."
+
+# After merge to develop, E2E tests run with development database
+# When ready for production, create PR from develop → master
+git checkout develop
+git pull origin develop
+gh pr create --base master --head develop --title "Release: description"
+```
+
+**Database branches:**
+
+- `develop` branch uses `DATABASE_URL_DEVELOP` (Neon development branch)
+- `master` branch uses `DATABASE_URL_STAGING` (Neon staging branch)
+
+**E2E tests:**
+
+- Run automatically on both `develop` and `master` branches
+- Use appropriate database for each branch
+- ~3-5 minutes to complete with 4 parallel workers
+
 ### Pull Request Workflow
 
 After creating a PR, automatically monitor CI status using the GitHub check-runs API:

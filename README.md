@@ -206,6 +206,20 @@ This project uses a comprehensive CI/CD pipeline with GitHub Actions, including:
 - Security scanning (CodeQL, Dependabot)
 - Branch protection and quality gates
 - Conventional commit enforcement
+- E2E tests with Playwright on `develop` and `master` branches
+
+### Branch Workflow
+
+This project uses a `develop` branch workflow for safer iteration:
+
+```text
+feature/* → develop → master → production
+```
+
+- **Regular development**: Create feature branches from `develop` and PR back to `develop`
+- **Production releases**: PR from `develop` to `master` triggers production deployment
+- **Hotfixes**: Can be merged directly to `master` when needed
+- **E2E testing**: Runs automatically on both branches with appropriate test databases
 
 See [docs/CI_CD_SETUP.md](docs/CI_CD_SETUP.md) for complete setup guide and replication instructions.
 
