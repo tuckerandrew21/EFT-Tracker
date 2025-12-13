@@ -702,7 +702,60 @@ Serve static assets from CDN:
 - `/public/*` - Images, fonts, static files
 - `/_next/static/*` - Next.js build artifacts
 
+## Pre-Deployment Procedures
+
+### Database Backup
+
+Before any production deployment, especially those involving schema changes or risky operations, create a manual backup:
+
+**When to Create Backup:**
+
+- Schema migrations (`prisma migrate deploy`)
+- Major code deployments
+- Bulk data operations
+- Configuration changes
+
+**Backup Procedure:**
+
+1. Navigate to [Neon Console](https://console.neon.tech) → Branches
+2. Click "Create Branch"
+3. Configure backup:
+   - **Name**: `backup-YYYYMMDD-HHMMSS` (e.g., `backup-20250113-143000`)
+   - **Source**: `main` (production branch)
+   - **Point in time**: "Now"
+4. Document backup in PR description or deployment notes
+5. Proceed with deployment
+
+**Example:**
+
+```bash
+# Document in deployment notes
+Backup created: backup-20250113-143000
+Reason: Pre-deployment backup for PR #238 (schema changes)
+Retention: Delete after 2025-01-20 (7 days)
+```
+
+For detailed backup and restoration procedures, see [DATABASE_BACKUPS.md](./DATABASE_BACKUPS.md).
+
 ## Production Checklist
+
+### Pre-Deployment Checklist
+
+- [ ] All CI checks passing (tests, lint, security)
+- [ ] PR approved and merged
+- [ ] **Database backup created** (if schema changes or risky operations)
+- [ ] Staging environment tested
+- [ ] Rollback plan documented
+
+### Post-Deployment Checklist
+
+- [ ] Health checks passing
+- [ ] Key endpoints verified (home, API, auth)
+- [ ] Error rates normal in Sentry
+- [ ] No performance degradation
+- [ ] Monitor for 15-30 minutes
+
+### Production Environment Checklist
 
 - [ ] Environment variables configured
 - [ ] Database connection tested
