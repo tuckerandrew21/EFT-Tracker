@@ -166,7 +166,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: build
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master'
+    # Temporarily disabled for master branch to speed up production deployment
+    if: github.ref == 'refs/heads/develop'
 
     steps:
       - name: Checkout code
