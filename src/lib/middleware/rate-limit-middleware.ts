@@ -3,7 +3,7 @@
  * Wraps route handlers with rate limiting logic
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   rateLimit,
   getClientIp,
@@ -23,7 +23,7 @@ import { logger } from "@/lib/logger";
  * import { withRateLimit } from "@/lib/middleware/rate-limit-middleware";
  * import { RATE_LIMITS } from "@/lib/rate-limit";
  *
- * async function handleGET(req: NextRequest) {
+ * async function handleGET(req: Request) {
  *   // Your logic here
  *   return NextResponse.json({ data: "..." });
  * }
