@@ -17,10 +17,13 @@ const linkSchema = z.object({
   gameMode: z.enum(["PVP", "PVE"]).default("PVP"),
 });
 
+const MAX_TOKENS_PER_USER = 5;
+
 /**
  * POST /api/companion/link
  * Generate a new companion token for linking the desktop app.
  * Requires user authentication.
+ * Limited to 5 active tokens per user.
  */
 async function handlePOST(request: Request) {
   try {
@@ -31,6 +34,23 @@ async function handlePOST(request: Request) {
 
     const body = await request.json();
     const { deviceName, gameMode } = linkSchema.parse(body);
+
+    // Check if user has reached max tokens
+    const activeTokenCount = await prisma.companionToken.count({
+      where: {
+        userId: session.user.id,
+        revokedAt: null,
+      },
+    });
+
+    if (activeTokenCount >= MAX_TOKENS_PER_USER) {
+      return NextResponse.json(
+        {
+          error: `Maximum of ${MAX_TOKENS_PER_USER} active tokens reached. Please revoke an existing token first.`,
+        },
+        { status: 400 }
+      );
+    }
 
     // Generate a secure random token
     // Format: cmp_<32 random hex chars> = 36 chars total

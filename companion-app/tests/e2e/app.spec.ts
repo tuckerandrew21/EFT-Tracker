@@ -70,8 +70,8 @@ describe("EFT Tracker Companion App", () => {
       await expect(step3).toBeDisplayed();
     });
 
-    it("should have a link to eft-tracker.vercel.app", async () => {
-      const link = await $('a[href="https://eft-tracker.vercel.app"]');
+    it("should have a link to learntotarkov.com", async () => {
+      const link = await $('a[href="https://learntotarkov.com"]');
       await expect(link).toBeDisplayed();
     });
   });

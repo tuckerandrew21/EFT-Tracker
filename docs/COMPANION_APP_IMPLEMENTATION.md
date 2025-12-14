@@ -1,34 +1,37 @@
-# EFT Quest Tracker - Companion App Implementation Plan
+# EFT Quest Tracker - Companion App Implementation
 
+**Status:** ✅ Implemented (December 2025)
 **Architecture:** Tauri + Remote Backend (Thin Client)
-**Estimated Effort:** 8-10 hours
+**Authentication:** Token-Based (Companion Tokens)
 **Target Platform:** Windows (initial release)
 
 ---
 
 ## Architecture Overview
 
-### Design Decision: Thin Client
+### Design Decision: Thin Client with Token Authentication
 
-The companion app will be a **thin client** that:
+The companion app is a **thin client** that:
 
 - Loads static HTML/CSS/JS assets locally (bundled in the app)
 - Calls the production API at `https://learntotarkov.com/api/*` for all data
-- Uses existing authentication flow (no local server needed)
+- **Uses Bearer token authentication** (not session cookies - cross-origin cookies don't work)
+- Watches EFT log files for quest events and syncs to the cloud
 - Updates via GitHub Releases with Tauri's auto-updater
 
 **Benefits:**
 
-- Small bundle size (~10-20MB vs 200MB for Electron)
+- Small bundle size (~15MB MSI installer)
 - No dual architecture maintenance
 - Always uses latest API features
-- Simpler authentication (reuses production OAuth)
-- Faster startup time
+- Secure token-based authentication
+- Works offline (queues events for later sync)
+- Fast startup time (~1 second)
 
 **Trade-offs:**
 
-- Requires internet connection (acceptable - web app does too)
-- API latency vs local (mitigated with optimistic UI)
+- Requires internet connection for initial authentication and syncing
+- Manual token generation step (one-time setup)
 
 ---
 

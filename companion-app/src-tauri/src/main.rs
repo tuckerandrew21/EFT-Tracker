@@ -249,7 +249,7 @@ fn main() {
     let api_base = if cfg!(debug_assertions) {
         "http://localhost:3000".to_string()
     } else {
-        "https://eft-tracker.vercel.app".to_string()
+        "https://learntotarkov.com".to_string()
     };
     let sync_manager = Arc::new(Mutex::new(SyncManager::new(api_base)));
 

@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     "coverage/**",
     // Companion app has its own eslint config
     "companion-app/**",
+    // Node.js scripts can use require()
+    "scripts/**",
   ]),
 ]);
 

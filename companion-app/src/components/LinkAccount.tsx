@@ -83,12 +83,12 @@ export function LinkAccount({ onComplete, onBack }: LinkAccountProps) {
             <li>
               Go to{" "}
               <a
-                href="https://eft-tracker.vercel.app/settings"
+                href="https://learntotarkov.com/settings"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-tarkov-accent hover:underline"
               >
-                eft-tracker.vercel.app/settings
+                learntotarkov.com/settings
               </a>
             </li>
             <li>Sign in to your account</li>

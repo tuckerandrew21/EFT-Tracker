@@ -409,12 +409,12 @@ function App() {
                 <div>
                   <p className="text-tarkov-text">Create an EFT Tracker account</p>
                   <a
-                    href="https://eft-tracker.vercel.app"
+                    href="https://learntotarkov.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-tarkov-accent hover:underline flex items-center gap-1 text-xs"
                   >
-                    eft-tracker.vercel.app
+                    learntotarkov.com
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>

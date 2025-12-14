@@ -16,7 +16,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
-import { tauriApiClient } from "@/lib/api/tauri-client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,8 +44,16 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
+    // Tauri users should use Settings page to generate companion token
+    if (isTauri) {
+      setError(
+        "Desktop app users: Generate a companion token from https://learntotarkov.com/settings and paste it in the app's link account screen."
+      );
+      return;
+    }
+
     // Validate CAPTCHA if shown (web only)
-    if (!isTauri && showCaptcha && !turnstileToken) {
+    if (showCaptcha && !turnstileToken) {
       setError("Please complete the CAPTCHA verification");
       return;
     }
@@ -54,39 +61,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      if (isTauri) {
-        // Tauri: Call production API directly
-        const response = await tauriApiClient.post<{
-          user?: { id: string; email: string; name?: string };
-        }>("/api/auth/callback/credentials", {
-          email,
-          password,
-        });
+      // Web: Use NextAuth
+      const result = await signIn("credentials", {
+        email,
+        password,
+        turnstileToken: showCaptcha ? turnstileToken : undefined,
+        redirect: false,
+      });
 
-        if (response.user) {
-          router.push("/quests");
-          router.refresh();
-        } else {
-          setError("Invalid email or password");
-          setFailedAttempts((prev) => prev + 1);
-        }
+      if (result?.error) {
+        setError("Invalid email or password");
+        setFailedAttempts((prev) => prev + 1);
+        setTurnstileToken(null); // Reset CAPTCHA on failure
       } else {
-        // Web: Use NextAuth
-        const result = await signIn("credentials", {
-          email,
-          password,
-          turnstileToken: showCaptcha ? turnstileToken : undefined,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          setError("Invalid email or password");
-          setFailedAttempts((prev) => prev + 1);
-          setTurnstileToken(null); // Reset CAPTCHA on failure
-        } else {
-          router.push("/quests");
-          router.refresh();
-        }
+        router.push("/quests");
+        router.refresh();
       }
     } catch (err) {
       console.error("Login error:", err);
