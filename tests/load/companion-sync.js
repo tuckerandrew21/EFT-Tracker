@@ -20,13 +20,14 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'https://learntotarkov.com';
 
 // Mock user tokens for testing (replace with actual test tokens)
-const TEST_USERS = [
-  'test-user-1',
-  'test-user-2',
-  'test-user-3',
-  'test-user-4',
-  'test-user-5',
-];
+// Note: Not used until authentication is implemented
+// const TEST_USERS = [
+//   'test-user-1',
+//   'test-user-2',
+//   'test-user-3',
+//   'test-user-4',
+//   'test-user-5',
+// ];
 
 export default function companionSyncTest() {
   // Simulate companion app syncing quest progress for multiple users
