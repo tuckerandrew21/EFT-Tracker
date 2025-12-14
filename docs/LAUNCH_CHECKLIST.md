@@ -580,8 +580,8 @@ Before launch, all checklist items must be completed or explicitly accepted as r
 - [ ] GO for launch
 - [ ] NO-GO (reasons documented)
 
-**Signed:** ********\_\_\_********
-**Date:** ********\_\_\_********
+**Signed:** **\*\*\*\***\_\_\_**\*\*\*\***
+**Date:** **\*\*\*\***\_\_\_**\*\*\*\***
 
 ---
 
