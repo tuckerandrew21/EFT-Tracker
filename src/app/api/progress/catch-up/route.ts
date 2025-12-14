@@ -62,6 +62,7 @@ function getIncompletePrerequisites(
 /**
  * POST /api/progress/catch-up
  * Bulk sync progress by completing all prerequisites for selected target quests.
+ * Note: Transaction chunks limited to 50 quests with 30s timeout for reliability.
  */
 export async function POST(request: Request) {
   try {
