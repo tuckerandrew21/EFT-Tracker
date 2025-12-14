@@ -1,8 +1,13 @@
 import { PrismaClient, QuestStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+// Prisma 7 requires a driver adapter
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 const TEST_USER_PREFIX = "test_";
 const TEST_USER_EMAIL = "qa@test.com";
