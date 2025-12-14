@@ -53,9 +53,9 @@ async function fetchWithAuth(
 ): Promise<Response> {
   const url = `${API_BASE_URL}${path}`;
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   // Add Bearer token for Tauri companion API endpoints
