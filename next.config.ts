@@ -18,6 +18,20 @@ const nextConfig: NextConfig = {
   // Configure server-side externals for Pino
   serverExternalPackages: ["pino", "pino-pretty"],
 
+  // Custom webpack config to exclude API routes during Tauri builds
+  webpack: (config, { isServer }) => {
+    if (isTauriBuild && isServer) {
+      // Exclude API routes from being processed during Tauri builds
+      config.module = config.module || {};
+      config.module.rules = config.module.rules || [];
+      config.module.rules.push({
+        test: /src[\\/]app[\\/]api[\\/].+\.ts$/,
+        use: "null-loader",
+      });
+    }
+    return config;
+  },
+
   // Security headers
   async headers() {
     return [
@@ -108,7 +122,7 @@ export default withSentryConfig(nextConfig, {
   // Requires SENTRY_AUTH_TOKEN environment variable
   widenClientFileUpload: true,
 
-  // Route tunneling to avoid ad-blockers
+  // Route tunneling to avoid ad-blockers (disabled for Tauri builds)
   // Creates a random route like /_sentry/<hash> to proxy requests
-  tunnelRoute: "/monitoring",
+  tunnelRoute: isTauriBuild ? undefined : "/monitoring",
 });

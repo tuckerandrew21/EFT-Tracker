@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 
 // In a real app, this would come from a database or GitHub releases API

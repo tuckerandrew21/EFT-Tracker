@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import { handlers } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/rate-limit";
@@ -49,3 +51,8 @@ async function POST(request: NextRequest) {
 
 export const GET = handlers.GET;
 export { POST };
+
+// For static export (Tauri build) - return empty array to skip this route
+export async function generateStaticParams() {
+  return [];
+}

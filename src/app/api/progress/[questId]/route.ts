@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -504,4 +506,9 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+// For static export (Tauri build) - return empty array to skip this route
+export async function generateStaticParams() {
+  return [];
 }

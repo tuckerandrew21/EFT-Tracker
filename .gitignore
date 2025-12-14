@@ -56,3 +56,4 @@ SENTRY_CREDENTIALS.txt
 .playwright-mcp/
 .coolify-url
 k6.exe
+src-tauri/tauri.key
