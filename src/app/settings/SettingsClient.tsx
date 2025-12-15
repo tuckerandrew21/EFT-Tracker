@@ -29,11 +29,8 @@ interface CompanionToken {
 
 interface NewTokenResponse {
   token: string;
-  tokenId: string;
   deviceName: string;
-  gameMode: string;
   createdAt: string;
-  message: string;
 }
 
 export function SettingsClient() {
@@ -70,7 +67,7 @@ export function SettingsClient() {
       const res = await fetch("/api/companion/link");
       if (!res.ok) throw new Error("Failed to fetch tokens");
       const data = await res.json();
-      setTokens(data.tokens);
+      setTokens(data); // API returns array directly, not wrapped in { tokens: [] }
     } catch (err) {
       setError(String(err));
     } finally {
@@ -152,7 +149,7 @@ export function SettingsClient() {
 
     try {
       const res = await fetch("/api/companion/unlink", {
-        method: "POST",
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tokenId }),
       });

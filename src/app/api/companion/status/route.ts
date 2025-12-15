@@ -1,83 +1,44 @@
-export const dynamic = "force-static";
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { logger } from "@/lib/logger";
-import { withRateLimit } from "@/lib/middleware/rate-limit-middleware";
-import { RATE_LIMITS } from "@/lib/rate-limit";
+import { validateCompanionToken } from "@/lib/auth/validate-companion-token";
 
 /**
- * Validate companion token from Authorization header.
- * Returns the token record with user info if valid, null otherwise.
+ * POST /api/companion/status - Validate companion token and return user info
+ *
+ * This endpoint validates a companion token from the Authorization header
+ * and returns user information with quest statistics.
  */
-async function validateCompanionToken(request: Request) {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const rawToken = authHeader.slice(7); // Remove "Bearer "
-  if (!rawToken.startsWith("cmp_")) {
-    return null;
-  }
-
-  // Find all non-revoked tokens and check against the hash
-  const tokens = await prisma.companionToken.findMany({
-    where: { revokedAt: null },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          playerLevel: true,
-        },
-      },
-    },
-  });
-
-  for (const tokenRecord of tokens) {
-    const isMatch = await bcrypt.compare(rawToken, tokenRecord.token);
-    if (isMatch) {
-      // Update lastSeen
-      await prisma.companionToken.update({
-        where: { id: tokenRecord.id },
-        data: { lastSeen: new Date() },
-      });
-      return tokenRecord;
-    }
-  }
-
-  return null;
-}
-
-/**
- * GET /api/companion/status
- * Check companion token validity and return user/connection info.
- * Used by companion app to verify connection and display status.
- */
-async function handleGET(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const tokenRecord = await validateCompanionToken(request);
-
-    if (!tokenRecord) {
+    // 1. Extract token from Authorization header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
-        {
-          valid: false,
-          error: "Invalid or expired companion token",
-        },
+        { valid: false, error: "Missing or invalid Authorization header" },
         { status: 401 }
       );
     }
 
-    // Get progress stats for the user
-    const progressStats = await prisma.questProgress.groupBy({
+    const token = authHeader.substring(7); // Remove "Bearer " prefix
+
+    // 2. Validate token using shared utility
+    const validation = await validateCompanionToken(token);
+
+    if (!validation.valid) {
+      return NextResponse.json(
+        { valid: false, error: validation.error },
+        { status: 401 }
+      );
+    }
+
+    // 3. Query quest stats grouped by status
+    const questStats = await prisma.questProgress.groupBy({
       by: ["status"],
-      where: { userId: tokenRecord.userId },
-      _count: true,
+      where: { userId: validation.userId },
+      _count: { status: true },
     });
 
+    // 4. Build stats object with all statuses
     const stats = {
       completed: 0,
       inProgress: 0,
@@ -85,42 +46,35 @@ async function handleGET(request: Request) {
       locked: 0,
     };
 
-    for (const stat of progressStats) {
-      switch (stat.status) {
-        case "COMPLETED":
-          stats.completed = stat._count;
-          break;
-        case "IN_PROGRESS":
-          stats.inProgress = stat._count;
-          break;
-        case "AVAILABLE":
-          stats.available = stat._count;
-          break;
-        case "LOCKED":
-          stats.locked = stat._count;
-          break;
+    // Map database results to stats object
+    questStats.forEach((stat) => {
+      const status = stat.status.toLowerCase();
+      if (status === "completed") {
+        stats.completed = stat._count.status;
+      } else if (status === "in_progress") {
+        stats.inProgress = stat._count.status;
+      } else if (status === "available") {
+        stats.available = stat._count.status;
+      } else if (status === "locked") {
+        stats.locked = stat._count.status;
       }
-    }
-
-    return NextResponse.json({
-      valid: true,
-      userId: tokenRecord.user.id,
-      userName: tokenRecord.user.name || tokenRecord.user.email,
-      playerLevel: tokenRecord.user.playerLevel,
-      deviceName: tokenRecord.deviceName,
-      gameMode: tokenRecord.gameMode,
-      lastSeen: tokenRecord.lastSeen,
-      createdAt: tokenRecord.createdAt,
-      stats,
     });
-  } catch (error) {
-    logger.error({ err: error }, "Error checking companion status:");
+
+    // 5. Return flat response (NOT nested)
     return NextResponse.json(
-      { error: "Failed to check status" },
+      {
+        valid: true,
+        userId: validation.userId,
+        userName: validation.userName,
+        stats,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error validating companion token:", error);
+    return NextResponse.json(
+      { valid: false, error: "Internal server error" },
       { status: 500 }
     );
   }
 }
-
-// Apply rate limiting for companion API
-export const GET = withRateLimit(handleGET, RATE_LIMITS.API_COMPANION);

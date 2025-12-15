@@ -1,158 +1,153 @@
-export const dynamic = "force-static";
-
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { logger } from "@/lib/logger";
-import { withRateLimit } from "@/lib/middleware/rate-limit-middleware";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { logSecurityEvent } from "@/lib/security-logger";
-import { getClientIp } from "@/lib/rate-limit";
-
-const linkSchema = z.object({
-  deviceName: z.string().min(1, "Device name is required").max(100),
-  gameMode: z.enum(["PVP", "PVE"]).default("PVP"),
-});
-
-const MAX_TOKENS_PER_USER = 5;
+import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth/auth-options";
 
 /**
- * POST /api/companion/link
- * Generate a new companion token for linking the desktop app.
- * Requires user authentication.
- * Limited to 5 active tokens per user.
+ * POST /api/companion/link - Generate a new companion token
+ *
+ * Generates a secure token for linking the Tauri companion app to a user's account.
+ * Token is shown ONCE and cannot be retrieved later.
  */
-async function handlePOST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    // 1. Check session authentication
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized - No valid session" },
+        { status: 401 }
+      );
     }
 
+    // 2. Parse request body
     const body = await request.json();
-    const { deviceName, gameMode } = linkSchema.parse(body);
+    const { deviceName, gameMode } = body;
 
-    // Check if user has reached max tokens
-    const activeTokenCount = await prisma.companionToken.count({
-      where: {
-        userId: session.user.id,
-        revokedAt: null,
-      },
-    });
-
-    if (activeTokenCount >= MAX_TOKENS_PER_USER) {
+    // Validate deviceName (optional but recommended)
+    if (deviceName && typeof deviceName !== "string") {
       return NextResponse.json(
-        {
-          error: `Maximum of ${MAX_TOKENS_PER_USER} active tokens reached. Please revoke an existing token first.`,
-        },
+        { error: "Invalid deviceName - must be a string" },
         { status: 400 }
       );
     }
 
-    // Generate a secure random token
-    // Format: cmp_<32 random hex chars> = 36 chars total
-    const rawToken = `cmp_${crypto.randomBytes(16).toString("hex")}`;
-    const tokenHint = rawToken.slice(-4); // Last 4 chars for display
+    // Validate gameMode (optional, defaults to PVP if provided)
+    if (gameMode && !["PVP", "PVE"].includes(gameMode)) {
+      return NextResponse.json(
+        { error: "Invalid gameMode - must be PVP or PVE" },
+        { status: 400 }
+      );
+    }
 
-    // Hash the token for storage
+    // 3. Check device limit (5 per user)
+    const tokenCount = await prisma.companionToken.count({
+      where: {
+        userId: session.user.id,
+        revokedAt: null, // Only count active tokens
+      },
+    });
+
+    if (tokenCount >= 5) {
+      return NextResponse.json(
+        {
+          error:
+            "Device limit reached - You can have a maximum of 5 active companion tokens. Please revoke an existing token to generate a new one.",
+        },
+        { status: 429 }
+      );
+    }
+
+    // 4. Generate token: cmp_ + 32 hex characters
+    const rawToken = `cmp_${crypto.randomBytes(16).toString("hex")}`;
+
+    // 5. Hash token with bcrypt (cost factor 10 for ~100ms)
     const hashedToken = await bcrypt.hash(rawToken, 10);
 
-    // Create the companion token record
+    // 6. Store hashed token with last 4 chars as hint
+    const tokenHint = rawToken.slice(-4);
     const companionToken = await prisma.companionToken.create({
       data: {
-        token: hashedToken,
-        tokenHint,
         userId: session.user.id,
-        deviceName,
-        gameMode,
-      },
-      select: {
-        id: true,
-        deviceName: true,
-        gameMode: true,
-        createdAt: true,
+        token: hashedToken,
+        tokenHint: tokenHint,
+        deviceName: deviceName || "Unnamed Device",
+        gameMode: gameMode || "PVP",
+        lastSeen: new Date(),
       },
     });
 
-    // Log token generation
-    await logSecurityEvent({
-      type: "TOKEN_GENERATED",
-      userId: session.user.id,
-      ipAddress: getClientIp(request),
-      userAgent: request.headers.get("user-agent") ?? undefined,
-      metadata: { deviceName, gameMode, tokenHint },
-    });
-
-    // Return the raw token (only time it's visible)
+    // 7. Return unhashed token ONCE (never stored in plain text)
     return NextResponse.json(
       {
         token: rawToken,
-        tokenId: companionToken.id,
         deviceName: companionToken.deviceName,
-        gameMode: companionToken.gameMode,
-        createdAt: companionToken.createdAt,
-        message: "Save this token securely. It will not be shown again.",
+        createdAt: companionToken.createdAt.toISOString(),
       },
       { status: 201 }
     );
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: error.issues[0].message },
-        { status: 400 }
-      );
-    }
-
-    logger.error({ err: error }, "Error creating companion token");
+    console.error("Error generating companion token:", error);
     return NextResponse.json(
-      { error: "Failed to create companion token" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
 /**
- * GET /api/companion/link
- * List all companion tokens for the authenticated user.
+ * GET /api/companion/link - List all active companion tokens
+ *
+ * Returns all non-revoked tokens for the authenticated user.
  */
-async function handleGET() {
+export async function GET() {
   try {
-    const session = await auth();
+    // 1. Check session authentication
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized - No valid session" },
+        { status: 401 }
+      );
     }
 
+    // 2. Query active tokens (not revoked)
     const tokens = await prisma.companionToken.findMany({
       where: {
         userId: session.user.id,
         revokedAt: null,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       select: {
         id: true,
-        tokenHint: true,
         deviceName: true,
         gameMode: true,
         lastSeen: true,
         createdAt: true,
-      },
-      orderBy: {
-        createdAt: "desc",
+        // Explicitly exclude hashed token from response
       },
     });
 
-    return NextResponse.json({ tokens });
-  } catch (error) {
-    logger.error({ err: error }, "Error listing companion tokens");
+    // 3. Return token list with ISO date strings
     return NextResponse.json(
-      { error: "Failed to list companion tokens" },
+      tokens.map((token) => ({
+        id: token.id,
+        deviceName: token.deviceName,
+        gameMode: token.gameMode,
+        lastSeen: token.lastSeen.toISOString(),
+        createdAt: token.createdAt.toISOString(),
+      })),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error listing companion tokens:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
-
-// Apply rate limiting - lower limits for sensitive operations
-export const POST = withRateLimit(handlePOST, RATE_LIMITS.API_DATA_WRITE);
-export const GET = withRateLimit(handleGET, RATE_LIMITS.API_AUTHENTICATED);

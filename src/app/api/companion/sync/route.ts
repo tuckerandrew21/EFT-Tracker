@@ -1,332 +1,248 @@
-export const dynamic = "force-static";
-
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import type { Prisma, QuestStatus } from "@prisma/client";
-import { logger } from "@/lib/logger";
+import { validateCompanionToken } from "@/lib/auth/validate-companion-token";
 
-type QuestDependencyWithStatus = Prisma.QuestDependencyGetPayload<{
-  select: { requiredId: true; requirementStatus: true };
-}>;
-
-// Map log event status to our QuestStatus enum
-const STATUS_MAP: Record<string, QuestStatus> = {
+// Status mapping: Companion app ’ Database
+const statusMap = {
   STARTED: "IN_PROGRESS",
-  FINISHED: "COMPLETED",
-  FAILED: "AVAILABLE", // Failed quests reset to available (for restartable ones)
-};
+  COMPLETED: "COMPLETED",
+  FAILED: "AVAILABLE",
+} as const;
 
-const syncEventSchema = z.object({
-  questId: z.string().min(1),
-  status: z.enum(["STARTED", "FINISHED", "FAILED"]),
-  timestamp: z.string().datetime(),
-});
+type CompanionStatus = keyof typeof statusMap;
 
-const syncSchema = z.object({
-  events: z.array(syncEventSchema).min(1).max(100),
-  deviceInfo: z
-    .object({
-      version: z.string().optional(),
-      os: z.string().optional(),
-    })
-    .optional(),
-});
-
-/**
- * Validate companion token from Authorization header.
- * Returns the token record if valid, null otherwise.
- */
-async function validateCompanionToken(request: Request) {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const rawToken = authHeader.slice(7); // Remove "Bearer "
-  if (!rawToken.startsWith("cmp_")) {
-    return null;
-  }
-
-  // Find all non-revoked tokens and check against the hash
-  // This is not ideal for performance, but companion tokens are rare
-  const tokens = await prisma.companionToken.findMany({
-    where: { revokedAt: null },
-    include: { user: { select: { id: true } } },
-  });
-
-  for (const tokenRecord of tokens) {
-    const isMatch = await bcrypt.compare(rawToken, tokenRecord.token);
-    if (isMatch) {
-      // Update lastSeen
-      await prisma.companionToken.update({
-        where: { id: tokenRecord.id },
-        data: { lastSeen: new Date() },
-      });
-      return tokenRecord;
-    }
-  }
-
-  return null;
+interface QuestEvent {
+  questId: string;
+  status: string;
+  timestamp: string;
 }
 
 /**
- * Check if a dependency requirement is satisfied.
+ * POST /api/companion/sync - Sync quest progress from companion app
+ *
+ * This endpoint accepts quest status updates from the Tauri companion app
+ * and updates the database accordingly. It handles status mapping, validation,
+ * and auto-unlocking of dependent quests.
  */
-function isDependencyMet(
-  requirementStatus: string[],
-  actualStatus: string | null
-): boolean {
-  if (!actualStatus) return false;
-
-  const normalizedActual = actualStatus.toUpperCase();
-
-  for (const reqStatus of requirementStatus) {
-    const normalizedReq = reqStatus.toLowerCase();
-
-    if (normalizedReq === "complete" && normalizedActual === "COMPLETED") {
-      return true;
-    }
-    if (
-      normalizedReq === "active" &&
-      (normalizedActual === "IN_PROGRESS" || normalizedActual === "COMPLETED")
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Check if all dependencies for a quest are met.
- */
-async function checkAllDependenciesMet(
-  userId: string,
-  dependencies: QuestDependencyWithStatus[]
-): Promise<boolean> {
-  if (dependencies.length === 0) return true;
-
-  const requiredQuestIds = dependencies.map((d) => d.requiredId);
-  const progressRecords = await prisma.questProgress.findMany({
-    where: {
-      userId,
-      questId: { in: requiredQuestIds },
-    },
-  });
-
-  const progressMap = new Map(
-    progressRecords.map((p) => [p.questId, p.status])
-  );
-
-  for (const dep of dependencies) {
-    const actualStatus = progressMap.get(dep.requiredId) || null;
-    const requirementStatus = dep.requirementStatus || ["complete"];
-
-    if (!isDependencyMet(requirementStatus, actualStatus)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-/**
- * Auto-unlock quests that depend on the completed quest.
- */
-async function autoUnlockDependentQuests(
-  userId: string,
-  completedQuestId: string
-): Promise<string[]> {
-  const dependentQuests = await prisma.questDependency.findMany({
-    where: { requiredId: completedQuestId },
-    include: {
-      dependentQuest: {
-        include: { dependsOn: true },
-      },
-    },
-  });
-
-  const unlockedQuestIds: string[] = [];
-
-  for (const dep of dependentQuests) {
-    const quest = dep.dependentQuest;
-
-    // Check if ALL dependencies are now met
-    const allDepsMet = await checkAllDependenciesMet(
-      userId,
-      quest.dependsOn as QuestDependencyWithStatus[]
-    );
-
-    if (allDepsMet) {
-      const currentProgress = await prisma.questProgress.findUnique({
-        where: {
-          userId_questId: { userId, questId: quest.id },
-        },
-      });
-
-      if (!currentProgress) {
-        // Create as AVAILABLE
-        await prisma.questProgress.create({
-          data: {
-            userId,
-            questId: quest.id,
-            status: "AVAILABLE",
-            syncSource: "COMPANION",
-          },
-        });
-        unlockedQuestIds.push(quest.id);
-      } else if (currentProgress.status === "LOCKED") {
-        // Unlock it
-        await prisma.questProgress.update({
-          where: {
-            userId_questId: { userId, questId: quest.id },
-          },
-          data: { status: "AVAILABLE", syncSource: "COMPANION" },
-        });
-        unlockedQuestIds.push(quest.id);
-      }
-    }
-  }
-
-  return unlockedQuestIds;
-}
-
-/**
- * POST /api/companion/sync
- * Sync quest progress events from the companion app.
- * Requires companion token authentication.
- */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Validate companion token
-    const tokenRecord = await validateCompanionToken(request);
-    if (!tokenRecord) {
+    // 1. Extract and validate token
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
-        { error: "Invalid or expired companion token" },
+        { success: false, error: "Missing or invalid Authorization header" },
         { status: 401 }
       );
     }
 
-    const userId = tokenRecord.userId;
-    const body = await request.json();
-    const { events } = syncSchema.parse(body);
+    const token = authHeader.substring(7);
+    const validation = await validateCompanionToken(token);
 
-    const results = {
-      synced: 0,
-      errors: [] as { questId: string; error: string }[],
-      unlockedQuests: [] as string[],
-    };
-
-    // Process events in order (by timestamp)
-    const sortedEvents = [...events].sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
-
-    for (const event of sortedEvents) {
-      try {
-        const newStatus = STATUS_MAP[event.status];
-        if (!newStatus) {
-          results.errors.push({
-            questId: event.questId,
-            error: `Unknown status: ${event.status}`,
-          });
-          continue;
-        }
-
-        // Check if quest exists
-        const quest = await prisma.quest.findUnique({
-          where: { id: event.questId },
-          include: { dependsOn: true },
-        });
-
-        if (!quest) {
-          results.errors.push({
-            questId: event.questId,
-            error: "Quest not found",
-          });
-          continue;
-        }
-
-        // Get or create progress record
-        let progress = await prisma.questProgress.findUnique({
-          where: {
-            userId_questId: { userId, questId: event.questId },
-          },
-        });
-
-        if (!progress) {
-          // Determine initial status based on dependencies
-          let initialStatus: QuestStatus = "AVAILABLE";
-          if (quest.dependsOn.length > 0) {
-            const depsMet = await checkAllDependenciesMet(
-              userId,
-              quest.dependsOn as QuestDependencyWithStatus[]
-            );
-            if (!depsMet) {
-              initialStatus = "LOCKED";
-            }
-          }
-
-          progress = await prisma.questProgress.create({
-            data: {
-              userId,
-              questId: event.questId,
-              status: initialStatus,
-              syncSource: "COMPANION",
-            },
-          });
-        }
-
-        // Apply the status change
-        // Note: We're more permissive here than the web UI since the game
-        // is the source of truth
-        await prisma.questProgress.update({
-          where: {
-            userId_questId: { userId, questId: event.questId },
-          },
-          data: {
-            status: newStatus,
-            syncSource: "COMPANION",
-          },
-        });
-
-        results.synced++;
-
-        // Auto-unlock dependent quests if completed
-        if (newStatus === "COMPLETED") {
-          const unlocked = await autoUnlockDependentQuests(
-            userId,
-            event.questId
-          );
-          results.unlockedQuests.push(...unlocked);
-        }
-      } catch (eventError) {
-        logger.error(
-          { err: eventError, questId: event.questId },
-          `Error processing event for quest ${event.questId}`
-        );
-        results.errors.push({
-          questId: event.questId,
-          error: "Failed to process event",
-        });
-      }
+    if (!validation.valid) {
+      return NextResponse.json(
+        { success: false, error: validation.error },
+        { status: 401 }
+      );
     }
 
-    return NextResponse.json(results);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+    // 2. Parse and validate request body
+    const body = await request.json();
+    const { events } = body;
+
+    if (!Array.isArray(events) || events.length === 0) {
       return NextResponse.json(
-        { error: error.issues[0].message },
+        { success: false, error: "Invalid events array" },
         { status: 400 }
       );
     }
 
-    logger.error({ err: error }, "Error syncing companion progress:");
+    // 3. Validate event format
+    const failedEvents: Array<{
+      questId: string;
+      status: string;
+      reason: string;
+    }> = [];
+
+    for (const event of events as QuestEvent[]) {
+      if (!event.questId || !event.status) {
+        failedEvents.push({
+          questId: event.questId || "unknown",
+          status: event.status || "unknown",
+          reason: "Missing questId or status",
+        });
+      }
+    }
+
+    if (failedEvents.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid event format",
+          failedEvents,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4. Process updates in transaction
+    const result = await prisma.$transaction(async (tx) => {
+      let syncedCount = 0;
+      const failed: typeof failedEvents = [];
+
+      for (const event of events as QuestEvent[]) {
+        const { questId, status } = event;
+
+        // Map status from companion format to database format
+        const mappedStatus = statusMap[status as CompanionStatus];
+        if (!mappedStatus) {
+          failed.push({
+            questId,
+            status,
+            reason: `Invalid status: ${status}`,
+          });
+          continue;
+        }
+
+        // Verify quest exists
+        const quest = await tx.quest.findUnique({
+          where: { id: questId },
+        });
+
+        if (!quest) {
+          failed.push({
+            questId,
+            status,
+            reason: "Quest not found",
+          });
+          continue;
+        }
+
+        // Update or create quest progress
+        await tx.questProgress.upsert({
+          where: {
+            userId_questId: {
+              userId: validation.userId!,
+              questId,
+            },
+          },
+          update: {
+            status: mappedStatus,
+            updatedAt: new Date(),
+          },
+          create: {
+            userId: validation.userId!,
+            questId,
+            status: mappedStatus,
+          },
+        });
+
+        syncedCount++;
+
+        // Auto-unlock dependent quests if this quest was completed
+        if (mappedStatus === "COMPLETED") {
+          // Find quests that depend on this quest
+          const dependencies = await tx.questDependency.findMany({
+            where: { dependsOnId: questId },
+            include: {
+              quest: {
+                include: {
+                  dependencies: true,
+                },
+              },
+            },
+          });
+
+          for (const dep of dependencies) {
+            // Check if all dependencies for the dependent quest are met
+            const allDeps = dep.quest.dependencies;
+            const completedDeps = await tx.questProgress.count({
+              where: {
+                userId: validation.userId!,
+                questId: { in: allDeps.map((d) => d.dependsOnId) },
+                status: "COMPLETED",
+              },
+            });
+
+            // If all dependencies are met, unlock the quest
+            if (completedDeps === allDeps.length) {
+              await tx.questProgress.upsert({
+                where: {
+                  userId_questId: {
+                    userId: validation.userId!,
+                    questId: dep.questId,
+                  },
+                },
+                update: {
+                  status: "AVAILABLE",
+                  updatedAt: new Date(),
+                },
+                create: {
+                  userId: validation.userId!,
+                  questId: dep.questId,
+                  status: "AVAILABLE",
+                },
+              });
+            }
+          }
+        }
+      }
+
+      // Query updated stats
+      const questStats = await tx.questProgress.groupBy({
+        by: ["status"],
+        where: { userId: validation.userId },
+        _count: { status: true },
+      });
+
+      const stats = {
+        completed: 0,
+        inProgress: 0,
+        available: 0,
+        locked: 0,
+      };
+
+      questStats.forEach((stat) => {
+        const status = stat.status.toLowerCase();
+        if (status === "completed") {
+          stats.completed = stat._count.status;
+        } else if (status === "in_progress") {
+          stats.inProgress = stat._count.status;
+        } else if (status === "available") {
+          stats.available = stat._count.status;
+        } else if (status === "locked") {
+          stats.locked = stat._count.status;
+        }
+      });
+
+      return { syncedCount, failed, stats };
+    });
+
+    // 5. Return success or partial success
+    if (result.failed.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Some events failed to sync",
+          synced: result.syncedCount,
+          failedEvents: result.failed,
+          stats: result.stats,
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to sync progress" },
+      {
+        success: true,
+        synced: result.syncedCount,
+        stats: result.stats,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error syncing quest progress:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

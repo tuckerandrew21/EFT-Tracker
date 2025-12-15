@@ -44,6 +44,13 @@ export function setCompanionToken(token: string | null): void {
 }
 
 /**
+ * Clear companion token (sign out or invalid token)
+ */
+export function clearCompanionToken(): void {
+  setCompanionToken(null);
+}
+
+/**
  * Generic fetch wrapper with authentication
  * Uses Bearer token for Tauri, cookies for web
  */
@@ -71,6 +78,11 @@ async function fetchWithAuth(
     credentials: isTauri ? "omit" : "include", // No cookies in Tauri
     headers,
   });
+
+  // If 401 Unauthorized in Tauri, clear the invalid token
+  if (isTauri && response.status === 401) {
+    clearCompanionToken();
+  }
 
   return response;
 }
