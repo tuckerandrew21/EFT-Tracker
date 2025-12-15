@@ -167,8 +167,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: build
-    # Temporarily disabled during active development - re-enable when ready
-    if: false
+    # Re-enabled after achieving 100% stability (Dec 15, 2025)
+    if: true
 
     steps:
       - name: Checkout code
