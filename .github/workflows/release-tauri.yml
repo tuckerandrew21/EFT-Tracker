@@ -68,5 +68,5 @@ jobs:
             4. Configure your EFT installation path if needed
 
             See the assets below to download.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
