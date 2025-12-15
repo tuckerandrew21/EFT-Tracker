@@ -188,18 +188,95 @@ Don't rely on the user to catch visual issues - proactively identify and fix the
 - Look for `[active]`, `[expanded]`, `[disabled]` states
 - Check for expected text content and structure
 
-### Running E2E Tests
+### E2E Testing Strategy (Hybrid Approach)
+
+**IMPORTANT:** E2E tests are slow and expensive to debug in CI. Follow this hybrid approach:
+
+#### 1. Run Tests Locally BEFORE Pushing
+
+Always run E2E tests locally before pushing to catch issues early:
 
 ```bash
-# Run all E2E tests
-npx playwright test
+# Full local test run (do this before pushing)
+npm run db:seed        # Seed quest data
+npm run db:seed:test   # Seed test user
+rm -rf .next           # Clear cache
+npm run dev            # Start dev server (in separate terminal)
+npx playwright test    # Run tests
 
-# Run with UI mode for debugging
+# Debug mode with browser visible
+npx playwright test --headed
+
+# Interactive UI mode (best for debugging)
 npx playwright test --ui
 
-# Run specific test file
-npx playwright test homepage.spec.ts
+# Debug specific test
+npx playwright test --debug homepage.spec.ts
 ```
+
+**Benefits:**
+
+- ⚡ Fast feedback (2-3 min vs 10+ min in CI)
+- 👀 See browser in headed mode to understand failures
+- 🐛 Use Playwright Inspector for step-by-step debugging
+- 💰 No wasted CI minutes on preventable failures
+
+#### 2. Keep CI E2E Tests Minimal
+
+CI E2E tests should be a **small smoke test**, not exhaustive:
+
+**What to test in CI:**
+
+- Critical user flows only (login, core feature)
+- 1-2 tests per major feature
+- Tests that verify end-to-end integration
+
+**What NOT to test in CI:**
+
+- Edge cases (move to unit/integration tests)
+- UI variations (use integration tests)
+- Complex multi-step flows (break into smaller tests)
+
+**Goal:** CI E2E should complete in <5 minutes, not 15+
+
+#### 3. Prefer Integration Tests Over E2E
+
+For most testing, use integration tests instead of E2E:
+
+```typescript
+// __tests__/integration/api/auth.test.ts
+// Test API directly - 10x faster than E2E
+describe("POST /api/auth/callback/credentials", () => {
+  it("should authenticate with valid credentials", async () => {
+    // Direct API call, no browser needed
+    // Runs in milliseconds instead of seconds
+  });
+});
+```
+
+**When to use each:**
+
+- **E2E tests:** Critical user flows, UI integration
+- **Integration tests:** API endpoints, database operations, business logic
+- **Unit tests:** Individual functions, utilities, components
+
+#### 4. If E2E Fails in CI
+
+Don't debug in CI - reproduce locally:
+
+```bash
+# Pull the branch that failed
+git checkout feature-branch
+git pull
+
+# Run the exact test that failed
+npx playwright test failed-test.spec.ts --headed
+
+# Use UI mode to see what's happening
+npx playwright test failed-test.spec.ts --ui
+```
+
+Fix locally, verify it passes, then push.
 
 ### Branch Naming Convention
 

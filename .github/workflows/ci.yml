@@ -222,6 +222,8 @@ jobs:
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           NEXTAUTH_SECRET: ${{ secrets.AUTH_SECRET }}
           NEXTAUTH_URL: http://localhost:3000
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
 
       - name: Upload Playwright report
         if: always()
