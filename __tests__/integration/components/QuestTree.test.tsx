@@ -8,13 +8,18 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SessionProvider } from "next-auth/react";
 import {
-  mockSession,
   mockQuests,
   mockQuestsWithProgress,
   createQuestWithProgress,
   QUEST_IDS,
 } from "../../../test/fixtures/quests";
 import { mockTraders } from "../../../test/fixtures/traders";
+
+// Mock session for SessionProvider
+const mockSession = {
+  user: { id: "test-user", name: "Test User", email: "test@example.com" },
+  expires: new Date(Date.now() + 86400000).toISOString(),
+};
 
 // Mock ReactFlow before importing QuestTree
 const mockFitView = vi.fn();
