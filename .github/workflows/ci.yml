@@ -215,6 +215,8 @@ jobs:
         env:
           CI: true
           DATABASE_URL: ${{ github.ref == 'refs/heads/master' && secrets.DATABASE_URL_STAGING || secrets.DATABASE_URL_DEVELOP }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXTAUTH_URL: http://localhost:3000
 
       - name: Upload Playwright report
         if: always()
