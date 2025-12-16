@@ -672,20 +672,29 @@ nixPkgs = ["openssl"]
 
 Start Docker Desktop before running the full build test. The `--plan` mode doesn't require Docker.
 
-#### Pre-Push Workflow (Recommended)
+#### Pre-Push Workflow (Automatic!)
 
-Before pushing to GitHub:
+The Coolify deployment check runs automatically as part of the pre-push hook:
 
 ```bash
-# 1. Run the full validation (catches most issues)
-npm run validate
+# 1. Make your changes
+vim apps/web/src/components/MyComponent.tsx
 
-# 2. If validation passes, run quick Coolify plan check
-bash scripts/test-coolify-build.sh --plan
+# 2. Commit
+git add .
+git commit -m "feat: Add new component"
 
-# 3. If plan check passes, push with confidence
+# 3. Push to GitHub
 git push origin branch-name
+
+# Automatic pre-push checks run:
+#   ✓ Formatting, linting, types, tests, build (npm run validate)
+#   ✓ Coolify Nixpacks build plan validation (~10 seconds)
+#   ✓ If everything passes: push completes
+#   ✓ If anything fails: push blocked with clear error
 ```
+
+**You don't need to remember to run the check manually** — it happens automatically every time you push.
 
 #### When to Use Full Docker Test
 
