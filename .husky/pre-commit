@@ -1,1 +1,22 @@
-npx lint-staged
+#!/bin/sh
+
+# Run quick validation before every commit
+# This catches formatting, lint, and type errors early
+echo "🔍 Running pre-commit validation..."
+echo ""
+
+# Run lint-staged for quick formatting checks on staged files
+if ! npx lint-staged; then
+    echo ""
+    echo "❌ Formatting/linting failed"
+    exit 1
+fi
+
+echo ""
+echo "✓ Pre-commit checks passed"
+echo ""
+echo "💡 Tip: Before pushing to GitHub, run the full validation:"
+echo "   npm run validate"
+echo ""
+echo "This will catch all issues (TypeScript, tests, build) before submitting your PR."
+echo "(Full validation is NOT run on every commit to keep commit speed fast)"
