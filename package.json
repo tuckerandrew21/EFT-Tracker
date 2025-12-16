@@ -20,7 +20,14 @@
     "db:push": "pnpm --filter @eft-tracker/web prisma db push",
     "db:studio": "pnpm --filter @eft-tracker/web prisma studio",
     "db:generate": "pnpm --filter @eft-tracker/web prisma generate",
-    "db:seed": "pnpm --filter @eft-tracker/web prisma db seed"
+    "db:seed": "pnpm --filter @eft-tracker/web prisma db seed",
+    "validate": "bash scripts/validate-build.sh",
+    "validate:quick": "bash scripts/validate-build.sh --quick",
+    "pre-pr": "bash scripts/validate-build.sh"
+  },
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=10.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

@@ -2,7 +2,7 @@
 # Multi-stage build for optimized image size and security
 
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:22.12.0-alpine AS deps
 WORKDIR /app
 
 # Install dependencies for native modules and pnpm
@@ -27,7 +27,7 @@ RUN pnpm install --frozen-lockfile && \
     pnpm store prune
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM node:22.12.0-alpine AS builder
 WORKDIR /app
 
 # Install pnpm
@@ -52,7 +52,7 @@ ENV SKIP_ENV_VALIDATION=1
 RUN pnpm --filter @eft-tracker/web run build
 
 # Stage 3: Runner (Production)
-FROM node:20-alpine AS runner
+FROM node:22.12.0-alpine AS runner
 WORKDIR /app
 
 # Install dumb-init for proper signal handling

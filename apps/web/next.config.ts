@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
   // Re-enable for production deployments
   output: process.env.NODE_ENV === "production" ? "standalone" : undefined,
 
-  // Disable TypeScript errors for portability issues in monorepo setup
+  // Fail fast on TypeScript errors - catch all issues before deployment
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // Configure server-side externals for Pino
