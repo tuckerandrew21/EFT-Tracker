@@ -27,8 +27,26 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "✅ All validations passed - push proceeding"
+echo "✅ All validations passed"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Your code is validated and will pass CI ✓"
+
+# Quick Coolify deployment configuration check
+echo "🐳 Checking Coolify build configuration..."
+if bash scripts/test-coolify-build.sh --plan > /dev/null 2>&1; then
+    echo "✅ Coolify deployment plan validated"
+else
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "⚠️  Coolify deployment check failed"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "Run manually to see details:"
+    echo "  bash scripts/test-coolify-build.sh --plan"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "Your code is validated and will pass CI & Coolify deployment ✓"
 echo ""
