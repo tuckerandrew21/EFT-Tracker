@@ -23,7 +23,7 @@ vi.mock("@tauri-apps/plugin-process", () => ({
 }));
 
 // Import after mocking
-import { checkForUpdates } from "companion-app/src/lib/updater";
+import { checkForUpdates } from "../../../companion-app/src/lib/updater";
 
 describe("Tauri v2 Auto-Updater", () => {
   beforeEach(() => {
