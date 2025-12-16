@@ -231,7 +231,6 @@ git push --no-verify    # Skips pre-push hook (doesn't exist yet)
 ```
 
 ⚠️ **WARNING:** Bypassing validation almost always leads to CI failures. Don't do this.
-
 ## Tech Stack
 
 - Next.js 16 with Turbopack
