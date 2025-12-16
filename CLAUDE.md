@@ -75,6 +75,46 @@ After modifying `prisma/schema.prisma`, sync to remote database:
 npx prisma db push
 ```
 
+### Pre-Commit Checklist
+
+**IMPORTANT:** Before committing code, always run these checks locally to avoid CI failures:
+
+```bash
+# 1. Format code with Prettier (REQUIRED - CI will fail without this)
+npx prettier --write <files-changed>
+
+# 2. Run linting (REQUIRED - CI will fail without this)
+npm run lint
+
+# 3. Run type checking (REQUIRED - CI will fail without this)
+npm run typecheck
+
+# 4. Run tests (RECOMMENDED - catch issues before CI)
+npm test
+
+# 5. Run build (RECOMMENDED - catch build errors before CI)
+npm run build
+```
+
+**Shortcut - Run all checks at once:**
+
+```bash
+npx prettier --write <files> && npm run lint && npm run typecheck && npm test && npm run build
+```
+
+**Common Issues:**
+
+- **Prettier failures in CI:** Run `npx prettier --write <files>` on modified files before committing
+- **ESLint failures:** Run `npm run lint` to see and fix issues locally
+- **Type errors:** Run `npm run typecheck` to catch TypeScript errors
+- **Build failures:** Run `npm run build` to catch build errors (e.g., missing exports, circular dependencies)
+
+**Bypass for debugging (NOT recommended for production code):**
+
+```bash
+git commit --no-verify  # Skips pre-commit hooks but CI will still fail on formatting
+```
+
 ## Tech Stack
 
 - Next.js 16 with Turbopack
@@ -373,6 +413,43 @@ curl -s "https://api.github.com/repos/andrew-tucker-razorvision/EFT-Tracker/comm
 If needed, you can trigger a manual deployment from the Coolify dashboard using the "Redeploy" button.
 
 **Production URL:** `https://learntotarkov.com`
+
+### Coolify Deployment Monitoring API
+
+The application includes HTTP API endpoints for programmatic deployment monitoring. **See [docs/coolify-deployment.md](docs/coolify-deployment.md) for complete documentation.**
+
+**Quick Reference:**
+
+```typescript
+import { getCoolifyAPIClient } from '@eft-tracker/utils';
+
+const client = getCoolifyAPIClient();
+
+// Test connection
+const connected = await client.testConnection();
+
+// Get deployment status
+const deployment = await client.getDeployment('deployment-uuid');
+console.log(deployment.status); // 'queued' | 'in_progress' | 'finished' | 'failed' | 'cancelled'
+
+// List all deployments
+const deployments = await client.listDeployments();
+```
+
+**API Routes:**
+
+- `GET /api/deployment/status?deploymentId=<uuid>` - Get deployment status
+- `GET /api/deployment/logs?deploymentId=<uuid>` - Get deployment logs
+
+**Environment Variables Required:**
+
+- `COOLIFY_API_URL` - `http://95.217.155.28:8000/api/v1`
+- `COOLIFY_API_TOKEN` - Bearer token (read-only recommended)
+
+**Files:**
+
+- Client: `packages/utils/src/coolify-api.ts`
+- Routes: `apps/web/src/app/api/deployment/{logs,status}/route.ts`
 
 ## Model Selection (Cost Optimization)
 
