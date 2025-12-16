@@ -5,6 +5,8 @@
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "jsx": "preserve",
     "incremental": true,
+    "declaration": false,
+    "declarationMap": false,
     "plugins": [
       {
         "name": "next"
