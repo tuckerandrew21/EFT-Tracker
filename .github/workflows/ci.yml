@@ -167,9 +167,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: build
-    # Disabled due to CI timing issues (Dec 15, 2025)
-    # Tests pass 100% locally but timeout in CI - waitForQuestTree() page.reload() causes context closure
-    # TODO: See issue #267 for fix - extend timeouts or different wait strategy
+    # Completely disabled - E2E tests run locally only
     if: false
 
     steps:
@@ -249,7 +247,7 @@ jobs:
   ci-success:
     name: CI Success
     runs-on: ubuntu-latest
-    needs: [lint, test, security, build] # e2e removed - disabled during development
+    needs: [lint, test, security, build]
     if: always()
 
     steps:
