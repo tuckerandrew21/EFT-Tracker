@@ -48,4 +48,10 @@ export type {
   RegisterResponse,
 } from "@eft-tracker/types";
 
-export { linkSchema, syncEventSchema, syncSchema, progressUpdateSchema, registerSchema } from "@eft-tracker/types";
+export {
+  linkSchema,
+  syncEventSchema,
+  syncSchema,
+  progressUpdateSchema,
+  registerSchema,
+} from "@eft-tracker/types";
