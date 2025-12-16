@@ -1,0 +1,91 @@
+import "@testing-library/jest-dom";
+import { cleanup } from "@testing-library/react";
+import { afterEach, beforeAll, afterAll, vi } from "vitest";
+import { server } from "./msw-server";
+
+// Skip environment validation in tests
+process.env.SKIP_ENV_VALIDATION = "1";
+
+// Establish API mocking before all tests
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: "warn" });
+});
+
+// Reset any request handlers that are declared as a part of tests
+afterEach(() => {
+  cleanup();
+  server.resetHandlers();
+});
+
+// Clean up after all tests are done
+afterAll(() => {
+  server.close();
+});
+
+// Mock next/navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+  redirect: vi.fn(),
+}));
+
+// Mock next-auth/react
+vi.mock("next-auth/react", () => ({
+  useSession: vi.fn(() => ({
+    data: null,
+    status: "unauthenticated",
+  })),
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock Upstash Redis and Ratelimit packages
+vi.mock("@upstash/redis", () => ({
+  Redis: vi.fn(() => ({
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
+    incr: vi.fn(),
+    expire: vi.fn(),
+  })),
+}));
+
+vi.mock("@upstash/ratelimit", () => ({
+  Ratelimit: vi.fn(() => ({
+    limit: vi.fn().mockResolvedValue({ success: true, limit: 10, reset: 60 }),
+  })),
+}));
+
+// Mock window.matchMedia for responsive tests
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+// Mock ResizeObserver as a proper class
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+global.ResizeObserver = ResizeObserverMock;
+
+// Suppress console errors during tests (optional, comment out for debugging)
+// vi.spyOn(console, 'error').mockImplementation(() => {});
