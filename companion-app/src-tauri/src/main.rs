@@ -288,15 +288,21 @@ fn main() {
                 }
             });
 
-            // Check for updates on startup (dialog will be shown automatically if update available)
+            // Check for updates on startup
             let app_handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
-                use tauri_plugin_updater::UpdaterExt;
-
-                if let Ok(updater) = app_handle.updater() {
-                    if let Err(e) = updater.check().await {
-                        error!("Failed to check for updates: {}", e);
+                match tauri_plugin_updater::check(&app_handle).await {
+                    Ok(update) => {
+                        if update.available {
+                            info!("Update available: {}", update.version);
+                            if let Err(e) = update.download_and_install().await {
+                                error!("Failed to download and install update: {}", e);
+                            }
+                        } else {
+                            info!("No updates available");
+                        }
                     }
+                    Err(e) => error!("Failed to check for updates: {}", e),
                 }
             });
 
