@@ -47,6 +47,23 @@ vi.mock("next-auth/react", () => ({
   SessionProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// Mock Upstash Redis and Ratelimit packages
+vi.mock("@upstash/redis", () => ({
+  Redis: vi.fn(() => ({
+    get: vi.fn(),
+    set: vi.fn(),
+    del: vi.fn(),
+    incr: vi.fn(),
+    expire: vi.fn(),
+  })),
+}));
+
+vi.mock("@upstash/ratelimit", () => ({
+  Ratelimit: vi.fn(() => ({
+    limit: vi.fn().mockResolvedValue({ success: true, limit: 10, reset: 60 }),
+  })),
+}));
+
 // Mock window.matchMedia for responsive tests
 Object.defineProperty(window, "matchMedia", {
   writable: true,

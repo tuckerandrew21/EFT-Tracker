@@ -7,13 +7,13 @@
  * - Error handling during update check
  * - User interaction flows (accept/decline)
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 
-// Mock Tauri plugins before importing the module under test
+// Create mock functions at module scope
 const mockCheck = vi.fn();
-const mockDownloadAndInstall = vi.fn();
 const mockRelaunch = vi.fn();
 
+// Mock Tauri modules - these MUST be hoisted
 vi.mock("@tauri-apps/plugin-updater", () => ({
   check: mockCheck,
 }));
@@ -22,23 +22,29 @@ vi.mock("@tauri-apps/plugin-process", () => ({
   relaunch: mockRelaunch,
 }));
 
-// Now import the module under test
+// Mock window.confirm
+const mockConfirm = vi.fn();
+global.window.confirm = mockConfirm;
+
+// Now import after mocks are set up
 import {
   checkForUpdates,
   checkForUpdatesSilently,
 } from "@/lib/updater/check-updates";
 
-// Mock window.confirm
-const mockConfirm = vi.fn();
-global.window.confirm = mockConfirm;
+// Mock function for downloadAndInstall
+const mockDownloadAndInstall = vi.fn();
 
 describe("checkForUpdates", () => {
   beforeEach(() => {
+    mockConfirm.mockClear();
+    mockCheck.mockClear();
+    mockDownloadAndInstall.mockClear();
+    mockRelaunch.mockClear();
+  });
+
+  afterEach(() => {
     vi.clearAllMocks();
-    mockConfirm.mockReset();
-    mockCheck.mockReset();
-    mockDownloadAndInstall.mockReset();
-    mockRelaunch.mockReset();
   });
 
   it("should return false when no update is available", async () => {
@@ -119,8 +125,11 @@ describe("checkForUpdates", () => {
 
 describe("checkForUpdatesSilently", () => {
   beforeEach(() => {
+    mockCheck.mockClear();
+  });
+
+  afterEach(() => {
     vi.clearAllMocks();
-    mockCheck.mockReset();
   });
 
   it("should return true when update is available", async () => {

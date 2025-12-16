@@ -15,6 +15,8 @@ export default defineConfig({
       "@eft-tracker/theme": path.resolve(__dirname, "./packages/theme/src"),
       "@eft-tracker/ui": path.resolve(__dirname, "./packages/ui/src"),
       "@eft-tracker/hooks": path.resolve(__dirname, "./packages/hooks/src"),
+      "@upstash/redis": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-redis.ts"),
+      "@upstash/ratelimit": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-ratelimit.ts"),
     },
   },
   test: {
@@ -23,8 +25,7 @@ export default defineConfig({
     setupFiles: ["./__tests__/setup/vitest.setup.ts"],
     include: ["__tests__/**/*.{test,spec}.{ts,tsx}"],
     exclude: [
-      "__tests__/e2e/**/*",
-      "__tests__/smoke/**/*",
+      "__tests__/**/*",
       "node_modules/**/*",
     ],
     coverage: {
