@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCoolifyAPIClient } from '@eft-tracker/utils';
+import { NextRequest, NextResponse } from "next/server";
+import { getCoolifyAPIClient } from "@eft-tracker/utils";
 
 /**
  * GET /api/deployment/status
@@ -10,11 +10,11 @@ import { getCoolifyAPIClient } from '@eft-tracker/utils';
  * Requires COOLIFY_API_URL and COOLIFY_API_TOKEN environment variables
  */
 export async function GET(request: NextRequest) {
-  const deploymentUuid = request.nextUrl.searchParams.get('deploymentId');
+  const deploymentUuid = request.nextUrl.searchParams.get("deploymentId");
 
   if (!deploymentUuid) {
     return NextResponse.json(
-      { error: 'deploymentId query parameter is required' },
+      { error: "deploymentId query parameter is required" },
       { status: 400 }
     );
   }
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Check if Coolify API credentials are configured
     if (!process.env.COOLIFY_API_URL || !process.env.COOLIFY_API_TOKEN) {
       return NextResponse.json(
-        { error: 'Coolify API credentials not configured' },
+        { error: "Coolify API credentials not configured" },
         { status: 503 }
       );
     }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const connected = await client.testConnection();
     if (!connected) {
       return NextResponse.json(
-        { error: 'Failed to connect to Coolify API. Check API token and URL.' },
+        { error: "Failed to connect to Coolify API. Check API token and URL." },
         { status: 503 }
       );
     }
@@ -54,9 +54,11 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Failed to fetch deployment status:', error);
+    console.error("Failed to fetch deployment status:", error);
     return NextResponse.json(
-      { error: `Failed to fetch deployment status: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      {
+        error: `Failed to fetch deployment status: ${error instanceof Error ? error.message : "Unknown error"}`,
+      },
       { status: 500 }
     );
   }
