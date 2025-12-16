@@ -75,6 +75,46 @@ After modifying `prisma/schema.prisma`, sync to remote database:
 npx prisma db push
 ```
 
+### Pre-Commit Checklist
+
+**IMPORTANT:** Before committing code, always run these checks locally to avoid CI failures:
+
+```bash
+# 1. Format code with Prettier (REQUIRED - CI will fail without this)
+npx prettier --write <files-changed>
+
+# 2. Run linting (REQUIRED - CI will fail without this)
+npm run lint
+
+# 3. Run type checking (REQUIRED - CI will fail without this)
+npm run typecheck
+
+# 4. Run tests (RECOMMENDED - catch issues before CI)
+npm test
+
+# 5. Run build (RECOMMENDED - catch build errors before CI)
+npm run build
+```
+
+**Shortcut - Run all checks at once:**
+
+```bash
+npx prettier --write <files> && npm run lint && npm run typecheck && npm test && npm run build
+```
+
+**Common Issues:**
+
+- **Prettier failures in CI:** Run `npx prettier --write <files>` on modified files before committing
+- **ESLint failures:** Run `npm run lint` to see and fix issues locally
+- **Type errors:** Run `npm run typecheck` to catch TypeScript errors
+- **Build failures:** Run `npm run build` to catch build errors (e.g., missing exports, circular dependencies)
+
+**Bypass for debugging (NOT recommended for production code):**
+
+```bash
+git commit --no-verify  # Skips pre-commit hooks but CI will still fail on formatting
+```
+
 ## Tech Stack
 
 - Next.js 16 with Turbopack
