@@ -37,7 +37,6 @@ RUN apk add --no-cache libc6-compat && \
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Copy application code
 COPY . .
