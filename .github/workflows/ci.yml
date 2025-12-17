@@ -195,7 +195,67 @@ jobs:
           retention-days: 7
         continue-on-error: true
 
-  # Job 5: E2E Tests (Playwright)
+  # Job 5: Build Companion App (Windows only, conditional)
+  build-companion:
+    name: Build Companion App
+    runs-on: windows-latest
+    timeout-minutes: 15
+    needs: [lint, test]
+    # Only run if companion files changed
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.changed_files.*.filename, 'apps/companion/'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+          cache: "npm"
+          cache-dependency-path: "apps/companion/package-lock.json"
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "apps/companion/src-tauri -> target"
+
+      - name: Install dependencies
+        working-directory: ./apps/companion
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./apps/companion
+        run: npm run build
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No signing keys needed for CI builds (only releases)
+        with:
+          projectPath: apps/companion
+          # Don't create release, just build
+          args: --verbose
+
+      - name: Upload companion build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: companion-installers-${{ github.sha }}
+          path: |
+            apps/companion/src-tauri/target/release/bundle/msi/*.msi
+            apps/companion/src-tauri/target/release/bundle/nsis/*.exe
+          retention-days: 7
+          if-no-files-found: error
+
+  # Job 6: E2E Tests (Playwright)
   # Currently disabled during active development (if: false)
   # To run locally: NEXTAUTH_URL=http://localhost:3001 npx playwright test
   # See docs/CI_CD_SETUP.md for re-enablement criteria
@@ -267,7 +327,7 @@ jobs:
           path: apps/web/playwright-report/
           retention-days: 7
 
-  # Job 6: Dependency Review (PRs only)
+  # Job 7: Dependency Review (PRs only)
   dependency-review:
     name: Dependency Review
     runs-on: ubuntu-latest
@@ -284,17 +344,21 @@ jobs:
           fail-on-severity: moderate
           deny-licenses: GPL-3.0, AGPL-3.0
 
-  # Job 7: Status Check (Required for branch protection)
+  # Job 8: Status Check (Required for branch protection)
   ci-success:
     name: CI Success
     runs-on: ubuntu-latest
-    needs: [lint, test, security, build]
+    needs: [lint, test, security, build, build-companion]
     if: always()
 
     steps:
       - name: Check all jobs
         run: |
-          if [ "${{ contains(needs.*.result, 'failure') }}" == "true" ]; then
+          # Check if build-companion ran and failed
+          if [ "${{ needs.build-companion.result }}" == "failure" ]; then
+            echo "Companion build failed"
+            exit 1
+          elif [ "${{ contains(needs.*.result, 'failure') }}" == "true" ]; then
             echo "One or more jobs failed"
             exit 1
           elif [ "${{ contains(needs.*.result, 'cancelled') }}" == "true" ]; then
