@@ -1,13 +1,18 @@
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
-import { env } from "./env";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
+  // Lazy import env to avoid validation errors during build time
+  // env.ts validates required env vars, which aren't available during 'next build'
+  // Using dynamic require prevents the module from being evaluated at import time
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { env } = require("./env") as typeof import("./env");
+
   const pool = new Pool({
     connectionString: env.DATABASE_URL,
     // Connection pool configuration optimized for Neon Free Tier
@@ -20,8 +25,23 @@ function createPrismaClient() {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+// Lazy initialization: store in global object but don't initialize until first use
+if (!globalForPrisma.prisma) {
+  globalForPrisma.prisma = undefined;
 }
+
+export function getPrismaClient() {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
+}
+
+// For backwards compatibility, export as a getter
+export const prisma = new Proxy({} as PrismaClient, {
+  get(target, prop) {
+    const client = getPrismaClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (client as any)[prop];
+  },
+});

@@ -89,4 +89,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
-CMD ["node", "server.js"]
+# Note: In a monorepo, .next/standalone copies nested paths, so server.js is at apps/web/server.js
+CMD ["node", "apps/web/server.js"]
