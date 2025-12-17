@@ -57,7 +57,9 @@ describe("SettingsPanel", () => {
       />
     );
 
-    expect(screen.getByDisplayValue("C:\\Battlestate Games\\EFT")).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue("C:\\Battlestate Games\\EFT")
+    ).toBeInTheDocument();
   });
 
   it("toggles notification setting", async () => {
@@ -72,10 +74,15 @@ describe("SettingsPanel", () => {
       />
     );
 
-    const notificationToggle = screen.getByRole("checkbox", { name: /enable notifications/i });
+    const notificationToggle = screen.getByRole("checkbox", {
+      name: /enable notifications/i,
+    });
     await user.click(notificationToggle);
 
-    expect(mockOnUpdateSetting).toHaveBeenCalledWith("enableNotifications", false);
+    expect(mockOnUpdateSetting).toHaveBeenCalledWith(
+      "enableNotifications",
+      false
+    );
   });
 
   it("toggles auto-watch setting", async () => {
@@ -90,7 +97,9 @@ describe("SettingsPanel", () => {
       />
     );
 
-    const autoWatchToggle = screen.getByRole("checkbox", { name: /auto-watch/i });
+    const autoWatchToggle = screen.getByRole("checkbox", {
+      name: /auto-watch/i,
+    });
     await user.click(autoWatchToggle);
 
     expect(mockOnUpdateSetting).toHaveBeenCalledWith("enableAutoWatch", true);
@@ -111,7 +120,9 @@ describe("SettingsPanel", () => {
       />
     );
 
-    const autostartToggle = screen.getByRole("checkbox", { name: /launch at startup/i });
+    const autostartToggle = screen.getByRole("checkbox", {
+      name: /launch at startup/i,
+    });
     await user.click(autostartToggle);
 
     // Should disable autostart (currently enabled)
@@ -166,7 +177,9 @@ describe("SettingsPanel", () => {
     await user.click(saveButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/invalid eft installation path/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/invalid eft installation path/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -233,7 +246,9 @@ describe("SettingsPanel", () => {
     await user.click(browseButton);
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("D:\\Selected\\Path")).toBeInTheDocument();
+      expect(
+        screen.getByDisplayValue("D:\\Selected\\Path")
+      ).toBeInTheDocument();
     });
   });
 
