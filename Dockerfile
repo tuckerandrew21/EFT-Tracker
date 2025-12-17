@@ -1,4 +1,4 @@
-# Production Dockerfile for EFT-Tracker (Monorepo)
+# Production Dockerfile for EFT-Tracker (pnpm Monorepo)
 # Multi-stage build for optimized image size and security
 
 # Stage 1: Dependencies
@@ -10,19 +10,19 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm
 
-# Copy pnpm configuration
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy pnpm configuration and workspace definition
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package files (root and workspaces)
-COPY package.json ./
+# Copy all package.json files to establish workspace structure
 COPY packages/*/package.json ./packages/
 COPY apps/*/package.json ./apps/
 
-# Copy Prisma schema (needed for postinstall script)
+# Copy Prisma schemas (needed for postinstall scripts)
 COPY prisma ./prisma/
 COPY apps/web/prisma ./apps/web/prisma/
 
-# Install dependencies with pnpm
+# Install all dependencies
+# This creates node_modules with proper pnpm workspace symlinks
 RUN pnpm install --frozen-lockfile && \
     pnpm store prune
 
@@ -35,17 +35,26 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm
 
-# Copy entire deps stage output (preserves pnpm workspace structure)
-COPY --from=deps /app .
+# Copy EVERYTHING from deps (preserves exact structure with symlinks)
+COPY --from=deps /app ./
 
-# Generate Prisma Client for web app
+# Copy source code directories on top (complete directory structures)
+# Docker merges, preserving the symlinked node_modules
+COPY apps ./apps
+COPY packages ./packages
+
+# Generate Prisma Client
 RUN pnpm --filter @eft-tracker/web run prisma:generate
 
-# Build Next.js application
+# Build Next.js with standalone output
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV SKIP_ENV_VALIDATION=1
 RUN pnpm --filter @eft-tracker/web run build
+
+# Verify build artifacts exist
+RUN ls -la /app/apps/web/.next/standalone || (echo "ERROR: standalone output not found" && exit 1)
+RUN ls -la /app/apps/web/.next/static || (echo "ERROR: static output not found" && exit 1)
 
 # Stage 3: Runner (Production)
 FROM node:22.12.0-alpine AS runner
@@ -59,13 +68,13 @@ RUN apk add --no-cache dumb-init
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Set production environment
+# Set production environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Copy necessary files from builder
+# Copy production files from builder
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./.next/static
@@ -74,7 +83,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 # Switch to non-root user
 USER nextjs
 
-# Expose port
+# Expose application port
 EXPOSE 3000
 
 # Health check
@@ -85,5 +94,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
-# Note: In a monorepo, .next/standalone copies nested paths, so server.js is at apps/web/server.js
+# In monorepo standalone builds, Next.js preserves the directory structure
 CMD ["node", "apps/web/server.js"]
