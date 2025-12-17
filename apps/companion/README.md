@@ -4,6 +4,8 @@
 ![Platform](https://img.shields.io/badge/platform-windows-blue)
 ![Version](https://img.shields.io/badge/version-0.1.5-blue)
 
+> **Note:** CI builds are now automatically tested on every companion change (thanks to GitHub Actions companion build integration).
+
 ## Overview
 
 EFT Tracker Companion is a lightweight Windows desktop application that automatically syncs your Escape from Tarkov quest progress with [Learn to Tarkov](https://learntotarkov.com). It runs in the system tray and monitors your game logs in real-time.
