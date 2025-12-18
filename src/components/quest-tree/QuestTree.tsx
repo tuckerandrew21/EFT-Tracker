@@ -22,6 +22,7 @@ import { TraderNode } from "./TraderNode";
 import { buildTraderLaneGraph, getQuestChain } from "@/lib/quest-layout";
 import { getTraderColor } from "@/lib/trader-colors";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useQuestKeyboardNav } from "@/hooks/useQuestKeyboardNav";
 import {
   Tooltip,
   TooltipContent,
@@ -201,108 +202,18 @@ function QuestTreeInner({
   );
 
   // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't handle if user is typing in an input
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
-        return;
-      }
-
-      // ESC exits focus mode
-      if (e.key === "Escape") {
-        if (focusedQuestId) {
-          setFocusedQuestId(null);
-        } else if (keyboardSelectedId) {
-          setKeyboardSelectedId(null);
-        }
-        return;
-      }
-
-      // Arrow keys for navigation
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-
-        // If no node selected, select the first quest node
-        if (!keyboardSelectedId) {
-          const firstQuest = questNodes[0];
-          if (firstQuest) {
-            setKeyboardSelectedId(firstQuest.id);
-          }
-          return;
-        }
-
-        const direction = e.key.replace("Arrow", "").toLowerCase() as
-          | "up"
-          | "down"
-          | "left"
-          | "right";
-        const nextId = findNearestNode(keyboardSelectedId, direction);
-        if (nextId) {
-          setKeyboardSelectedId(nextId);
-          // Center view on the selected node
-          const node = nodesRef.current.find((n) => n.id === nextId);
-          if (node) {
-            fitView({
-              nodes: [node],
-              duration: 150,
-              padding: 0.5,
-              maxZoom: 1.5,
-            });
-          }
-        }
-        return;
-      }
-
-      // Only handle action keys if a node is selected
-      if (!keyboardSelectedId) return;
-
-      const selectedNode = nodesRef.current.find(
-        (n) => n.id === keyboardSelectedId
-      );
-      const data = selectedNode?.data as QuestNodeData | undefined;
-      if (!data?.quest) return;
-
-      // Enter: Toggle quest status
-      if (e.key === "Enter") {
-        e.preventDefault();
-        onStatusChange(data.quest.id, data.quest.computedStatus);
-        return;
-      }
-
-      // Space: Open quest details
-      if (e.key === " ") {
-        e.preventDefault();
-        if (onQuestDetails) {
-          onQuestDetails(data.quest.id);
-        }
-        return;
-      }
-
-      // F: Enter focus mode on selected quest
-      if (e.key === "f" || e.key === "F") {
-        e.preventDefault();
-        handleFocus(data.quest.id);
-        return;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    focusedQuestId,
-    keyboardSelectedId,
+  useQuestKeyboardNav({
     questNodes,
-    findNearestNode,
+    keyboardSelectedId,
+    focusedQuestId,
+    onKeyboardSelect: setKeyboardSelectedId,
     onStatusChange,
     onQuestDetails,
-    handleFocus,
+    onFocus: handleFocus,
     fitView,
-  ]);
+    findNearestNode,
+    nodesRef,
+  });
 
   // Set initial viewport to center content with appropriate zoom when React Flow is ready
   // Uses nodesRef to avoid callback recreation on every nodes change
@@ -320,7 +231,7 @@ function QuestTreeInner({
 
       isInitializedRef.current = true;
     }
-  }, [fitView, getViewport, setViewport]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Calculate bounds to constrain panning - include ALL nodes (traders + quests)
   const translateExtent = useMemo(() => {
@@ -403,7 +314,7 @@ function QuestTreeInner({
 
     container.addEventListener("wheel", handleWheel, { passive: false });
     return () => container.removeEventListener("wheel", handleWheel);
-  }, [getViewport, setViewport]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle background click to exit focus mode
   const handlePaneClick = useCallback(() => {
