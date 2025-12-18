@@ -18,7 +18,6 @@ export default function GlobalError({
 }) {
   // Log error for debugging purposes
   if (typeof window === "undefined") {
-    // eslint-disable-next-line no-console
     console.error("Global error:", error);
   }
 
