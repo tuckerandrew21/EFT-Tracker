@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useDebouncedCallback } from "use-debounce";
+import { useUserPrefs } from "@/hooks/useUserPrefs";
+import { useDebouncedPrefs } from "@/hooks/useDebouncedPrefs";
 import { SlidersHorizontal, Filter } from "lucide-react";
 import { ViewToggle } from "@/components/quest-views";
 import { ProgressStats } from "@/components/progress-stats";
@@ -222,10 +225,15 @@ export function QuestFilters({
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const initialPrefsLoaded = useRef(false);
-  const prefsFullyLoaded = useRef(false); // True only after prefs fetch completes
   const lastSavedLevel = useRef<number | null>(null);
   const lastSavedQuestsPerTree = useRef<number | null>(5);
   const lastSavedBypassLevel = useRef<boolean>(false);
+
+  // Fetch user preferences (replaces manual fetch effect)
+  const { data: userPrefs } = useUserPrefs();
+
+  // Debounced preferences update (consolidates three separate debounced saves)
+  const { update: updatePrefs, isPending: isSavingPrefs, isError: prefsError, retry: retryPrefs } = useDebouncedPrefs();
 
   // Stable ref for onApplyFilters to avoid infinite loops
   const onApplyFiltersRef = useRef(onApplyFilters);
@@ -233,161 +241,65 @@ export function QuestFilters({
     onApplyFiltersRef.current = onApplyFilters;
   });
 
-  // Load user's saved preferences on mount (only for logged-in users)
+  // Apply user preferences to filters on initial load
   useEffect(() => {
-    // For non-authenticated users, mark prefs as loaded immediately
-    if (sessionStatus === "unauthenticated" && !prefsFullyLoaded.current) {
-      prefsFullyLoaded.current = true;
+    if (!userPrefs || initialPrefsLoaded.current) return;
+
+    initialPrefsLoaded.current = true;
+    const updates: Partial<Filters> = {};
+
+    if (userPrefs.playerLevel !== null) {
+      lastSavedLevel.current = userPrefs.playerLevel;
+      updates.playerLevel = userPrefs.playerLevel;
+    }
+    if (userPrefs.questsPerTree !== null) {
+      lastSavedQuestsPerTree.current = userPrefs.questsPerTree;
+      updates.questsPerTree = userPrefs.questsPerTree;
+    }
+    if (userPrefs.bypassLevelRequirement !== undefined) {
+      lastSavedBypassLevel.current = userPrefs.bypassLevelRequirement;
+      updates.bypassLevelRequirement = userPrefs.bypassLevelRequirement;
     }
 
-    if (sessionStatus === "authenticated" && !initialPrefsLoaded.current) {
-      initialPrefsLoaded.current = true;
-      fetch("/api/user")
-        .then((res) => res.json())
-        .then((data) => {
-          const updates: Partial<Filters> = {};
-          if (data.user?.playerLevel != null) {
-            lastSavedLevel.current = data.user.playerLevel;
-            updates.playerLevel = data.user.playerLevel;
-          }
-          if (data.user?.questsPerTree != null) {
-            lastSavedQuestsPerTree.current = data.user.questsPerTree;
-            updates.questsPerTree = data.user.questsPerTree;
-          }
-          if (data.user?.bypassLevelRequirement != null) {
-            lastSavedBypassLevel.current = data.user.bypassLevelRequirement;
-            updates.bypassLevelRequirement = data.user.bypassLevelRequirement;
-          }
-          if (Object.keys(updates).length > 0) {
-            onFilterChange(updates);
-            // Apply the loaded preferences immediately
-            setTimeout(() => onApplyFiltersRef.current(), 0);
-          }
-          // Mark prefs as fully loaded after applying
-          prefsFullyLoaded.current = true;
-        })
-        .catch((err) => {
-          console.error("Failed to fetch user preferences:", err);
-          prefsFullyLoaded.current = true; // Still mark as loaded on error
-        });
+    if (Object.keys(updates).length > 0) {
+      onFilterChange(updates);
+      onApplyFilters();
     }
-  }, [sessionStatus, onFilterChange]);
+  }, [userPrefs, onFilterChange, onApplyFilters]);
 
-  // Auto-save player level when it changes (debounced, only for logged-in users)
-  const savePlayerLevel = useCallback(
-    async (level: number | null) => {
-      if (!session?.user) return;
-      if (level === lastSavedLevel.current) return;
-
-      try {
-        const res = await fetch("/api/user", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerLevel: level }),
-        });
-        if (res.ok) {
-          lastSavedLevel.current = level;
-        }
-      } catch (err) {
-        console.error("Failed to save player level:", err);
-      }
-    },
-    [session?.user]
-  );
-
+  // Consolidate all three preference saves into one effect with debounced updates
   useEffect(() => {
     if (sessionStatus !== "authenticated") return;
-    if (!prefsFullyLoaded.current) return; // Wait until prefs are fully loaded
+    if (!initialPrefsLoaded.current) return;
 
-    const timer = setTimeout(() => {
-      savePlayerLevel(filters.playerLevel);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [filters.playerLevel, sessionStatus, savePlayerLevel]);
-
-  // Auto-save questsPerTree when it changes
-  const saveQuestsPerTree = useCallback(
-    async (count: number | null) => {
-      if (!session?.user) return;
-      if (count === lastSavedQuestsPerTree.current) return;
-
-      try {
-        const res = await fetch("/api/user", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ questsPerTree: count }),
-        });
-        if (res.ok) {
-          lastSavedQuestsPerTree.current = count;
-        }
-      } catch (err) {
-        console.error("Failed to save quests per tree:", err);
-      }
-    },
-    [session?.user]
-  );
-
-  useEffect(() => {
-    if (sessionStatus !== "authenticated") return;
-    if (!prefsFullyLoaded.current) return; // Wait until prefs are fully loaded
-
-    const timer = setTimeout(() => {
-      saveQuestsPerTree(filters.questsPerTree);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [filters.questsPerTree, sessionStatus, saveQuestsPerTree]);
-
-  // Auto-save bypassLevelRequirement when it changes
-  const saveBypassLevelRequirement = useCallback(
-    async (bypass: boolean) => {
-      if (!session?.user) return;
-      if (bypass === lastSavedBypassLevel.current) return;
-
-      try {
-        const res = await fetch("/api/user", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bypassLevelRequirement: bypass }),
-        });
-        if (res.ok) {
-          lastSavedBypassLevel.current = bypass;
-        }
-      } catch (err) {
-        console.error("Failed to save bypass level requirement:", err);
-      }
-    },
-    [session?.user]
-  );
-
-  useEffect(() => {
-    if (sessionStatus !== "authenticated") return;
-    if (!prefsFullyLoaded.current) return; // Wait until prefs are fully loaded
-
-    const timer = setTimeout(() => {
-      saveBypassLevelRequirement(filters.bypassLevelRequirement);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    updatePrefs({
+      playerLevel: filters.playerLevel,
+      questsPerTree: filters.questsPerTree,
+      bypassLevelRequirement: filters.bypassLevelRequirement,
+    });
   }, [
+    filters.playerLevel,
+    filters.questsPerTree,
     filters.bypassLevelRequirement,
     sessionStatus,
-    saveBypassLevelRequirement,
+    updatePrefs,
   ]);
 
-  // Debounce search input and auto-apply
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchValue !== filters.search) {
-        onFilterChange({ search: searchValue });
-        // Use ref to avoid dependency on onApplyFilters
-        setTimeout(() => onApplyFiltersRef.current(), 100);
-      }
-    }, 500);
+  // Debounce search input with proper library (instead of nested setTimeout)
+  const debouncedSearch = useDebouncedCallback(
+    (value: string) => {
+      onFilterChange({ search: value });
+      onApplyFilters();
+    },
+    500
+  );
 
-    return () => clearTimeout(timer);
-  }, [searchValue, filters.search, onFilterChange]);
+  // Trigger debounced search when search value changes
+  useEffect(() => {
+    if (searchValue !== filters.search) {
+      debouncedSearch(searchValue);
+    }
+  }, [searchValue, filters.search, debouncedSearch]);
 
   // Keyboard shortcut: "/" to focus search input
   useEffect(() => {
