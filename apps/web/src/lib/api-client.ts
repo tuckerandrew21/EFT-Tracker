@@ -19,17 +19,17 @@ class ApiClient {
   /**
    * Make a fetch request with centralized error handling
    */
-  async fetch<T>(
-    endpoint: string,
-    options: FetchOptions = {}
-  ): Promise<T> {
+  async fetch<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
     const { timeout = this.defaultTimeout, ...fetchOptions } = options;
 
     const url = `${this.baseUrl}${endpoint}`;
 
     // Set default headers
     const headers = new Headers(fetchOptions.headers || {});
-    if (!headers.has("Content-Type") && !(fetchOptions.body instanceof FormData)) {
+    if (
+      !headers.has("Content-Type") &&
+      !(fetchOptions.body instanceof FormData)
+    ) {
       headers.set("Content-Type", "application/json");
     }
 
@@ -118,11 +118,7 @@ class ApiClient {
   /**
    * PUT request
    */
-  put<T>(
-    endpoint: string,
-    body?: unknown,
-    options?: FetchOptions
-  ): Promise<T> {
+  put<T>(endpoint: string, body?: unknown, options?: FetchOptions): Promise<T> {
     return this.fetch<T>(endpoint, {
       ...options,
       method: "PUT",
