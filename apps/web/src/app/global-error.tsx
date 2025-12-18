@@ -16,6 +16,12 @@ export default function GlobalError({
 }: {
   error: Error & { digest?: string };
 }) {
+  // Log error for debugging purposes
+  if (typeof window === "undefined") {
+    // eslint-disable-next-line no-console
+    console.error("Global error:", error);
+  }
+
   return (
     <html>
       <body>
