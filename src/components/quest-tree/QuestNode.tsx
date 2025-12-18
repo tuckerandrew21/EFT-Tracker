@@ -88,31 +88,6 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
   // Should this node be dimmed? (focus mode active but not in chain)
   const isDimmed = hasFocusMode && !isInFocusChain && !isFocused;
 
-  // Memoize style objects to prevent breaking memo equality checks
-  const nodeStyle = useMemo(() => {
-    // All quests use trader color for border (dimmed gets gray)
-    const borderColor = isDimmed ? "#636363" : traderColor.primary;
-
-    return {
-      width: QUEST_NODE_WIDTH,
-      minHeight: QUEST_NODE_HEIGHT,
-      backgroundColor: isDimmed ? "#424242" : statusColor.bg,
-      borderColor,
-    };
-  }, [isDimmed, statusColor.bg, traderColor.primary]);
-
-  const levelBadgeStyle = useMemo(
-    () => ({
-      color: isLevelAppropriate
-        ? STATUS_COLORS.completed.primary
-        : isUpcoming
-          ? STATUS_COLORS.in_progress.primary
-          : STATUS_COLORS.locked.primary,
-      fontWeight: isLevelAppropriate ? 600 : 400,
-    }),
-    [isLevelAppropriate, isUpcoming]
-  );
-
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     // Right-click to open quest details
@@ -210,7 +185,12 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
             !isFocused &&
             "ring-2 ring-orange-400 ring-offset-1 shadow-lg"
         )}
-        style={nodeStyle}
+        style={{
+          width: QUEST_NODE_WIDTH,
+          minHeight: QUEST_NODE_HEIGHT,
+          backgroundColor: isDimmed ? "#424242" : statusColor.bg,
+          borderColor: isDimmed ? "#636363" : traderColor.primary,
+        }}
       >
         {/* Kappa badge */}
         {quest.kappaRequired && (
@@ -288,7 +268,17 @@ function QuestNodeComponent({ data, selected }: NodeProps<QuestNodeType>) {
 
         {/* Level badge and action buttons row */}
         <div className="flex items-center justify-between mt-1">
-          <div className="text-[12px]" style={levelBadgeStyle}>
+          <div
+            className="text-[12px]"
+            style={{
+              color: isLevelAppropriate
+                ? STATUS_COLORS.completed.primary
+                : isUpcoming
+                  ? STATUS_COLORS.in_progress.primary
+                  : STATUS_COLORS.locked.primary,
+              fontWeight: isLevelAppropriate ? 600 : 400,
+            }}
+          >
             Lv.{quest.levelRequired}
           </div>
           {/* Action buttons - info and wiki link */}

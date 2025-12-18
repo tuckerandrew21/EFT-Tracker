@@ -233,7 +233,12 @@ export function QuestFilters({
   const { data: userPrefs } = useUserPrefs();
 
   // Debounced preferences update (consolidates three separate debounced saves)
-  const { update: updatePrefs, isPending: isSavingPrefs, isError: prefsError, retry: retryPrefs } = useDebouncedPrefs();
+  const {
+    update: updatePrefs,
+    isPending: isSavingPrefs,
+    isError: prefsError,
+    retry: retryPrefs,
+  } = useDebouncedPrefs();
 
   // Stable ref for onApplyFilters to avoid infinite loops
   const onApplyFiltersRef = useRef(onApplyFilters);
@@ -286,13 +291,10 @@ export function QuestFilters({
   ]);
 
   // Debounce search input with proper library (instead of nested setTimeout)
-  const debouncedSearch = useDebouncedCallback(
-    (value: string) => {
-      onFilterChange({ search: value });
-      onApplyFilters();
-    },
-    500
-  );
+  const debouncedSearch = useDebouncedCallback((value: string) => {
+    onFilterChange({ search: value });
+    onApplyFilters();
+  }, 500);
 
   // Trigger debounced search when search value changes
   useEffect(() => {
