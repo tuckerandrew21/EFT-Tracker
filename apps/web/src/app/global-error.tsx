@@ -16,6 +16,11 @@ export default function GlobalError({
 }: {
   error: Error & { digest?: string };
 }) {
+  // Log error for debugging purposes
+  if (typeof window === "undefined") {
+    console.error("Global error:", error);
+  }
+
   return (
     <html>
       <body>
