@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useDebouncedCallback } from "use-debounce";
 import { useUserPrefs } from "@/hooks/useUserPrefs";
 import { useDebouncedPrefs } from "@/hooks/useDebouncedPrefs";
 import { SlidersHorizontal, Filter } from "lucide-react";
@@ -284,18 +285,21 @@ export function QuestFilters({
     updatePrefs,
   ]);
 
-  // Debounce search input and auto-apply
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchValue !== filters.search) {
-        onFilterChange({ search: searchValue });
-        // Use ref to avoid dependency on onApplyFilters
-        setTimeout(() => onApplyFiltersRef.current(), 100);
-      }
-    }, 500);
+  // Debounce search input with proper library (instead of nested setTimeout)
+  const debouncedSearch = useDebouncedCallback(
+    (value: string) => {
+      onFilterChange({ search: value });
+      onApplyFilters();
+    },
+    500
+  );
 
-    return () => clearTimeout(timer);
-  }, [searchValue, filters.search, onFilterChange]);
+  // Trigger debounced search when search value changes
+  useEffect(() => {
+    if (searchValue !== filters.search) {
+      debouncedSearch(searchValue);
+    }
+  }, [searchValue, filters.search, debouncedSearch]);
 
   // Keyboard shortcut: "/" to focus search input
   useEffect(() => {
