@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useUserPrefs } from "@/hooks/useUserPrefs";
 import { SlidersHorizontal, Filter } from "lucide-react";
 import { ViewToggle } from "@/components/quest-views";
 import { ProgressStats } from "@/components/progress-stats";
@@ -222,10 +223,12 @@ export function QuestFilters({
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const initialPrefsLoaded = useRef(false);
-  const prefsFullyLoaded = useRef(false); // True only after prefs fetch completes
   const lastSavedLevel = useRef<number | null>(null);
   const lastSavedQuestsPerTree = useRef<number | null>(5);
   const lastSavedBypassLevel = useRef<boolean>(false);
+
+  // Fetch user preferences (replaces manual fetch effect)
+  const { data: userPrefs } = useUserPrefs();
 
   // Stable ref for onApplyFilters to avoid infinite loops
   const onApplyFiltersRef = useRef(onApplyFilters);
@@ -233,45 +236,31 @@ export function QuestFilters({
     onApplyFiltersRef.current = onApplyFilters;
   });
 
-  // Load user's saved preferences on mount (only for logged-in users)
+  // Apply user preferences to filters on initial load
   useEffect(() => {
-    // For non-authenticated users, mark prefs as loaded immediately
-    if (sessionStatus === "unauthenticated" && !prefsFullyLoaded.current) {
-      prefsFullyLoaded.current = true;
+    if (!userPrefs || initialPrefsLoaded.current) return;
+
+    initialPrefsLoaded.current = true;
+    const updates: Partial<Filters> = {};
+
+    if (userPrefs.playerLevel !== null) {
+      lastSavedLevel.current = userPrefs.playerLevel;
+      updates.playerLevel = userPrefs.playerLevel;
+    }
+    if (userPrefs.questsPerTree !== null) {
+      lastSavedQuestsPerTree.current = userPrefs.questsPerTree;
+      updates.questsPerTree = userPrefs.questsPerTree;
+    }
+    if (userPrefs.bypassLevelRequirement !== undefined) {
+      lastSavedBypassLevel.current = userPrefs.bypassLevelRequirement;
+      updates.bypassLevelRequirement = userPrefs.bypassLevelRequirement;
     }
 
-    if (sessionStatus === "authenticated" && !initialPrefsLoaded.current) {
-      initialPrefsLoaded.current = true;
-      fetch("/api/user")
-        .then((res) => res.json())
-        .then((data) => {
-          const updates: Partial<Filters> = {};
-          if (data.user?.playerLevel != null) {
-            lastSavedLevel.current = data.user.playerLevel;
-            updates.playerLevel = data.user.playerLevel;
-          }
-          if (data.user?.questsPerTree != null) {
-            lastSavedQuestsPerTree.current = data.user.questsPerTree;
-            updates.questsPerTree = data.user.questsPerTree;
-          }
-          if (data.user?.bypassLevelRequirement != null) {
-            lastSavedBypassLevel.current = data.user.bypassLevelRequirement;
-            updates.bypassLevelRequirement = data.user.bypassLevelRequirement;
-          }
-          if (Object.keys(updates).length > 0) {
-            onFilterChange(updates);
-            // Apply the loaded preferences immediately
-            setTimeout(() => onApplyFiltersRef.current(), 0);
-          }
-          // Mark prefs as fully loaded after applying
-          prefsFullyLoaded.current = true;
-        })
-        .catch((err) => {
-          console.error("Failed to fetch user preferences:", err);
-          prefsFullyLoaded.current = true; // Still mark as loaded on error
-        });
+    if (Object.keys(updates).length > 0) {
+      onFilterChange(updates);
+      onApplyFilters();
     }
-  }, [sessionStatus, onFilterChange]);
+  }, [userPrefs, onFilterChange, onApplyFilters]);
 
   // Auto-save player level when it changes (debounced, only for logged-in users)
   const savePlayerLevel = useCallback(
