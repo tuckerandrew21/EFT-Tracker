@@ -1,3 +1,4 @@
+/// <reference types="@wdio/globals/types" />
 /**
  * E2E tests for EFT Tracker Companion App
  *
