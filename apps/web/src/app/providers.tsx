@@ -1,12 +1,32 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { checkForUpdates } from "@/lib/updater/check-updates";
 
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+        retry: 1,
+        refetchOnWindowFocus: false,
+      },
+      mutations: {
+        retry: 1,
+      },
+    },
+  });
+}
+
 export function Providers({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => createQueryClient());
+
   useEffect(() => {
     // Check for updates on app startup (Tauri only)
     if (typeof window !== "undefined" && "__TAURI__" in window) {
@@ -17,11 +37,16 @@ export function Providers({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SessionProvider>
-      <StatsProvider>
-        {children}
-        <Toaster richColors position="bottom-right" />
-      </StatsProvider>
-    </SessionProvider>
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
+        <StatsProvider>
+          {children}
+          <Toaster richColors position="bottom-right" />
+        </StatsProvider>
+      </SessionProvider>
+      {process.env.NODE_ENV === "development" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+    </QueryClientProvider>
   );
 }
