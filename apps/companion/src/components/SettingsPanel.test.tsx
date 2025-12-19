@@ -11,11 +11,12 @@ vi.mock("@tauri-apps/plugin-dialog");
 
 describe("SettingsPanel", () => {
   const mockSettings: AppSettings = {
+    companionToken: null,
     eftPath: "C:\\Battlestate Games\\EFT",
-    enableNotifications: true,
-    enableAutoWatch: false,
-    enableAutostart: true,
-    theme: "dark",
+    autoStart: true,
+    autoWatch: false,
+    notifications: true,
+    notificationSound: true,
   };
 
   const mockOnUpdateSetting = vi.fn();
@@ -324,11 +325,12 @@ describe("SettingsPanel", () => {
 
   it("reflects current setting states in toggles", () => {
     const settings: AppSettings = {
+      companionToken: null,
       eftPath: "C:\\EFT",
-      enableNotifications: false,
-      enableAutoWatch: true,
-      enableAutostart: false,
-      theme: "dark",
+      autoStart: false,
+      autoWatch: true,
+      notifications: false,
+      notificationSound: false,
     };
 
     render(
