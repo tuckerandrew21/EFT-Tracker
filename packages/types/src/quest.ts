@@ -103,12 +103,8 @@ export interface QuestFilters {
   hideReputationQuests: boolean; // Hide Fence reputation quests by default
 }
 
-// View mode for quest display
-export type ViewMode =
-  | "trader-lanes"
-  | "level-timeline"
-  | "map-groups"
-  | "raid-planner";
+// View mode for quest display (legacy - kept for type compatibility)
+export type ViewMode = "trader-lanes" | "map-groups" | "raid-planner";
 
 // React Flow node data for quest nodes
 export interface QuestNodeData extends Record<string, unknown> {
