@@ -17,13 +17,7 @@ import type { QuestWithProgress } from "@/types";
 export function RaidClient() {
   const { status: sessionStatus } = useSession();
   const { setStats } = useStats();
-  const {
-    allQuests,
-    loading,
-    initialLoading,
-    error,
-    refetch,
-  } = useQuests();
+  const { allQuests, loading, initialLoading, error, refetch } = useQuests();
   const {
     progress,
     unlockedQuests,
@@ -120,7 +114,9 @@ export function RaidClient() {
   }, [refetch]);
 
   const handleQuestDetails = useCallback((questId: string) => {
-    const quest = allQuestsWithProgressRef.current.find((q) => q.id === questId);
+    const quest = allQuestsWithProgressRef.current.find(
+      (q) => q.id === questId
+    );
     if (quest) {
       setDetailQuest(quest);
       setDetailModalOpen(true);

@@ -650,7 +650,6 @@ export function QuestFilters({
                     isMobile
                   />
                 </div>
-
               </div>
             </SheetContent>
           </Sheet>
