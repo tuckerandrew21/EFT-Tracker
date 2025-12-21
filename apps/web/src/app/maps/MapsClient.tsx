@@ -4,22 +4,17 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useStats } from "@/contexts/StatsContext";
-import {
-  QuestTree,
-  QuestFilters,
-  SyncStatusIndicator,
-} from "@/components/quest-tree";
+import { QuestFilters, SyncStatusIndicator } from "@/components/quest-tree";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
-import { LevelTimelineView, MapGroupsView } from "@/components/quest-views";
-import { RaidPlanner } from "@/components/raid-planner";
+import { MapGroupsView } from "@/components/quest-views";
 import { WelcomeModal } from "@/components/onboarding";
 import { QuestDetailModal } from "@/components/quest-detail";
 import { CatchUpDialog } from "@/components/catch-up";
 import { useQuests } from "@/hooks/useQuests";
 import { useProgress } from "@/hooks/useProgress";
 import { getIncompletePrerequisites } from "@/lib/quest-layout";
-import type { QuestStatus, QuestWithProgress, ViewMode } from "@/types";
+import type { QuestStatus, QuestWithProgress } from "@/types";
 
 // Status cycle map for click handling (simplified: available <-> completed)
 const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
@@ -29,7 +24,7 @@ const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
   completed: "available", // Reset
 };
 
-export function QuestsClient() {
+export function MapsClient() {
   const { status: sessionStatus } = useSession();
   const { setStats } = useStats();
   const {
@@ -46,6 +41,18 @@ export function QuestsClient() {
     refetch,
     hiddenByLevelCount,
   } = useQuests();
+
+  // Track if initial filters have been applied
+  const initialFiltersApplied = useRef(false);
+
+  // Apply map-specific default filters on mount
+  useEffect(() => {
+    if (!initialLoading && !initialFiltersApplied.current) {
+      initialFiltersApplied.current = true;
+      setFilters({ statuses: ["available"], bypassLevelRequirement: true });
+      setTimeout(() => applyFilters(), 0);
+    }
+  }, [initialLoading, setFilters, applyFilters]);
   const {
     progress,
     updateStatus,
@@ -57,8 +64,6 @@ export function QuestsClient() {
     isOnline,
     pendingOfflineCount,
   } = useProgress();
-  const [selectedQuestId, setSelectedQuestId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("map-groups");
 
   // Skip quest dialog state
   const [skipDialogOpen, setSkipDialogOpen] = useState(false);
@@ -78,21 +83,16 @@ export function QuestsClient() {
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
-  // Refs for stable callback references (prevents re-renders from invalidating memoization)
+  // Refs for stable callback references
   const questsWithProgressRef = useRef<QuestWithProgress[]>([]);
   const sessionStatusRef = useRef(sessionStatus);
   const updateStatusRef = useRef(updateStatus);
   const refetchRef = useRef(refetch);
 
-  // Merge progress into quests (memoized to prevent infinite re-renders)
-  // Note: If API says quest is "locked" (unmet dependencies), use that regardless of
-  // stored progress. This handles cases where a quest was completed but prereqs were
-  // later unchecked.
+  // Merge progress into quests
   const questsWithProgress = useMemo(
     () =>
       quests.map((quest) => {
-        // If API determined this quest should be locked due to unmet dependencies,
-        // always use that status - don't override with stale progress from the Map
         if (quest.computedStatus === "locked") {
           return {
             ...quest,
@@ -108,11 +108,10 @@ export function QuestsClient() {
     [quests, progress]
   );
 
-  // Merge progress into all quests (for accurate depth calculation)
+  // Merge progress into all quests
   const allQuestsWithProgress = useMemo(
     () =>
       allQuests.map((quest) => {
-        // Same logic as above - prioritize API's "locked" status
         if (quest.computedStatus === "locked") {
           return {
             ...quest,
@@ -128,7 +127,7 @@ export function QuestsClient() {
     [allQuests, progress]
   );
 
-  // Keep refs in sync with current values (for stable callback references)
+  // Keep refs in sync
   useEffect(() => {
     questsWithProgressRef.current = questsWithProgress;
   }, [questsWithProgress]);
@@ -164,9 +163,8 @@ export function QuestsClient() {
     }
   }, [progressError]);
 
-  // Check for first-time user and show welcome modal
+  // Check for first-time user
   useEffect(() => {
-    // Only check after initial loading is complete
     if (loading) return;
 
     const hasSeenWelcome = localStorage.getItem("eft-tracker-onboarding");
@@ -175,54 +173,21 @@ export function QuestsClient() {
     }
   }, [loading]);
 
-  // Handle completing onboarding
   const handleOnboardingComplete = useCallback(() => {
     localStorage.setItem("eft-tracker-onboarding", "completed");
     setShowWelcome(false);
   }, []);
 
-  // Handle catch-up from welcome modal
   const handleCatchUpFromWelcome = useCallback(() => {
     localStorage.setItem("eft-tracker-onboarding", "completed");
     setShowWelcome(false);
     setShowCatchUp(true);
   }, []);
 
-  // Handle catch-up completion
   const handleCatchUpComplete = useCallback(() => {
     refetch();
   }, [refetch]);
 
-  // Track if this is the first render (to skip initial effect)
-  const isFirstViewRender = useRef(true);
-
-  // Apply view-specific default filters when view mode changes
-  // Maps view: show only available quests (focused on what to do next)
-  // Other views: show all quests (for planning and overview)
-  useEffect(() => {
-    // Skip on first render - don't change filters from defaults
-    if (isFirstViewRender.current) {
-      isFirstViewRender.current = false;
-      return;
-    }
-
-    if (viewMode === "map-groups") {
-      // Maps view: filter to available quests, bypass level requirement
-      setFilters({ statuses: ["available"], bypassLevelRequirement: true });
-    } else {
-      // Traders/Levels view: show all quests for full picture
-      setFilters({ statuses: [], bypassLevelRequirement: false });
-    }
-    // Auto-apply the filter changes
-    // Note: Using setTimeout to ensure setFilters has updated pendingFilters
-    setTimeout(() => applyFilters(), 0);
-  }, [viewMode, setFilters, applyFilters]);
-
-  const handleQuestSelect = useCallback((questId: string) => {
-    setSelectedQuestId((prev) => (prev === questId ? null : questId));
-  }, []);
-
-  // Handle opening quest details modal
   const handleQuestDetails = useCallback((questId: string) => {
     const quest = questsWithProgressRef.current.find((q) => q.id === questId);
     if (quest) {
@@ -231,7 +196,6 @@ export function QuestsClient() {
     }
   }, []);
 
-  // Get prerequisites for the skip dialog
   const skipPrerequisites = useMemo(() => {
     if (!skipTargetQuest) return [];
     return getIncompletePrerequisites(
@@ -240,13 +204,11 @@ export function QuestsClient() {
     );
   }, [skipTargetQuest, allQuestsWithProgress]);
 
-  // Handle confirming the skip (complete all prerequisites)
   const handleSkipConfirm = useCallback(async () => {
     if (!skipTargetQuest || skipPrerequisites.length === 0) return;
 
     setSkipLoading(true);
     try {
-      // Complete all prerequisites in order
       for (const prereq of skipPrerequisites) {
         const success = await updateStatus(prereq.id, "completed");
         if (!success) {
@@ -278,16 +240,13 @@ export function QuestsClient() {
     }
   }, [skipTargetQuest, skipPrerequisites, updateStatus, refetch]);
 
-  // Stable callback reference using refs - prevents QuestTree useMemo from recalculating
   const handleStatusChange = useCallback(async (questId: string) => {
     const quest = questsWithProgressRef.current.find((q) => q.id === questId);
     if (!quest) return;
 
     const currentStatus = quest.computedStatus;
 
-    // If locked, open skip dialog instead of showing toast
     if (currentStatus === "locked") {
-      // If not authenticated, prompt to login first
       if (sessionStatusRef.current !== "authenticated") {
         toast.warning("Sign In Required", {
           description: "Please sign in to track your progress.",
@@ -299,13 +258,11 @@ export function QuestsClient() {
         return;
       }
 
-      // Open the skip quest dialog
       setSkipTargetQuest(quest);
       setSkipDialogOpen(true);
       return;
     }
 
-    // If not authenticated, prompt to login
     if (sessionStatusRef.current !== "authenticated") {
       toast.warning("Sign In Required", {
         description: "Please sign in to track your progress.",
@@ -317,13 +274,11 @@ export function QuestsClient() {
       return;
     }
 
-    // Get next status in cycle
     const nextStatus = STATUS_CYCLE[currentStatus];
     if (!nextStatus) return;
 
     const success = await updateStatusRef.current(questId, nextStatus);
     if (success) {
-      // Show success toast for completed quests
       if (nextStatus === "completed") {
         toast.success("Quest Completed!", {
           description: quest.title,
@@ -335,10 +290,8 @@ export function QuestsClient() {
         description: "Could not update quest status. Please try again.",
       });
     }
-  }, []); // Empty deps - uses refs for all values
+  }, []);
 
-  // Calculate progress stats (in_progress counted as available)
-  // Must be before early returns to follow React hooks rules
   const stats = useMemo(
     () => ({
       total: questsWithProgress.length,
@@ -355,16 +308,13 @@ export function QuestsClient() {
     [questsWithProgress]
   );
 
-  // Update stats in context for header display
   useEffect(() => {
     if (!loading && !error) {
       setStats(stats);
     }
-    return () => setStats(null); // Clear on unmount
+    return () => setStats(null);
   }, [stats, setStats, loading, error]);
 
-  // Only show skeleton on initial page load, not on filter-triggered refetches
-  // This prevents QuestFilters from unmounting and causing infinite API loops
   if (initialLoading) {
     return <QuestTreeSkeleton />;
   }
@@ -422,47 +372,18 @@ export function QuestsClient() {
         onFilterChange={setFilters}
         onApplyFilters={applyFilters}
         hasPendingChanges={hasPendingChanges}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
         hiddenByLevelCount={hiddenByLevelCount}
       />
       <div className="flex-1 min-h-0">
         {questsWithProgress.length > 0 ? (
-          viewMode === "trader-lanes" ? (
-            <QuestTree
-              quests={questsWithProgress}
-              allQuests={allQuestsWithProgress}
-              traders={traders}
-              selectedQuestId={selectedQuestId}
-              playerLevel={filters.playerLevel}
-              maxColumns={filters.questsPerTree}
-              savingQuestIds={savingQuestIds}
-              onQuestSelect={handleQuestSelect}
-              onStatusChange={handleStatusChange}
-              onQuestDetails={handleQuestDetails}
-            />
-          ) : viewMode === "level-timeline" ? (
-            <LevelTimelineView
-              quests={questsWithProgress}
-              playerLevel={filters.playerLevel}
-              onStatusChange={handleStatusChange}
-              onQuestDetails={handleQuestDetails}
-            />
-          ) : viewMode === "raid-planner" ? (
-            <RaidPlanner
-              quests={allQuestsWithProgress}
-              onQuestDetails={handleQuestDetails}
-            />
-          ) : (
-            <MapGroupsView
-              quests={questsWithProgress}
-              allQuests={allQuestsWithProgress}
-              playerLevel={filters.playerLevel}
-              hideReputationQuests={filters.hideReputationQuests}
-              onStatusChange={handleStatusChange}
-              onQuestDetails={handleQuestDetails}
-            />
-          )
+          <MapGroupsView
+            quests={questsWithProgress}
+            allQuests={allQuestsWithProgress}
+            playerLevel={filters.playerLevel}
+            hideReputationQuests={filters.hideReputationQuests}
+            onStatusChange={handleStatusChange}
+            onQuestDetails={handleQuestDetails}
+          />
         ) : (
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">
@@ -471,7 +392,6 @@ export function QuestsClient() {
           </div>
         )}
       </div>
-      {/* Sync status footer - only show when user is authenticated */}
       {sessionStatus === "authenticated" && (
         <div className="shrink-0 px-4 py-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <SyncStatusIndicator

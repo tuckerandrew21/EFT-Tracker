@@ -4,7 +4,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { SlidersHorizontal, Filter } from "lucide-react";
-import { ViewToggle } from "@/components/quest-views";
 import { ProgressStats } from "@/components/progress-stats";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +36,6 @@ import { getTraderColor } from "@/lib/trader-colors";
 import type {
   Trader,
   QuestFilters as Filters,
-  ViewMode,
   QuestWithProgress,
   QuestType,
 } from "@/types";
@@ -82,8 +80,6 @@ interface QuestFiltersProps {
   onFilterChange: (filters: Partial<Filters>) => void;
   onApplyFilters: () => void;
   hasPendingChanges: boolean;
-  viewMode: ViewMode;
-  onViewModeChange: (mode: ViewMode) => void;
   hiddenByLevelCount: number;
 }
 
@@ -213,8 +209,6 @@ export function QuestFilters({
   onFilterChange,
   onApplyFilters,
   hasPendingChanges,
-  viewMode,
-  onViewModeChange,
   hiddenByLevelCount,
 }: QuestFiltersProps) {
   const { data: session, status: sessionStatus } = useSession();
@@ -657,24 +651,9 @@ export function QuestFilters({
                   />
                 </div>
 
-                {/* View Mode */}
-                <div className="pt-4 border-t">
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    View Mode
-                  </Label>
-                  <ViewToggle
-                    viewMode={viewMode}
-                    onViewModeChange={onViewModeChange}
-                  />
-                </div>
               </div>
             </SheetContent>
           </Sheet>
-        </div>
-
-        {/* View toggle row (mobile) */}
-        <div className="px-4 pb-1 flex items-center justify-end">
-          <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
         </div>
 
         {/* Active filter chips (mobile) */}
@@ -839,14 +818,8 @@ export function QuestFilters({
             </Popover>
           </div>
 
-          {/* Progress Stats + View Toggle */}
-          <div className="flex items-center gap-3">
-            <ProgressStats quests={quests} traders={traders} />
-            <ViewToggle
-              viewMode={viewMode}
-              onViewModeChange={onViewModeChange}
-            />
-          </div>
+          {/* Progress Stats */}
+          <ProgressStats quests={quests} traders={traders} />
         </div>
 
         {/* Active filter chips (desktop) */}

@@ -60,7 +60,7 @@ export default function LoginPage() {
         setFailedAttempts((prev) => prev + 1);
         setTurnstileToken(null); // Reset CAPTCHA on failure
       } else {
-        router.push("/quests");
+        router.push("/quest-tree");
         router.refresh();
       }
     } catch (err) {

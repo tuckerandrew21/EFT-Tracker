@@ -127,7 +127,7 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4">
               <Button variant="tactical" size="lg" asChild>
-                <Link href="/quests">Start Planning</Link>
+                <Link href="/maps">Start Planning</Link>
               </Button>
               <Button variant="tactical-ghost" size="lg" asChild>
                 <Link href="/register">Sign Up</Link>
@@ -211,7 +211,7 @@ export default function Home() {
                 className="w-full justify-center"
                 asChild
               >
-                <Link href="/quests">Plan This Raid →</Link>
+                <Link href="/raid">Plan This Raid →</Link>
               </Button>
             </div>
           </div>
@@ -263,7 +263,7 @@ export default function Home() {
                 {toolTitles[activeTab]}
               </span>
               <span className="px-3 py-1 bg-[var(--bg-elevated)] border border-[var(--tactical-border)] rounded text-xs text-[var(--text-dim)]">
-                learntotarkov.com/quests
+                learntotarkov.com
               </span>
             </div>
 
@@ -343,7 +343,7 @@ export default function Home() {
             Join thousands of players who plan smarter and progress faster.
           </p>
           <Button variant="tactical" size="lg" asChild>
-            <Link href="/quests">Start Planning Now</Link>
+            <Link href="/maps">Start Planning Now</Link>
           </Button>
         </div>
       </section>

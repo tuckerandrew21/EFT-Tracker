@@ -23,13 +23,17 @@
     "db:seed": "pnpm --filter @eft-tracker/web prisma db seed",
     "validate": "bash scripts/validate-build.sh",
     "validate:quick": "bash scripts/validate-build.sh --quick",
-    "pre-pr": "bash scripts/validate-build.sh"
+    "pre-pr": "bash scripts/validate-build.sh",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug"
   },
   "engines": {
     "node": ">=22.12.0",
     "pnpm": ">=10.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.5.2",
