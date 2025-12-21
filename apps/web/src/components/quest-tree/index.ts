@@ -4,3 +4,4 @@ export { TraderNode } from "./TraderNode";
 export { QuestFilters } from "./QuestFilters";
 export { QuestTreeSkeleton } from "./QuestTreeSkeleton";
 export { SyncStatusIndicator } from "./SyncStatusIndicator";
+export { QuestTypeMultiSelect } from "./QuestTypeMultiSelect";
