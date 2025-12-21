@@ -4,7 +4,8 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useStats } from "@/contexts/StatsContext";
-import { QuestFilters, SyncStatusIndicator } from "@/components/quest-tree";
+import { SyncStatusIndicator } from "@/components/quest-tree";
+import { MapFilters } from "@/components/map-filters";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
 import { SkipQuestDialog } from "@/components/quest-tree/SkipQuestDialog";
 import { MapGroupsView } from "@/components/quest-views";
@@ -37,9 +38,7 @@ export function MapsClient() {
     filters,
     setFilters,
     applyFilters,
-    hasPendingChanges,
     refetch,
-    hiddenByLevelCount,
   } = useQuests();
 
   // Track if initial filters have been applied
@@ -49,7 +48,7 @@ export function MapsClient() {
   useEffect(() => {
     if (!initialLoading && !initialFiltersApplied.current) {
       initialFiltersApplied.current = true;
-      setFilters({ statuses: ["available"], bypassLevelRequirement: true });
+      setFilters({ statuses: ["available"], bypassLevelRequirement: false });
       setTimeout(() => applyFilters(), 0);
     }
   }, [initialLoading, setFilters, applyFilters]);
@@ -365,14 +364,12 @@ export function MapsClient() {
         open={detailModalOpen}
         onOpenChange={setDetailModalOpen}
       />
-      <QuestFilters
+      <MapFilters
         traders={traders}
         quests={allQuestsWithProgress}
         filters={filters}
         onFilterChange={setFilters}
         onApplyFilters={applyFilters}
-        hasPendingChanges={hasPendingChanges}
-        hiddenByLevelCount={hiddenByLevelCount}
       />
       <div className="flex-1 min-h-0">
         {questsWithProgress.length > 0 ? (

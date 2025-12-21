@@ -99,12 +99,16 @@ export interface QuestFilters {
   playerLevel: number | null;
   questsPerTree: number | null; // null = show all
   bypassLevelRequirement: boolean; // Show all quests regardless of level
-  questType: QuestType | null; // null = all quest types
+  questTypes: QuestType[]; // Empty array = all quest types (multi-select)
   hideReputationQuests: boolean; // Hide Fence reputation quests by default
 }
 
-// View mode for quest display (legacy - kept for type compatibility)
-export type ViewMode = "trader-lanes" | "map-groups" | "raid-planner";
+// View mode for quest display
+export type ViewMode =
+  | "trader-lanes"
+  | "level-timeline"
+  | "map-groups"
+  | "raid-planner";
 
 // React Flow node data for quest nodes
 export interface QuestNodeData extends Record<string, unknown> {

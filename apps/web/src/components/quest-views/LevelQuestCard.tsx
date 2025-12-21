@@ -122,9 +122,6 @@ export function LevelQuestCard({
         quest.computedStatus === "completed" && "opacity-70",
         quest.computedStatus === "available" && "shadow-sm hover:shadow-lg",
         // Level-based highlighting
-        isLevelAppropriate &&
-          quest.computedStatus === "available" &&
-          "ring-2 ring-emerald-400",
         isUpcoming &&
           quest.computedStatus !== "completed" &&
           "ring-1 ring-amber-300"

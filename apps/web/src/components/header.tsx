@@ -114,22 +114,22 @@ export function Header() {
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              href="/quest-tree"
-              className="text-sm font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors"
-            >
-              Quest Tree
-            </Link>
-            <Link
               href="/maps"
               className="text-sm font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors"
             >
-              Maps
+              Map Select
             </Link>
             <Link
               href="/raid"
               className="text-sm font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors"
             >
-              Raid
+              Raid Prep
+            </Link>
+            <Link
+              href="/quest-tree"
+              className="text-sm font-[family-name:var(--font-rajdhani)] font-semibold uppercase tracking-wide text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors"
+            >
+              Quest Tree
             </Link>
           </nav>
         </div>
@@ -163,13 +163,13 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
+                  <Link href="/maps">Map Select</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/raid">Raid Prep</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/quest-tree">Quest Tree</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/maps">Maps</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/raid">Raid</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings" className="flex items-center gap-2">
@@ -200,8 +200,8 @@ export function Header() {
 
         {/* Mobile: Nav + Menu */}
         <div className="flex md:hidden items-center gap-2 ml-auto">
-          <Link href="/quest-tree" className="text-sm hover:text-primary px-2">
-            Quests
+          <Link href="/maps" className="text-sm hover:text-primary px-2">
+            Map Select
           </Link>
 
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -231,25 +231,25 @@ export function Header() {
                       </p>
                     </div>
                     <Link
-                      href="/quest-tree"
-                      className="px-2 py-2 text-sm hover:bg-muted rounded-md"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Quest Tree
-                    </Link>
-                    <Link
                       href="/maps"
                       className="px-2 py-2 text-sm hover:bg-muted rounded-md"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Maps
+                      Map Select
                     </Link>
                     <Link
                       href="/raid"
                       className="px-2 py-2 text-sm hover:bg-muted rounded-md"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Raid
+                      Raid Prep
+                    </Link>
+                    <Link
+                      href="/quest-tree"
+                      className="px-2 py-2 text-sm hover:bg-muted rounded-md"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Quest Tree
                     </Link>
                     <Link
                       href="/settings"

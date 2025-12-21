@@ -31,13 +31,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { StatusMultiSelect } from "./StatusMultiSelect";
+import { QuestTypeMultiSelect } from "./QuestTypeMultiSelect";
 import { ActiveFilterChips } from "./ActiveFilterChips";
 import { getTraderColor } from "@/lib/trader-colors";
 import type {
   Trader,
   QuestFilters as Filters,
   QuestWithProgress,
-  QuestType,
 } from "@/types";
 
 const MAPS = [
@@ -58,19 +58,6 @@ const COLUMNS_OPTIONS: { value: number | null; label: string }[] = [
   { value: 5, label: "5 columns" },
   { value: 10, label: "10 columns" },
   { value: null, label: "All columns" },
-];
-
-// Quest type options for filtering
-const QUEST_TYPE_OPTIONS: { value: QuestType | "all"; label: string }[] = [
-  { value: "all", label: "All Types" },
-  { value: "standard", label: "Standard" },
-  { value: "pvp_zone", label: "PVP Zone" },
-  { value: "reputation", label: "Reputation (Fence)" },
-  { value: "lightkeeper", label: "Lightkeeper" },
-  { value: "faction_bear", label: "BEAR Only" },
-  { value: "faction_usec", label: "USEC Only" },
-  { value: "story", label: "Story" },
-  { value: "prestige", label: "Prestige (New Beginning)" },
 ];
 
 interface QuestFiltersProps {
@@ -418,7 +405,7 @@ export function QuestFilters({
       playerLevel: 1,
       questsPerTree: 5,
       bypassLevelRequirement: false,
-      questType: null,
+      questTypes: [],
       hideReputationQuests: true, // Default to hiding reputation quests
     });
     onApplyFilters();
@@ -447,8 +434,11 @@ export function QuestFilters({
       onFilterChange({ bypassLevelRequirement: false });
     } else if (key === "questsPerTree") {
       onFilterChange({ questsPerTree: 5 });
-    } else if (key === "questType") {
-      onFilterChange({ questType: null });
+    } else if (key === "questTypes" && value) {
+      const newTypes = filters.questTypes.filter((t) => t !== value);
+      onFilterChange({ questTypes: newTypes });
+    } else if (key === "questTypes") {
+      onFilterChange({ questTypes: [] });
     } else if (key === "hideReputationQuests") {
       onFilterChange({ hideReputationQuests: false });
     }
@@ -474,7 +464,7 @@ export function QuestFilters({
     filters.statuses.length > 0 ? filters.statuses : null,
     filters.kappaOnly,
     filters.map,
-    filters.questType,
+    filters.questTypes.length > 0 ? filters.questTypes : null,
     filters.playerLevel !== 1 ? filters.playerLevel : null,
     filters.questsPerTree !== 5 ? filters.questsPerTree : null,
     filters.bypassLevelRequirement ? true : null,
@@ -617,26 +607,14 @@ export function QuestFilters({
                   <Label className="text-xs text-muted-foreground">
                     Quest Type
                   </Label>
-                  <Select
-                    value={filters.questType || "all"}
-                    onValueChange={(value) =>
-                      handlePrimaryFilterChange({
-                        questType:
-                          value === "all" ? null : (value as QuestType),
-                      })
-                    }
-                  >
-                    <SelectTrigger className="h-9 mt-1">
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {QUEST_TYPE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="mt-1">
+                    <QuestTypeMultiSelect
+                      selectedTypes={filters.questTypes}
+                      onChange={(types) =>
+                        handlePrimaryFilterChange({ questTypes: types })
+                      }
+                    />
+                  </div>
                 </div>
 
                 {/* Advanced Filters */}
@@ -744,25 +722,12 @@ export function QuestFilters({
             </Select>
 
             {/* Quest Type */}
-            <Select
-              value={filters.questType || "all"}
-              onValueChange={(value) =>
-                handlePrimaryFilterChange({
-                  questType: value === "all" ? null : (value as QuestType),
-                })
+            <QuestTypeMultiSelect
+              selectedTypes={filters.questTypes}
+              onChange={(types) =>
+                handlePrimaryFilterChange({ questTypes: types })
               }
-            >
-              <SelectTrigger className="h-9 w-[150px]">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                {QUEST_TYPE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
 
             {/* Apply button for primary filters */}
             <Button

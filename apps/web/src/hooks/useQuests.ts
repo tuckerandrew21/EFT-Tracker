@@ -56,7 +56,7 @@ const defaultFilters: QuestFilters = {
   playerLevel: 1, // Default to level 1 for all users
   questsPerTree: 5, // Default to showing 5 columns (depth levels) per trader
   bypassLevelRequirement: false, // Show all quests regardless of level when true
-  questType: null, // Default to all quest types
+  questTypes: [], // Default to all quest types (empty = all)
   hideReputationQuests: true, // Hide Fence reputation quests by default
 };
 
@@ -128,12 +128,14 @@ export function useQuests(): UseQuestsReturn {
         );
       }
 
-      // Quest type filtering (null = all types)
+      // Quest type filtering (empty array = all types)
       // Compare case-insensitively since Prisma returns UPPERCASE, but filters use lowercase
-      if (appliedFilters.questType) {
-        const filterType = appliedFilters.questType.toUpperCase();
-        filteredQuests = filteredQuests.filter(
-          (q: QuestWithProgress) => q.questType?.toUpperCase() === filterType
+      if (appliedFilters.questTypes.length > 0) {
+        const filterTypes = appliedFilters.questTypes.map((t) =>
+          t.toUpperCase()
+        );
+        filteredQuests = filteredQuests.filter((q: QuestWithProgress) =>
+          filterTypes.includes(q.questType?.toUpperCase() || "")
         );
       }
 

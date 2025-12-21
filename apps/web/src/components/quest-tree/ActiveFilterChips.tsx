@@ -85,14 +85,14 @@ export function ActiveFilterChips({
     });
   }
 
-  // Quest type filter
-  if (filters.questType) {
+  // Quest type filters (one chip per type)
+  filters.questTypes.forEach((type) => {
     chips.push({
-      key: `questType-${filters.questType}`,
-      label: QUEST_TYPE_LABELS[filters.questType],
-      onRemove: () => onRemoveFilter("questType"),
+      key: `questType-${type}`,
+      label: QUEST_TYPE_LABELS[type],
+      onRemove: () => onRemoveFilter("questTypes", type),
     });
-  }
+  });
 
   // Kappa filter
   if (filters.kappaOnly) {
