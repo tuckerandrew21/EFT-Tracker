@@ -17,6 +17,11 @@ export default defineConfig({
       "@eft-tracker/hooks": path.resolve(__dirname, "./packages/hooks/src"),
       "@upstash/redis": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-redis.ts"),
       "@upstash/ratelimit": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-ratelimit.ts"),
+      // Fix for Vite 7.3.0 + React JSX runtime resolution (pnpm uses .pnpm directory)
+      "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-dev-runtime.js"),
+      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-runtime.js"),
+      "react": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom"),
     },
   },
   test: {

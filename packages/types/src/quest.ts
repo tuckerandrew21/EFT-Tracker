@@ -175,3 +175,25 @@ export interface TraderQuestGroup {
     targetTraderId: string;
   }>;
 }
+
+// Catch-up feature types
+export interface CatchUpSelection {
+  questId: string;
+  questTitle: string;
+  traderId: string;
+  traderName: string;
+  traderColor: string;
+  levelRequired: number;
+  chainLength: number;
+}
+
+export interface CatchUpCalculation {
+  prerequisites: CatchUpSelection[];
+  completedBranches: CatchUpSelection[];
+}
+
+export interface CatchUpRequest {
+  targetQuests: string[];
+  playerLevel: number;
+  confirmedBranches: string[];
+}

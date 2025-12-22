@@ -127,6 +127,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["D"],
+          playerLevel: 15,
         }),
       });
 
@@ -145,6 +146,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: [],
+          playerLevel: 15,
         }),
       });
 
@@ -157,7 +159,38 @@ describe("catch-up API", () => {
       const request = new Request("http://localhost/api/progress/catch-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          playerLevel: 15,
+        }),
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it("returns 400 when playerLevel is missing", async () => {
+      const request = new Request("http://localhost/api/progress/catch-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetQuests: ["D"],
+        }),
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it("returns 400 when playerLevel is out of range", async () => {
+      const request = new Request("http://localhost/api/progress/catch-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetQuests: ["D"],
+          playerLevel: 80, // Max is 79
+        }),
       });
 
       const response = await POST(request);
@@ -171,6 +204,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["non-existent-quest"],
+          playerLevel: 15,
         }),
       });
 
@@ -208,6 +242,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["D"],
+          playerLevel: 15,
         }),
       });
 
@@ -234,6 +269,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["D"],
+          playerLevel: 15,
         }),
       });
 
@@ -255,6 +291,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["D"],
+          playerLevel: 15,
         }),
       });
 
@@ -264,9 +301,11 @@ describe("catch-up API", () => {
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data).toHaveProperty("completed");
+      expect(data).toHaveProperty("completedBranches");
       expect(data).toHaveProperty("available");
       expect(data).toHaveProperty("totalChanged");
       expect(Array.isArray(data.completed)).toBe(true);
+      expect(Array.isArray(data.completedBranches)).toBe(true);
       expect(Array.isArray(data.available)).toBe(true);
       expect(typeof data.totalChanged).toBe("number");
     });
@@ -277,6 +316,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["D"],
+          playerLevel: 15,
         }),
       });
 
@@ -284,8 +324,10 @@ describe("catch-up API", () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      // totalChanged should equal completed + available count
-      expect(data.totalChanged).toBe(data.completed.length + data.available.length);
+      // totalChanged should equal completed + completedBranches + available count
+      expect(data.totalChanged).toBe(
+        data.completed.length + data.completedBranches.length + data.available.length
+      );
     });
   });
 
@@ -296,6 +338,7 @@ describe("catch-up API", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: ["C", "E"],
+          playerLevel: 17,
         }),
       });
 
@@ -311,6 +354,61 @@ describe("catch-up API", () => {
       // Both C and E should be available
       expect(data.available).toContain("C");
       expect(data.available).toContain("E");
+    });
+  });
+
+  describe("Confirmed Branches", () => {
+    it("completes confirmed branch quests and their prerequisites", async () => {
+      // Add a sibling branch quest F that shares ancestor A with target D
+      const questsWithBranch = [
+        ...mockQuestsFromDb,
+        {
+          id: "F",
+          title: "Quest F",
+          levelRequired: 11,
+          dependsOn: [{ requiredQuest: { id: "A" } }],
+        },
+      ];
+      mockQuestFindMany.mockResolvedValue(questsWithBranch);
+
+      const request = new Request("http://localhost/api/progress/catch-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetQuests: ["D"],
+          playerLevel: 15,
+          confirmedBranches: ["F"],
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // F should be in completedBranches
+      expect(data.completedBranches).toContain("F");
+      // A and B should be completed as prerequisites of D
+      expect(data.completed).toContain("A");
+      expect(data.completed).toContain("B");
+    });
+
+    it("ignores invalid branch quest IDs", async () => {
+      const request = new Request("http://localhost/api/progress/catch-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetQuests: ["D"],
+          playerLevel: 15,
+          confirmedBranches: ["non-existent-branch"],
+        }),
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // Should succeed but have empty completedBranches
+      expect(data.completedBranches).toEqual([]);
     });
   });
 });
