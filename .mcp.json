@@ -2,8 +2,8 @@
   "mcpServers": {
     "playwright": {
       "transport": "stdio",
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"],
+      "command": "C:\\Users\\tucke\\.claude\\scripts\\playwright-mcp.cmd",
+      "args": [],
       "env": {}
     },
     "context7": {
