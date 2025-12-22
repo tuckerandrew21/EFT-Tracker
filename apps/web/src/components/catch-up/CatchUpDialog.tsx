@@ -13,68 +13,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getTraderColor } from "@/lib/trader-colors";
+import { calculateCatchUp, groupByTrader } from "@/lib/catch-up-algorithm";
+import { TraderQuestGroup } from "./TraderQuestGroup";
 import {
   Search,
   X,
   Loader2,
   CheckCircle2,
-  ChevronDown,
-  ChevronRight,
+  ChevronLeft,
+  AlertTriangle,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { QuestWithProgress } from "@/types";
+import type { QuestWithProgress, CatchUpCalculation } from "@eft-tracker/types";
+
+type Step = "select" | "confirm-reset" | "review";
 
 interface CatchUpDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   quests: QuestWithProgress[];
   onComplete: () => void;
-}
-
-interface TraderPrerequisites {
-  traderId: string;
-  traderName: string;
-  color: string;
-  quests: QuestWithProgress[];
-}
-
-interface PrerequisiteSummary {
-  total: number;
-  byTrader: TraderPrerequisites[];
-}
-
-/**
- * Recursively collect all incomplete prerequisites for a quest.
- */
-function getIncompletePrerequisites(
-  questId: string,
-  quests: QuestWithProgress[],
-  seen: Set<string>
-): QuestWithProgress[] {
-  if (seen.has(questId)) return [];
-  seen.add(questId);
-
-  const questMap = new Map(quests.map((q) => [q.id, q]));
-  const quest = questMap.get(questId);
-  if (!quest) return [];
-
-  const prerequisites: QuestWithProgress[] = [];
-
-  for (const dep of quest.dependsOn || []) {
-    const prereqId = dep.requiredQuest.id;
-    const prereqQuest = questMap.get(prereqId);
-
-    // First recurse to get deeper prerequisites
-    const deeperPrereqs = getIncompletePrerequisites(prereqId, quests, seen);
-    prerequisites.push(...deeperPrereqs);
-
-    // Then add this prerequisite if not completed
-    if (prereqQuest && prereqQuest.computedStatus !== "completed") {
-      prerequisites.push(prereqQuest);
-    }
-  }
-
-  return prerequisites;
+  existingProgressCount?: number;
 }
 
 export function CatchUpDialog({
@@ -82,40 +42,51 @@ export function CatchUpDialog({
   onOpenChange,
   quests,
   onComplete,
+  existingProgressCount = 0,
 }: CatchUpDialogProps) {
+  const [step, setStep] = useState<Step>("select");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedQuests, setSelectedQuests] = useState<QuestWithProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [expandedTraders, setExpandedTraders] = useState<Set<string>>(
+  const [playerLevel, setPlayerLevel] = useState<number | null>(null);
+  const [confirmedBranches, setConfirmedBranches] = useState<Set<string>>(
     new Set()
   );
+  const [isLoading, setIsLoading] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when dialog closes
   useEffect(() => {
     if (!open) {
+      setStep("select");
       setSearchQuery("");
       setSelectedQuests([]);
-      setExpandedTraders(new Set());
+      setPlayerLevel(null);
+      setConfirmedBranches(new Set());
     }
   }, [open]);
 
-  // Collect all prerequisite IDs for current selection (to exclude from search)
-  const prerequisiteIds = useMemo(() => {
-    const ids = new Set<string>();
-    const selectedIds = new Set(selectedQuests.map((q) => q.id));
+  // Calculate catch-up data when we have selections and player level
+  const catchUpData = useMemo((): CatchUpCalculation | null => {
+    if (selectedQuests.length === 0 || playerLevel === null) return null;
+    return calculateCatchUp(
+      selectedQuests.map((q) => q.id),
+      quests,
+      playerLevel
+    );
+  }, [selectedQuests, quests, playerLevel]);
 
-    for (const quest of selectedQuests) {
-      const seen = new Set<string>();
-      const prereqs = getIncompletePrerequisites(quest.id, quests, seen);
-      for (const prereq of prereqs) {
-        if (!selectedIds.has(prereq.id)) {
-          ids.add(prereq.id);
+  // Initialize confirmed branches when catch-up data changes
+  useEffect(() => {
+    if (catchUpData && playerLevel !== null) {
+      const autoChecked = new Set<string>();
+      for (const branch of catchUpData.completedBranches) {
+        if (branch.levelRequired <= playerLevel) {
+          autoChecked.add(branch.questId);
         }
       }
+      setConfirmedBranches(autoChecked);
     }
-    return ids;
-  }, [selectedQuests, quests]);
+  }, [catchUpData, playerLevel]);
 
   // Filter quests based on search query
   const searchResults = useMemo(() => {
@@ -127,80 +98,17 @@ export function CatchUpDialog({
     return quests
       .filter(
         (q) =>
-          q.title.toLowerCase().includes(lowerQuery) &&
-          !selectedIds.has(q.id) &&
-          !prerequisiteIds.has(q.id) // Exclude quests that are already prerequisites
+          q.title.toLowerCase().includes(lowerQuery) && !selectedIds.has(q.id)
       )
       .sort((a, b) => {
-        // Exact match first, then by level
         const aExact = a.title.toLowerCase() === lowerQuery;
         const bExact = b.title.toLowerCase() === lowerQuery;
         if (aExact && !bExact) return -1;
         if (!aExact && bExact) return 1;
         return a.levelRequired - b.levelRequired;
       })
-      .slice(0, 26);
-  }, [searchQuery, quests, selectedQuests, prerequisiteIds]);
-
-  // Calculate prerequisites summary with full quest details
-  const prerequisiteSummary = useMemo((): PrerequisiteSummary => {
-    const allPrereqs = new Map<string, QuestWithProgress>();
-    const selectedIds = new Set(selectedQuests.map((q) => q.id));
-
-    for (const quest of selectedQuests) {
-      const seen = new Set<string>();
-      const prereqs = getIncompletePrerequisites(quest.id, quests, seen);
-      for (const prereq of prereqs) {
-        // Don't count selected quests as prerequisites
-        if (!selectedIds.has(prereq.id)) {
-          allPrereqs.set(prereq.id, prereq);
-        }
-      }
-    }
-
-    // Group by trader with full quest details
-    const traderMap = new Map<string, TraderPrerequisites>();
-    for (const prereq of allPrereqs.values()) {
-      const traderId = prereq.traderId.toLowerCase();
-      const existing = traderMap.get(traderId);
-      if (existing) {
-        existing.quests.push(prereq);
-      } else {
-        traderMap.set(traderId, {
-          traderId,
-          traderName: prereq.trader.name,
-          color: getTraderColor(traderId).primary,
-          quests: [prereq],
-        });
-      }
-    }
-
-    // Sort quests within each trader by level
-    const byTrader = Array.from(traderMap.values()).map((trader) => ({
-      ...trader,
-      quests: trader.quests.sort((a, b) => a.levelRequired - b.levelRequired),
-    }));
-
-    // Sort traders by total quest count (descending)
-    byTrader.sort((a, b) => b.quests.length - a.quests.length);
-
-    return {
-      total: allPrereqs.size,
-      byTrader,
-    };
-  }, [selectedQuests, quests]);
-
-  const toggleTrader = useCallback((traderId: string) => {
-    setExpandedTraders((prev) => {
-      const next = new Set(prev);
-      if (next.has(traderId)) {
-        next.delete(traderId);
-      } else {
-        next.add(traderId);
-      }
-      return next;
-    });
-  }, []);
+      .slice(0, 20);
+  }, [searchQuery, quests, selectedQuests]);
 
   const handleSelectQuest = useCallback((quest: QuestWithProgress) => {
     setSelectedQuests((prev) => [...prev, quest]);
@@ -212,8 +120,53 @@ export function CatchUpDialog({
     setSelectedQuests((prev) => prev.filter((q) => q.id !== questId));
   }, []);
 
+  const handlePlayerLevelChange = useCallback((value: string) => {
+    const num = parseInt(value, 10);
+    if (value === "") {
+      setPlayerLevel(null);
+    } else if (!isNaN(num) && num >= 1 && num <= 79) {
+      setPlayerLevel(num);
+    }
+  }, []);
+
+  const handleToggleBranch = useCallback((questId: string) => {
+    setConfirmedBranches((prev) => {
+      const next = new Set(prev);
+      if (next.has(questId)) {
+        next.delete(questId);
+      } else {
+        next.add(questId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (step === "select") {
+      if (existingProgressCount > 0) {
+        setStep("confirm-reset");
+      } else {
+        setStep("review");
+      }
+    } else if (step === "confirm-reset") {
+      setStep("review");
+    }
+  }, [step, existingProgressCount]);
+
+  const handleBack = useCallback(() => {
+    if (step === "review") {
+      if (existingProgressCount > 0) {
+        setStep("confirm-reset");
+      } else {
+        setStep("select");
+      }
+    } else if (step === "confirm-reset") {
+      setStep("select");
+    }
+  }, [step, existingProgressCount]);
+
   const handleCatchUp = useCallback(async () => {
-    if (selectedQuests.length === 0) return;
+    if (selectedQuests.length === 0 || playerLevel === null) return;
 
     setIsLoading(true);
     try {
@@ -222,6 +175,8 @@ export function CatchUpDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetQuests: selectedQuests.map((q) => q.id),
+          playerLevel,
+          confirmedBranches: Array.from(confirmedBranches),
         }),
       });
 
@@ -233,7 +188,11 @@ export function CatchUpDialog({
       const data = await response.json();
 
       toast.success("Progress synced!", {
-        description: `Completed ${data.completed.length} prerequisite quests.`,
+        description: `Completed ${data.completed.length} prerequisite quests${
+          data.completedBranches?.length > 0
+            ? ` and ${data.completedBranches.length} branch quests`
+            : ""
+        }.`,
       });
 
       onComplete();
@@ -246,76 +205,89 @@ export function CatchUpDialog({
     } finally {
       setIsLoading(false);
     }
-  }, [selectedQuests, onComplete, onOpenChange]);
+  }, [
+    selectedQuests,
+    playerLevel,
+    confirmedBranches,
+    onComplete,
+    onOpenChange,
+  ]);
+
+  const canProceed = selectedQuests.length > 0 && playerLevel !== null;
+
+  // Group prerequisites and branches by trader for display
+  const prerequisitesByTrader = useMemo(() => {
+    if (!catchUpData) return new Map();
+    return groupByTrader(catchUpData.prerequisites);
+  }, [catchUpData]);
+
+  const branchesByTrader = useMemo(() => {
+    if (!catchUpData) return new Map();
+    return groupByTrader(catchUpData.completedBranches);
+  }, [catchUpData]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Catch Up Progress</DialogTitle>
+          <DialogTitle>
+            {step === "select" && "Catch Up Progress"}
+            {step === "confirm-reset" && "Progress Reset Warning"}
+            {step === "review" && "Review Catch-Up"}
+          </DialogTitle>
           <DialogDescription>
-            Search and select the quests you&apos;re currently working on
-            in-game. All prerequisite quests will be auto-completed.
+            {step === "select" &&
+              "Select the quests you're currently working on and enter your PMC level."}
+            {step === "confirm-reset" &&
+              "This will reset your existing progress before applying the catch-up."}
+            {step === "review" &&
+              "Review the quests that will be marked as completed."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 flex flex-col gap-4 py-2 min-h-0 overflow-hidden">
-          {/* Search input */}
-          <div className="relative shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              ref={searchInputRef}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-              }}
-              placeholder="Search quests..."
-              className="pl-9"
-            />
-          </div>
+          {/* Step 1: Select quests and enter level */}
+          {step === "select" && (
+            <>
+              {/* Player level input */}
+              <div className="shrink-0">
+                <label className="text-sm font-medium mb-1.5 block">
+                  Your PMC Level
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={79}
+                  value={playerLevel ?? ""}
+                  onChange={(e) => handlePlayerLevelChange(e.target.value)}
+                  placeholder="Enter level (1-79)"
+                  className="w-32"
+                />
+              </div>
 
-          {/* Search results - inline list */}
-          {searchQuery.trim() && searchResults.length > 0 && (
-            <div className="border rounded-md max-h-64 overflow-y-auto shrink-0">
-              {searchResults.map((quest) => {
-                const traderColor = getTraderColor(quest.traderId);
-                return (
-                  <button
-                    key={quest.id}
-                    onClick={() => handleSelectQuest(quest)}
-                    className="w-full px-3 py-2 text-left hover:bg-muted flex items-center gap-2 text-sm"
-                  >
-                    <div
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: traderColor.primary }}
-                    />
-                    <span className="flex-1 truncate">{quest.title}</span>
-                    <span className="text-xs text-muted-foreground shrink-0">
-                      {quest.trader.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground shrink-0">
-                      Lv {quest.levelRequired}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+              {/* Search input */}
+              <div className="relative shrink-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search quests..."
+                  className="pl-9"
+                />
+              </div>
 
-          {/* Selected quests */}
-          <div className="flex-1 overflow-y-auto min-h-0">
-            {selectedQuests.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Selected quests ({selectedQuests.length}):
-                </p>
-                <div className="space-y-1">
-                  {selectedQuests.map((quest) => {
+              {/* Search results */}
+              {searchQuery.trim() && searchResults.length > 0 && (
+                <div className="border rounded-md max-h-48 overflow-y-auto shrink-0">
+                  {searchResults.map((quest) => {
                     const traderColor = getTraderColor(quest.traderId);
                     return (
-                      <div
+                      <button
+                        type="button"
                         key={quest.id}
-                        className="flex items-center gap-2 p-2 bg-muted/50 rounded-md text-sm"
+                        onClick={() => handleSelectQuest(quest)}
+                        className="w-full px-3 py-2 text-left hover:bg-muted flex items-center gap-2 text-sm"
                       >
                         <div
                           className="w-2 h-2 rounded-full shrink-0"
@@ -323,117 +295,199 @@ export function CatchUpDialog({
                         />
                         <span className="flex-1 truncate">{quest.title}</span>
                         <span className="text-xs text-muted-foreground shrink-0">
-                          {quest.trader.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground shrink-0">
                           Lv {quest.levelRequired}
                         </span>
-                        <button
-                          onClick={() => handleRemoveQuest(quest.id)}
-                          className="p-1 hover:bg-muted rounded-sm"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">
-                  Search for quests you&apos;re currently working on
-                </p>
-              </div>
-            )}
-          </div>
+              )}
 
-          {/* Prerequisites summary with collapsible trader sections */}
-          {selectedQuests.length > 0 && (
-            <div className="border-t pt-4">
-              <p className="text-sm font-medium mb-2">
-                This will complete {prerequisiteSummary.total} prerequisite
-                quest{prerequisiteSummary.total !== 1 ? "s" : ""}:
-              </p>
-              {prerequisiteSummary.total > 0 ? (
-                <div className="space-y-1 max-h-48 overflow-y-auto">
-                  {prerequisiteSummary.byTrader.map((trader) => {
-                    const isExpanded = expandedTraders.has(trader.traderId);
-                    return (
-                      <div key={trader.traderId} className="border rounded-md">
-                        <button
-                          onClick={() => toggleTrader(trader.traderId)}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/50 transition-colors"
-                        >
-                          {isExpanded ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                          )}
+              {/* Selected quests */}
+              <div className="flex-1 overflow-y-auto min-h-0">
+                {selectedQuests.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Selected quests ({selectedQuests.length}):
+                    </p>
+                    <div className="space-y-1">
+                      {selectedQuests.map((quest) => {
+                        const traderColor = getTraderColor(quest.traderId);
+                        return (
                           <div
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: trader.color }}
-                          />
-                          <span className="font-medium">
-                            {trader.traderName}
-                          </span>
-                          <span className="text-muted-foreground">
-                            ({trader.quests.length})
-                          </span>
-                        </button>
-                        {isExpanded && (
-                          <div className="border-t bg-muted/30 px-3 py-2 space-y-1">
-                            {trader.quests.map((quest) => (
-                              <div
-                                key={quest.id}
-                                className="flex items-center justify-between text-xs text-muted-foreground"
-                              >
-                                <span className="truncate">{quest.title}</span>
-                                <span className="shrink-0 ml-2">
-                                  Lv {quest.levelRequired}
-                                </span>
-                              </div>
-                            ))}
+                            key={quest.id}
+                            className="flex items-center gap-2 p-2 bg-muted/50 rounded-md text-sm"
+                          >
+                            <div
+                              className="w-2 h-2 rounded-full shrink-0"
+                              style={{ backgroundColor: traderColor.primary }}
+                            />
+                            <span className="flex-1 truncate">
+                              {quest.title}
+                            </span>
+                            <span className="text-xs text-muted-foreground shrink-0">
+                              Lv {quest.levelRequired}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveQuest(quest.id)}
+                              className="p-1 hover:bg-muted rounded-sm"
+                              aria-label={`Remove ${quest.title}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No additional prerequisites needed.
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">
+                      Search for quests you&apos;re currently working on
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Step 2: Confirm reset warning */}
+          {step === "confirm-reset" && (
+            <div className="flex flex-col items-center justify-center py-8 gap-4">
+              <AlertTriangle className="h-12 w-12 text-yellow-500" />
+              <div className="text-center space-y-2">
+                <p className="font-medium">
+                  You have {existingProgressCount} quest
+                  {existingProgressCount !== 1 ? "s" : ""} marked complete.
                 </p>
+                <p className="text-sm text-muted-foreground">
+                  Continuing will reset all existing progress and apply the new
+                  catch-up state. This cannot be undone.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Review */}
+          {step === "review" && catchUpData && (
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {/* Prerequisites section */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium">Prerequisites</h3>
+                  <span className="text-xs text-muted-foreground">
+                    ({catchUpData.prerequisites.length} quests)
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  These quests must be completed to reach your selected quests.
+                </p>
+                {catchUpData.prerequisites.length > 0 ? (
+                  <div className="space-y-1">
+                    {Array.from(prerequisitesByTrader.entries()).map(
+                      ([traderId, selections]) => (
+                        <TraderQuestGroup
+                          key={traderId}
+                          traderId={traderId}
+                          traderName={selections[0].traderName}
+                          traderColor={selections[0].traderColor}
+                          quests={selections}
+                          locked
+                        />
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    No prerequisites needed.
+                  </p>
+                )}
+              </div>
+
+              {/* Completed branches section */}
+              {catchUpData.completedBranches.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <h3 className="text-sm font-medium">Completed Branches</h3>
+                    <span className="text-xs text-muted-foreground">
+                      ({catchUpData.completedBranches.length} terminal quests)
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    These quest chains ended before your current position. Check
+                    the ones you&apos;ve completed.
+                  </p>
+                  <div className="space-y-1">
+                    {Array.from(branchesByTrader.entries()).map(
+                      ([traderId, selections]) => (
+                        <TraderQuestGroup
+                          key={traderId}
+                          traderId={traderId}
+                          traderName={selections[0].traderName}
+                          traderColor={selections[0].traderColor}
+                          quests={selections}
+                          showCheckboxes
+                          checkedIds={confirmedBranches}
+                          onToggle={handleToggleBranch}
+                          playerLevel={playerLevel}
+                        />
+                      )
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           )}
         </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleCatchUp}
-            disabled={isLoading || selectedQuests.length === 0}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Syncing...
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Catch Up
-              </>
+        <DialogFooter className="flex-row justify-between sm:justify-between">
+          <div>
+            {step !== "select" && (
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={isLoading}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
             )}
-          </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            {step === "review" ? (
+              <Button
+                onClick={handleCatchUp}
+                disabled={isLoading || !canProceed}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Apply Catch-Up
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button onClick={handleNext} disabled={!canProceed}>
+                Next
+              </Button>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

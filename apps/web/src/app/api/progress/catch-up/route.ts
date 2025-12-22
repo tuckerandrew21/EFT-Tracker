@@ -17,6 +17,8 @@ type QuestWithDependencies = Prisma.QuestGetPayload<{
 
 const catchUpSchema = z.object({
   targetQuests: z.array(z.string().min(1)).min(1).max(100),
+  playerLevel: z.number().int().min(1).max(79),
+  confirmedBranches: z.array(z.string().min(1)).max(100).default([]),
 });
 
 /**
@@ -72,7 +74,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { targetQuests } = catchUpSchema.parse(body);
+    const {
+      targetQuests,
+      playerLevel: _playerLevel,
+      confirmedBranches,
+    } = catchUpSchema.parse(body);
 
     // Fetch all quests with their dependencies
     const allQuests = await prisma.quest.findMany({
@@ -127,6 +133,35 @@ export async function POST(request: Request) {
     const targetQuestSet = new Set(targetQuests);
     targetQuestSet.forEach((id) => prerequisitesToComplete.delete(id));
 
+    // Collect all confirmed branch quests and their prerequisites
+    const branchQuestsToComplete = new Set<string>();
+    const branchSeen = new Set<string>();
+
+    for (const branchQuestId of confirmedBranches) {
+      if (!questMap.has(branchQuestId)) {
+        continue; // Skip invalid branch quests silently
+      }
+      // Add the branch terminal quest itself
+      branchQuestsToComplete.add(branchQuestId);
+      // Add all prerequisites of the branch quest
+      const branchPrereqs = getIncompletePrerequisites(
+        branchQuestId,
+        questMap,
+        progressMap,
+        branchSeen
+      );
+      branchPrereqs.forEach((id) => branchQuestsToComplete.add(id));
+    }
+
+    // Remove branch quests that are already in prerequisites (avoid duplicates)
+    branchQuestsToComplete.forEach((id) => {
+      if (prerequisitesToComplete.has(id)) {
+        branchQuestsToComplete.delete(id);
+      }
+    });
+    // Remove target quests from branch completion
+    targetQuestSet.forEach((id) => branchQuestsToComplete.delete(id));
+
     // Batch upsert all prerequisites as COMPLETED
     const completedIds: string[] = [];
     const prerequisiteArray = Array.from(prerequisitesToComplete);
@@ -174,6 +209,56 @@ export async function POST(request: Request) {
           );
           throw new Error(
             `Failed to complete prerequisite quests (chunk ${i / CHUNK_SIZE + 1})`
+          );
+        }
+      }
+    }
+
+    // Complete confirmed branch quests
+    const completedBranchIds: string[] = [];
+    const branchArray = Array.from(branchQuestsToComplete);
+
+    if (branchArray.length > 0) {
+      const CHUNK_SIZE = 50;
+      for (let i = 0; i < branchArray.length; i += CHUNK_SIZE) {
+        const chunk = branchArray.slice(i, i + CHUNK_SIZE);
+
+        try {
+          await prisma.$transaction(
+            async (tx) => {
+              for (const questId of chunk) {
+                await tx.questProgress.upsert({
+                  where: {
+                    userId_questId: {
+                      userId: session.user.id,
+                      questId,
+                    },
+                  },
+                  create: {
+                    userId: session.user.id,
+                    questId,
+                    status: "COMPLETED",
+                    syncSource: "WEB",
+                  },
+                  update: {
+                    status: "COMPLETED",
+                    syncSource: "WEB",
+                  },
+                });
+              }
+            },
+            {
+              timeout: 30000,
+            }
+          );
+          completedBranchIds.push(...chunk);
+        } catch (error) {
+          logger.error(
+            { err: error, chunk: chunk.length, userId: session.user.id },
+            "Transaction failed for branch quest chunk"
+          );
+          throw new Error(
+            `Failed to complete branch quests (chunk ${i / CHUNK_SIZE + 1})`
           );
         }
       }
@@ -239,8 +324,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       completed: completedIds,
+      completedBranches: completedBranchIds,
       available: availableIds,
-      totalChanged: completedIds.length + availableIds.length,
+      totalChanged:
+        completedIds.length + completedBranchIds.length + availableIds.length,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
