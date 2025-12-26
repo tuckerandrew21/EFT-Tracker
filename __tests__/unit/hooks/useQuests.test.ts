@@ -36,7 +36,7 @@ describe("useQuests", () => {
     it("should have default filters", () => {
       const { result } = renderHook(() => useQuests());
       expect(result.current.filters).toEqual({
-        statuses: ["available"], // Default to showing only available quests
+        statuses: ["available", "locked"], // Default to showing available and locked quests
         search: "",
         kappaOnly: false,
         playerLevel: 1,
