@@ -48,7 +48,7 @@ interface UseQuestsReturn {
 }
 
 const defaultFilters: QuestFilters = {
-  statuses: ["available"], // Default to showing only available quests
+  statuses: ["available", "locked"], // Default to showing available and locked quests
   search: "",
   kappaOnly: false,
   playerLevel: 1, // Default to level 1 for all users

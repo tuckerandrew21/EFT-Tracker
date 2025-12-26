@@ -3,13 +3,12 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { SlidersHorizontal, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { ProgressStats } from "@/components/progress-stats";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Sheet,
   SheetContent,
@@ -18,11 +17,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { StatusMultiSelect } from "./StatusMultiSelect";
 import { ActiveFilterChips } from "./ActiveFilterChips";
 import type {
@@ -41,112 +35,17 @@ interface QuestFiltersProps {
   hiddenByLevelCount: number;
 }
 
-// Advanced filters in popover
-interface AdvancedFiltersProps {
-  filters: Filters;
-  onFilterChange: (filters: Partial<Filters>) => void;
-  onApplyFilters: () => void;
-  hasPendingChanges: boolean;
-  onReset: () => void;
-  isMobile?: boolean;
-}
-
-function AdvancedFilters({
-  filters,
-  onFilterChange,
-  onApplyFilters,
-  hasPendingChanges,
-  onReset,
-  isMobile = false,
-}: AdvancedFiltersProps) {
-  return (
-    <div className={`space-y-4 ${isMobile ? "" : "w-[280px]"}`}>
-      <div className="text-sm font-medium">Advanced Filters</div>
-
-      {/* Kappa Only */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="kappa-advanced" className="text-sm cursor-pointer">
-          Kappa Required Only
-        </Label>
-        <Switch
-          id="kappa-advanced"
-          checked={filters.kappaOnly}
-          onCheckedChange={(checked) => onFilterChange({ kappaOnly: checked })}
-        />
-      </div>
-
-      {/* Player Level */}
-      <div className="space-y-2">
-        <Label className="text-sm">Player Level</Label>
-        <div className="flex gap-2 items-center">
-          <Input
-            type="number"
-            min={1}
-            max={79}
-            placeholder="1-79"
-            value={filters.playerLevel ?? ""}
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              const level = isNaN(val) ? null : Math.min(79, Math.max(1, val));
-              onFilterChange({ playerLevel: level });
-            }}
-            className="h-9 w-20"
-            disabled={filters.bypassLevelRequirement}
-          />
-          <div className="flex items-center gap-1.5">
-            <Switch
-              id="bypass-advanced"
-              checked={filters.bypassLevelRequirement}
-              onCheckedChange={(checked) =>
-                onFilterChange({ bypassLevelRequirement: checked })
-              }
-            />
-            <Label
-              htmlFor="bypass-advanced"
-              className="text-xs cursor-pointer whitespace-nowrap"
-            >
-              Bypass
-            </Label>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-2 pt-2 border-t">
-        <Button
-          size="sm"
-          onClick={onApplyFilters}
-          disabled={!hasPendingChanges}
-          className="flex-1"
-        >
-          Apply
-          {hasPendingChanges && (
-            <Badge className="ml-1 bg-white text-primary text-[10px] px-1">
-              !
-            </Badge>
-          )}
-        </Button>
-        <Button variant="ghost" size="sm" onClick={onReset}>
-          Reset All
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 export function QuestFilters({
   traders,
   quests,
   filters,
   onFilterChange,
   onApplyFilters,
-  hasPendingChanges,
   hiddenByLevelCount,
 }: QuestFiltersProps) {
   const { data: session, status: sessionStatus } = useSession();
   const [searchValue, setSearchValue] = useState(filters.search);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const initialPrefsLoaded = useRef(false);
   const prefsFullyLoaded = useRef(false); // True only after prefs fetch completes
@@ -304,52 +203,58 @@ export function QuestFilters({
   const handleReset = () => {
     setSearchValue("");
     onFilterChange({
-      statuses: ["available"], // Default to showing only available quests
+      statuses: ["available", "locked"], // Default to showing available and locked quests
       search: "",
       kappaOnly: false,
       playerLevel: 1,
       bypassLevelRequirement: false,
       hideReputationQuests: true, // Default to hiding reputation quests
     });
-    onApplyFilters();
+    setTimeout(() => onApplyFiltersRef.current(), 0);
   };
 
-  // Auto-apply is intentionally disabled for primary filters (trader, status, map).
-  // Users must click Apply button. This prevents:
-  // 1. Excessive API calls while user is still selecting filters
-  // 2. Render loops from filter state changes triggering refetches
-  // Search input auto-applies with debounce (handled above)
+  // Auto-apply filter change (immediate apply after state update)
+  const handleFilterChange = useCallback(
+    (update: Partial<Filters>) => {
+      onFilterChange(update);
+      setTimeout(() => onApplyFiltersRef.current(), 0);
+    },
+    [onFilterChange]
+  );
 
-  // Handle removal of individual filter from chips
+  // Debounced level change (auto-apply after 500ms)
+  const levelChangeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const handleLevelChange = useCallback(
+    (level: number | null) => {
+      onFilterChange({ playerLevel: level });
+
+      if (levelChangeTimerRef.current) {
+        clearTimeout(levelChangeTimerRef.current);
+      }
+      levelChangeTimerRef.current = setTimeout(() => {
+        onApplyFiltersRef.current();
+      }, 500);
+    },
+    [onFilterChange]
+  );
+
+  // Handle removal of individual filter from chips (auto-apply)
   const handleRemoveFilter = (key: keyof Filters, value?: string) => {
     if (key === "statuses" && value) {
       const newStatuses = filters.statuses.filter((s) => s !== value);
-      onFilterChange({ statuses: newStatuses });
+      handleFilterChange({ statuses: newStatuses });
     } else if (key === "kappaOnly") {
-      onFilterChange({ kappaOnly: false });
+      handleFilterChange({ kappaOnly: false });
     } else if (key === "playerLevel") {
-      onFilterChange({ playerLevel: 1 });
+      handleFilterChange({ playerLevel: 1 });
     } else if (key === "bypassLevelRequirement") {
-      onFilterChange({ bypassLevelRequirement: false });
+      handleFilterChange({ bypassLevelRequirement: false });
     } else if (key === "hideReputationQuests") {
-      onFilterChange({ hideReputationQuests: false });
+      handleFilterChange({ hideReputationQuests: false });
     }
-    // Filter chip removal requires clicking Apply to take effect
   };
 
-  // Simple filter change handler - requires Apply button click
-  const handlePrimaryFilterChange = (update: Partial<Filters>) => {
-    onFilterChange(update);
-  };
-
-  // Count advanced filters that are active
-  const advancedFilterCount = [
-    filters.kappaOnly,
-    filters.playerLevel !== 1 ? filters.playerLevel : null,
-    filters.bypassLevelRequirement,
-  ].filter(Boolean).length;
-
-  // Count all active filters (for chips)
+  // Count all active filters (for chips and mobile badge)
   const activeFilterCount = [
     filters.statuses.length > 0 ? filters.statuses : null,
     filters.kappaOnly,
@@ -370,10 +275,7 @@ export function QuestFilters({
             variant="ghost"
             size="sm"
             className="h-7 text-xs"
-            onClick={() => {
-              onFilterChange({ bypassLevelRequirement: true });
-              setTimeout(() => onApplyFiltersRef.current(), 0);
-            }}
+            onClick={() => handleFilterChange({ bypassLevelRequirement: true })}
           >
             Show All
           </Button>
@@ -421,23 +323,73 @@ export function QuestFilters({
                   <div className="mt-1">
                     <StatusMultiSelect
                       selectedStatuses={filters.statuses}
-                      onChange={(statuses) =>
-                        handlePrimaryFilterChange({ statuses })
-                      }
+                      onChange={(statuses) => handleFilterChange({ statuses })}
                     />
                   </div>
                 </div>
 
-                {/* Advanced Filters */}
-                <div className="pt-4 border-t">
-                  <AdvancedFilters
-                    filters={filters}
-                    onFilterChange={onFilterChange}
-                    onApplyFilters={onApplyFilters}
-                    hasPendingChanges={hasPendingChanges}
-                    onReset={handleReset}
-                    isMobile
+                {/* Kappa Only */}
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="kappa-mobile"
+                    className="text-sm cursor-pointer"
+                  >
+                    Kappa Required Only
+                  </Label>
+                  <Switch
+                    id="kappa-mobile"
+                    checked={filters.kappaOnly}
+                    onCheckedChange={(checked) =>
+                      handleFilterChange({ kappaOnly: checked })
+                    }
                   />
+                </div>
+
+                {/* Player Level */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Player Level</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={79}
+                      placeholder="1-79"
+                      value={filters.playerLevel ?? ""}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        const level = isNaN(val)
+                          ? null
+                          : Math.min(79, Math.max(1, val));
+                        handleLevelChange(level);
+                      }}
+                      className="h-9 w-20"
+                      disabled={filters.bypassLevelRequirement}
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <Switch
+                        id="bypass-mobile"
+                        checked={filters.bypassLevelRequirement}
+                        onCheckedChange={(checked) =>
+                          handleFilterChange({
+                            bypassLevelRequirement: checked,
+                          })
+                        }
+                      />
+                      <Label
+                        htmlFor="bypass-mobile"
+                        className="text-xs cursor-pointer whitespace-nowrap"
+                      >
+                        Bypass
+                      </Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reset button */}
+                <div className="pt-4 border-t">
+                  <Button variant="ghost" size="sm" onClick={handleReset}>
+                    Reset All
+                  </Button>
                 </div>
               </div>
             </SheetContent>
@@ -476,60 +428,67 @@ export function QuestFilters({
             {/* Status */}
             <StatusMultiSelect
               selectedStatuses={filters.statuses}
-              onChange={(statuses) => handlePrimaryFilterChange({ statuses })}
+              onChange={(statuses) => handleFilterChange({ statuses })}
             />
 
-            {/* Apply button for primary filters */}
-            <Button
-              size="sm"
-              onClick={onApplyFilters}
-              disabled={!hasPendingChanges}
-              className="h-9"
-            >
-              Apply
-              {hasPendingChanges && (
-                <Badge className="ml-1 bg-white text-primary text-[10px] px-1">
-                  !
-                </Badge>
-              )}
-            </Button>
+            {/* Kappa Only */}
+            <div className="flex items-center gap-1.5">
+              <Switch
+                id="kappa-desktop"
+                checked={filters.kappaOnly}
+                onCheckedChange={(checked) =>
+                  handleFilterChange({ kappaOnly: checked })
+                }
+              />
+              <Label
+                htmlFor="kappa-desktop"
+                className="text-sm cursor-pointer whitespace-nowrap"
+              >
+                Kappa
+              </Label>
+            </div>
 
-            {/* More Filters (Advanced) */}
-            <Popover open={advancedOpen} onOpenChange={setAdvancedOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-9 gap-1.5 relative"
-                >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  More
-                  {advancedFilterCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
-                    >
-                      {advancedFilterCount}
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="p-4">
-                <AdvancedFilters
-                  filters={filters}
-                  onFilterChange={onFilterChange}
-                  onApplyFilters={() => {
-                    onApplyFilters();
-                    setAdvancedOpen(false);
-                  }}
-                  hasPendingChanges={hasPendingChanges}
-                  onReset={() => {
-                    handleReset();
-                    setAdvancedOpen(false);
-                  }}
+            {/* Level + Bypass */}
+            <div className="flex items-center gap-2">
+              <Label
+                htmlFor="player-level-desktop"
+                className="text-sm whitespace-nowrap"
+              >
+                Level:
+              </Label>
+              <Input
+                id="player-level-desktop"
+                type="number"
+                min={1}
+                max={79}
+                placeholder="1-79"
+                value={filters.playerLevel ?? ""}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  const level = isNaN(val)
+                    ? null
+                    : Math.min(79, Math.max(1, val));
+                  handleLevelChange(level);
+                }}
+                className="h-9 w-16"
+                disabled={filters.bypassLevelRequirement}
+              />
+              <div className="flex items-center gap-1.5">
+                <Switch
+                  id="bypass-desktop"
+                  checked={filters.bypassLevelRequirement}
+                  onCheckedChange={(checked) =>
+                    handleFilterChange({ bypassLevelRequirement: checked })
+                  }
                 />
-              </PopoverContent>
-            </Popover>
+                <Label
+                  htmlFor="bypass-desktop"
+                  className="text-xs cursor-pointer whitespace-nowrap"
+                >
+                  Bypass
+                </Label>
+              </div>
+            </div>
           </div>
 
           {/* Progress Stats */}
