@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useStats } from "@/contexts/StatsContext";
+import { useUserPrefsContext } from "@/providers/UserPrefsProvider";
 import { SyncStatusIndicator } from "@/components/quest-tree";
 import { MapFilters } from "@/components/map-filters";
 import { QuestTreeSkeleton } from "@/components/quest-tree/QuestTreeSkeleton";
@@ -26,6 +27,7 @@ const STATUS_CYCLE: Record<QuestStatus, QuestStatus | null> = {
 
 export function MapsClient() {
   const { status: sessionStatus } = useSession();
+  const { isLoading: prefsLoading } = useUserPrefsContext();
   const { setStats } = useStats();
   const {
     quests,
@@ -43,14 +45,20 @@ export function MapsClient() {
   // Track if initial filters have been applied
   const initialFiltersApplied = useRef(false);
 
+  // Show skeleton until session resolved AND prefs loaded (if authenticated)
+  const isInitializing =
+    sessionStatus === "loading" ||
+    (sessionStatus === "authenticated" && prefsLoading);
+
   // Apply map-specific default filters on mount
   useEffect(() => {
+    if (isInitializing) return; // Wait until ready
     if (!initialLoading && !initialFiltersApplied.current) {
       initialFiltersApplied.current = true;
       setFilters({ statuses: ["available"], bypassLevelRequirement: false });
       setTimeout(() => applyFilters(), 0);
     }
-  }, [initialLoading, setFilters, applyFilters]);
+  }, [isInitializing, initialLoading, setFilters, applyFilters]);
   const {
     progress,
     updateStatus,
@@ -312,7 +320,7 @@ export function MapsClient() {
     return () => setStats(null);
   }, [stats, setStats, loading, error]);
 
-  if (initialLoading) {
+  if (isInitializing || initialLoading) {
     return <QuestTreeSkeleton />;
   }
 

@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTraderColor } from "@/lib/trader-colors";
+import { useUserPrefsContext } from "@/providers/UserPrefsProvider";
 import type {
   Trader,
   QuestFilters as Filters,
@@ -36,6 +37,7 @@ export function MapFilters({
   onApplyFilters,
 }: MapFiltersProps) {
   const { data: session, status: sessionStatus } = useSession();
+  const { prefs, isLoading: prefsLoading } = useUserPrefsContext();
   const initialPrefsLoaded = useRef(false);
   const prefsFullyLoaded = useRef(false);
   const lastSavedLevel = useRef<number | null>(null);
@@ -47,7 +49,7 @@ export function MapFilters({
     onApplyFiltersRef.current = onApplyFilters;
   });
 
-  // Load user's saved preferences on mount (only for logged-in users)
+  // Load user's saved preferences from context when they load
   useEffect(() => {
     // For non-authenticated users, mark prefs as loaded immediately
     if (sessionStatus === "unauthenticated" && !prefsFullyLoaded.current) {
@@ -55,31 +57,28 @@ export function MapFilters({
     }
 
     if (sessionStatus === "authenticated" && !initialPrefsLoaded.current) {
+      // Wait for prefs to load
+      if (prefsLoading || !prefs) return;
+
       initialPrefsLoaded.current = true;
-      fetch("/api/user")
-        .then((res) => res.json())
-        .then((data) => {
-          const updates: Partial<Filters> = {};
-          if (data.user?.playerLevel != null) {
-            lastSavedLevel.current = data.user.playerLevel;
-            updates.playerLevel = data.user.playerLevel;
-          }
-          if (data.user?.bypassLevelRequirement != null) {
-            lastSavedBypassLevel.current = data.user.bypassLevelRequirement;
-            updates.bypassLevelRequirement = data.user.bypassLevelRequirement;
-          }
-          if (Object.keys(updates).length > 0) {
-            onFilterChange(updates);
-            setTimeout(() => onApplyFiltersRef.current(), 0);
-          }
-          prefsFullyLoaded.current = true;
-        })
-        .catch((err) => {
-          console.error("Failed to fetch user preferences:", err);
-          prefsFullyLoaded.current = true;
-        });
+
+      const updates: Partial<Filters> = {};
+      if (prefs.playerLevel != null) {
+        lastSavedLevel.current = prefs.playerLevel;
+        updates.playerLevel = prefs.playerLevel;
+      }
+      if (prefs.bypassLevelRequirement != null) {
+        lastSavedBypassLevel.current = prefs.bypassLevelRequirement;
+        updates.bypassLevelRequirement = prefs.bypassLevelRequirement;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        onFilterChange(updates);
+        setTimeout(() => onApplyFiltersRef.current(), 0);
+      }
+      prefsFullyLoaded.current = true;
     }
-  }, [sessionStatus, onFilterChange]);
+  }, [sessionStatus, prefs, prefsLoading, onFilterChange]);
 
   // Auto-save player level when it changes (debounced)
   const savePlayerLevel = useCallback(
