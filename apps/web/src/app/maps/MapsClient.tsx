@@ -47,7 +47,11 @@ export function MapsClient() {
   useEffect(() => {
     if (!initialLoading && !initialFiltersApplied.current) {
       initialFiltersApplied.current = true;
-      setFilters({ statuses: ["available"], bypassLevelRequirement: false });
+      setFilters({
+        statuses: ["available"],
+        bypassLevelRequirement: false,
+        hideReputationQuests: false,
+      });
       setTimeout(() => applyFilters(), 0);
     }
   }, [initialLoading, setFilters, applyFilters]);
