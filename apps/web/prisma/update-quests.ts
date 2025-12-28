@@ -290,7 +290,9 @@ async function main() {
     }
   }
 
-  console.log(`Quests: ${created} created, ${updated} updated, ${skipped} skipped`);
+  console.log(
+    `Quests: ${created} created, ${updated} updated, ${skipped} skipped`
+  );
 
   // Update dependencies - delete all and recreate
   console.log("Updating quest dependencies...");
@@ -338,11 +340,15 @@ async function main() {
 
   // Count preserved progress
   const progressCount = await prisma.questProgress.count();
-  console.log(`\n✅ Update complete! Preserved ${progressCount} progress records.`);
+  console.log(
+    `\n✅ Update complete! Preserved ${progressCount} progress records.`
+  );
 
   // Summary
   const questCount = await prisma.quest.count();
-  const kappaCount = await prisma.quest.count({ where: { kappaRequired: true } });
+  const kappaCount = await prisma.quest.count({
+    where: { kappaRequired: true },
+  });
   console.log(`Total quests: ${questCount} (${kappaCount} required for Kappa)`);
 }
 
