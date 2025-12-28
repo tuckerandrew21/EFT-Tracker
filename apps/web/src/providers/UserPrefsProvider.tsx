@@ -33,7 +33,7 @@ export function UserPrefsProvider({ children }: UserPrefsProviderProps) {
   };
 
   return (
-    // @ts-expect-error React 19 type compatibility issue with Context.Provider
+    // @ts-ignore React 19 type compatibility issue with Context.Provider
     <UserPrefsContext.Provider value={value}>
       {children}
     </UserPrefsContext.Provider>
