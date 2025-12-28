@@ -15,8 +15,17 @@
  * - No update available scenario
  * - Error handling during update check
  * - User interaction flows (accept/decline)
+ *
+ * NOTE: These tests are skipped by default since they test Tauri functionality
+ * only relevant when updating the desktop app code. To run these tests explicitly:
+ *   RUN_TAURI_TESTS=true npm test -- check-updates
  */
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+
+// Skip these tests by default - only run when explicitly enabled
+// This prevents Tauri-specific tests from running on every test suite
+// and slowing down development when not working on Tauri code
+const SKIP_TAURI_TESTS = process.env.RUN_TAURI_TESTS !== "true";
 
 // Create mock functions at module scope
 const mockCheck = vi.fn();
@@ -44,7 +53,7 @@ import {
 // Mock function for downloadAndInstall
 const mockDownloadAndInstall = vi.fn();
 
-describe("checkForUpdates", () => {
+describe.skipIf(SKIP_TAURI_TESTS)("checkForUpdates", () => {
   beforeEach(() => {
     mockConfirm.mockClear();
     mockCheck.mockClear();
@@ -132,7 +141,7 @@ describe("checkForUpdates", () => {
   });
 });
 
-describe("checkForUpdatesSilently", () => {
+describe.skipIf(SKIP_TAURI_TESTS)("checkForUpdatesSilently", () => {
   beforeEach(() => {
     mockCheck.mockClear();
   });
