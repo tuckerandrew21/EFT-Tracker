@@ -15,13 +15,31 @@ export default defineConfig({
       "@eft-tracker/theme": path.resolve(__dirname, "./packages/theme/src"),
       "@eft-tracker/ui": path.resolve(__dirname, "./packages/ui/src"),
       "@eft-tracker/hooks": path.resolve(__dirname, "./packages/hooks/src"),
-      "@upstash/redis": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-redis.ts"),
-      "@upstash/ratelimit": path.resolve(__dirname, "./__tests__/setup/stubs/upstash-ratelimit.ts"),
+      "@upstash/redis": path.resolve(
+        __dirname,
+        "./__tests__/setup/stubs/upstash-redis.ts"
+      ),
+      "@upstash/ratelimit": path.resolve(
+        __dirname,
+        "./__tests__/setup/stubs/upstash-ratelimit.ts"
+      ),
       // Fix for Vite 7.3.0 + React JSX runtime resolution (pnpm uses .pnpm directory)
-      "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-dev-runtime.js"),
-      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-runtime.js"),
-      "react": path.resolve(__dirname, "./node_modules/.pnpm/react@19.2.0/node_modules/react"),
-      "react-dom": path.resolve(__dirname, "./node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom"),
+      "react/jsx-dev-runtime": path.resolve(
+        __dirname,
+        "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-dev-runtime.js"
+      ),
+      "react/jsx-runtime": path.resolve(
+        __dirname,
+        "./node_modules/.pnpm/react@19.2.0/node_modules/react/jsx-runtime.js"
+      ),
+      react: path.resolve(
+        __dirname,
+        "./node_modules/.pnpm/react@19.2.0/node_modules/react"
+      ),
+      "react-dom": path.resolve(
+        __dirname,
+        "./node_modules/.pnpm/react-dom@19.2.0_react@19.2.0/node_modules/react-dom"
+      ),
     },
   },
   test: {
@@ -29,9 +47,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./__tests__/setup/vitest.setup.ts"],
     include: ["__tests__/**/*.{test,spec}.{ts,tsx}"],
-    exclude: [
-      "node_modules/**/*",
-    ],
+    exclude: ["node_modules/**/*"],
     coverage: {
       provider: "v8",
       include: ["apps/web/src/**/*.{ts,tsx}"],

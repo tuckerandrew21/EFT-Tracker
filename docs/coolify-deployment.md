@@ -7,6 +7,7 @@ This document describes how to set up and use Coolify HTTP API for deployment mo
 ### 1. Generate API Token
 
 In Coolify UI:
+
 1. Navigate to **Keys & Tokens**
 2. Click **Create New Token**
 3. Enter name: `EFT-Tracker-Deployment-Monitor`
@@ -47,6 +48,7 @@ GET /api/deployment/status?deploymentId=<deployment-uuid>
 ```
 
 Response:
+
 ```json
 {
   "deploymentId": "ogo0gkc8488sccwgocwkc8gw",
@@ -76,6 +78,7 @@ GET /api/deployment/logs?deploymentId=<deployment-uuid>
 ```
 
 Response:
+
 ```json
 {
   "deploymentId": "ogo0gkc8488sccwgocwkc8gw",
@@ -93,22 +96,22 @@ Response:
 Use the Coolify API client in your application:
 
 ```typescript
-import { getCoolifyAPIClient } from '@eft-tracker/utils';
+import { getCoolifyAPIClient } from "@eft-tracker/utils";
 
 const client = getCoolifyAPIClient();
 
 // Test connection
 const connected = await client.testConnection();
-console.log('Connected:', connected);
+console.log("Connected:", connected);
 
 // Get deployment status
-const deployment = await client.getDeployment('ogo0gkc8488sccwgocwkc8gw');
-console.log('Status:', deployment.status);
-console.log('Logs:', deployment.logs);
+const deployment = await client.getDeployment("ogo0gkc8488sccwgocwkc8gw");
+console.log("Status:", deployment.status);
+console.log("Logs:", deployment.logs);
 
 // List all deployments
 const deployments = await client.listDeployments();
-console.log('Recent deployments:', deployments.length);
+console.log("Recent deployments:", deployments.length);
 ```
 
 ### Alternative: SSH Access (Deprecated)
@@ -135,6 +138,7 @@ If you need SSH access as a fallback:
    echo "ssh-ed25519 AAAAC..." >> ~/.ssh/authorized_keys
    chmod 600 ~/.ssh/authorized_keys
    ```
+
 4. Test with: `./scripts/tools/coolify-ssh.sh test`
 
 ## Troubleshooting
@@ -230,13 +234,13 @@ If you need SSH access as a fallback:
 
 ### Deployment Status Values
 
-| Status | Meaning |
-|--------|---------|
-| `queued` | Waiting to start deployment |
-| `in_progress` | Currently building/deploying |
-| `finished` | Successfully completed |
-| `failed` | Deployment encountered an error |
-| `cancelled` | Deployment was manually cancelled |
+| Status        | Meaning                           |
+| ------------- | --------------------------------- |
+| `queued`      | Waiting to start deployment       |
+| `in_progress` | Currently building/deploying      |
+| `finished`    | Successfully completed            |
+| `failed`      | Deployment encountered an error   |
+| `cancelled`   | Deployment was manually cancelled |
 
 ### Response Fields
 

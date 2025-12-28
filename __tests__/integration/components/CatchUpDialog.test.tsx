@@ -33,7 +33,11 @@ function createMockQuest(
     factionName: null,
     wikiLink: null,
     objectives: [],
-    trader: { id: traderId, name: traderId.charAt(0).toUpperCase() + traderId.slice(1), color: "#FF9800" },
+    trader: {
+      id: traderId,
+      name: traderId.charAt(0).toUpperCase() + traderId.slice(1),
+      color: "#FF9800",
+    },
     dependsOn: dependsOnIds.map((reqId) => ({
       requiredQuest: { id: reqId } as QuestWithProgress,
       requirementStatus: ["complete"] as const,
@@ -71,7 +75,8 @@ describe("CatchUpDialog Integration Tests", () => {
     vi.clearAllMocks();
     mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ success: true, completed: [], available: [] }),
+      json: () =>
+        Promise.resolve({ success: true, completed: [], available: [] }),
     });
   });
 
@@ -80,7 +85,9 @@ describe("CatchUpDialog Integration Tests", () => {
       render(<CatchUpDialog {...defaultProps} />);
 
       expect(screen.getByText("Catch Up Progress")).toBeInTheDocument();
-      expect(screen.getByPlaceholderText("Enter level (1-79)")).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText("Enter level (1-79)")
+      ).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/Search quests/)).toBeInTheDocument();
     });
 
@@ -128,7 +135,9 @@ describe("CatchUpDialog Integration Tests", () => {
 
       // Should show reset warning
       expect(screen.getByText("Progress Reset Warning")).toBeInTheDocument();
-      expect(screen.getByText(/5 quests? marked complete/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/5 quests? marked complete/i)
+      ).toBeInTheDocument();
     });
 
     it("skips reset warning when no existing progress", async () => {
@@ -196,8 +205,20 @@ describe("CatchUpDialog Integration Tests", () => {
       await user.type(screen.getByPlaceholderText("Enter level (1-79)"), "20");
 
       // Close and reopen dialog
-      rerender(<CatchUpDialog {...defaultProps} open={false} onOpenChange={onOpenChange} />);
-      rerender(<CatchUpDialog {...defaultProps} open={true} onOpenChange={onOpenChange} />);
+      rerender(
+        <CatchUpDialog
+          {...defaultProps}
+          open={false}
+          onOpenChange={onOpenChange}
+        />
+      );
+      rerender(
+        <CatchUpDialog
+          {...defaultProps}
+          open={true}
+          onOpenChange={onOpenChange}
+        />
+      );
 
       // Level input should be empty again
       const levelInput = screen.getByPlaceholderText("Enter level (1-79)");

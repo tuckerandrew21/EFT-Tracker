@@ -34,7 +34,11 @@ function createMockQuest(
     factionName: null,
     wikiLink: null,
     objectives: [],
-    trader: { id: traderId, name: traderId.charAt(0).toUpperCase() + traderId.slice(1), color: "#FF9800" },
+    trader: {
+      id: traderId,
+      name: traderId.charAt(0).toUpperCase() + traderId.slice(1),
+      color: "#FF9800",
+    },
     dependsOn: dependsOnIds.map((reqId) => ({
       requiredQuest: { id: reqId } as QuestWithProgress,
       requirementStatus: ["complete"] as const,
@@ -230,9 +234,33 @@ describe("getBranchQuestIds", () => {
 describe("groupByTrader", () => {
   it("groups selections by trader", () => {
     const selections = [
-      { questId: "A", questTitle: "Quest A", traderId: "prapor", traderName: "Prapor", traderColor: "#FF0000", levelRequired: 10, chainLength: 0 },
-      { questId: "B", questTitle: "Quest B", traderId: "prapor", traderName: "Prapor", traderColor: "#FF0000", levelRequired: 12, chainLength: 1 },
-      { questId: "C", questTitle: "Quest C", traderId: "therapist", traderName: "Therapist", traderColor: "#00FF00", levelRequired: 11, chainLength: 0 },
+      {
+        questId: "A",
+        questTitle: "Quest A",
+        traderId: "prapor",
+        traderName: "Prapor",
+        traderColor: "#FF0000",
+        levelRequired: 10,
+        chainLength: 0,
+      },
+      {
+        questId: "B",
+        questTitle: "Quest B",
+        traderId: "prapor",
+        traderName: "Prapor",
+        traderColor: "#FF0000",
+        levelRequired: 12,
+        chainLength: 1,
+      },
+      {
+        questId: "C",
+        questTitle: "Quest C",
+        traderId: "therapist",
+        traderName: "Therapist",
+        traderColor: "#00FF00",
+        levelRequired: 11,
+        chainLength: 0,
+      },
     ];
 
     const groups = groupByTrader(selections);

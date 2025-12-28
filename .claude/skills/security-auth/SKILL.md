@@ -179,12 +179,12 @@ export async function POST(request: Request) {
 
 ### Sensitive Endpoint Limits
 
-| Endpoint | Limit | Window |
-| -------- | ----- | ------ |
-| Login | 5 attempts | 15 min |
-| Password reset | 3 requests | 1 hour |
-| API general | 100 requests | 1 min |
-| Registration | 3 accounts | 1 hour |
+| Endpoint       | Limit        | Window |
+| -------------- | ------------ | ------ |
+| Login          | 5 attempts   | 15 min |
+| Password reset | 3 requests   | 1 hour |
+| API general    | 100 requests | 1 min  |
+| Registration   | 3 accounts   | 1 hour |
 
 ## Input Validation
 

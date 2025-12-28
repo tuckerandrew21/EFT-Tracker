@@ -51,6 +51,7 @@ A condensed reference of design principles from "Refactoring UI" by Adam Wathan 
 ### Limit Your Choices
 
 Define systems in advance for:
+
 - Font size
 - Font weight
 - Line height
@@ -272,14 +273,17 @@ Define systems in advance for:
 Five hex codes won't cut it. You need:
 
 **Greys (8-10 shades)**:
+
 - Text, backgrounds, panels, form controls
 - Start dark grey (not pure black), work to white
 
 **Primary Colors (5-10 shades each)**:
+
 - For buttons, navigation, branding
 - Include ultra-light (tinted backgrounds) and dark (text)
 
 **Accent Colors (5-10 shades each)**:
+
 - Yellow/teal for highlighting new features
 - Red for destructive/errors
 - Yellow for warnings
@@ -290,6 +294,7 @@ Five hex codes won't cut it. You need:
 Don't use `lighten()` or `darken()` functions - they create inconsistent palettes.
 
 **Process**:
+
 1. Pick **base color** (works as button background)
 2. Pick **darkest shade** (for text on light backgrounds)
 3. Pick **lightest shade** (for tinted backgrounds)
@@ -336,10 +341,12 @@ Don't use `lighten()` or `darken()` functions - they create inconsistent palette
 - Bottom edges should be darker (facing away)
 
 **Raised elements**:
+
 - Lighter top edge (border or inset shadow)
 - Dark shadow below element
 
 **Inset elements**:
+
 - Lighter bottom edge
 - Dark shadow at top inside
 
@@ -350,15 +357,17 @@ Don't use `lighten()` or `darken()` functions - they create inconsistent palette
 - Large shadows = high elevation (modals)
 
 **Define 5 shadow levels**:
+
 ```css
---shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
---shadow-md:  0 4px 6px rgba(0,0,0,0.1);
---shadow-lg:  0 10px 15px rgba(0,0,0,0.1);
---shadow-xl:  0 20px 25px rgba(0,0,0,0.15);
---shadow-2xl: 0 25px 50px rgba(0,0,0,0.25);
+--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+--shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+--shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
 ```
 
 **Combine with interaction**:
+
 - Drag item: Add larger shadow (feels lifted)
 - Press button: Remove/reduce shadow (feels pressed)
 
@@ -393,10 +402,12 @@ At higher elevations, reduce the tight shadow (it disappears as objects rise).
 ### Text Needs Consistent Contrast
 
 Problems with text on images:
+
 - Light areas wash out white text
 - Dark areas hide dark text
 
 **Solutions**:
+
 - **Semi-transparent overlay** (black darkens, white lightens)
 - **Lower image contrast** + adjust brightness
 - **Colorize image** (desaturate, add solid fill with multiply blend)
@@ -431,6 +442,7 @@ Problems with text on images:
 ### Add Color with Accent Borders
 
 Quick way to add visual interest:
+
 - Top of cards
 - Active nav items
 - Side of alerts
@@ -455,6 +467,7 @@ Quick way to add visual interest:
 ### Use Fewer Borders
 
 Borders can make designs feel busy. Alternatives:
+
 - **Box shadows**: Outline without distraction
 - **Different background colors**: Create natural separation
 - **Extra spacing**: Simplest form of separation
@@ -493,45 +506,46 @@ Don't let conventions limit creativity.
 
 ### Spacing Scale (Base 16px)
 
-| Value | Usage |
-|-------|-------|
-| 4px | Tight gaps, icon padding |
-| 8px | Small component gaps |
-| 12px | Form field internal spacing |
-| 16px | Default padding |
-| 24px | Card padding, form groups |
-| 32px | Component gaps |
-| 48px | Section gaps |
-| 64px | Major section padding |
-| 96px | Hero/header padding |
+| Value | Usage                       |
+| ----- | --------------------------- |
+| 4px   | Tight gaps, icon padding    |
+| 8px   | Small component gaps        |
+| 12px  | Form field internal spacing |
+| 16px  | Default padding             |
+| 24px  | Card padding, form groups   |
+| 32px  | Component gaps              |
+| 48px  | Section gaps                |
+| 64px  | Major section padding       |
+| 96px  | Hero/header padding         |
 
 ### Type Scale
 
-| Size | Usage |
-|------|-------|
-| 12px | Captions, badges |
+| Size | Usage                    |
+| ---- | ------------------------ |
+| 12px | Captions, badges         |
 | 14px | Secondary text, metadata |
-| 16px | Body text |
-| 18px | Lead paragraphs |
-| 20px | Small headings |
-| 24px | Section headings |
-| 30px | Page titles |
-| 36px | Large headings |
-| 48px | Hero headings |
+| 16px | Body text                |
+| 18px | Lead paragraphs          |
+| 20px | Small headings           |
+| 24px | Section headings         |
+| 30px | Page titles              |
+| 36px | Large headings           |
+| 48px | Hero headings            |
 
 ### Shadow Elevation
 
-| Level | Usage |
-|-------|-------|
-| sm | Buttons at rest |
-| md | Cards, raised elements |
-| lg | Dropdowns, popovers |
-| xl | Modals, dialogs |
-| 2xl | Tooltips on dark backgrounds |
+| Level | Usage                        |
+| ----- | ---------------------------- |
+| sm    | Buttons at rest              |
+| md    | Cards, raised elements       |
+| lg    | Dropdowns, popovers          |
+| xl    | Modals, dialogs              |
+| 2xl   | Tooltips on dark backgrounds |
 
 ### Color Palette Structure
 
 For each color, define 9 shades (100-900):
+
 - **100-200**: Tinted backgrounds
 - **300-400**: Borders, secondary elements
 - **500**: Base color (buttons)

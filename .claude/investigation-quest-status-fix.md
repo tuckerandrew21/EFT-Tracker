@@ -9,6 +9,7 @@ After comprehensive investigation and testing, the quest status issue from PR #3
 ## Problem
 
 After catch-up operation with level 38 and 61 target quests:
+
 - Quests like "Shootout Picnic" (Level 3) showed as **LOCKED** instead of **COMPLETED**
 - Quests like "Search Mission" (Level 5) showed as **LOCKED** instead of **COMPLETED**
 
@@ -21,6 +22,7 @@ These quests should have been marked COMPLETED by PR #361's `levelCompleted` alg
 When quests were searched/filtered, dependency prerequisites weren't always included in the query results.
 
 **Example Scenario:**
+
 ```
 User searches for "Shootout Picnic"
   ↓
@@ -43,6 +45,7 @@ Modified `apps/web/src/app/api/quests/route.ts` to:
 2. Use progress from dependency relation as fallback when dependency quest isn't in filtered results (Status calculation lines 104-114)
 
 **Code Changes:**
+
 ```typescript
 // Prisma query - include progress for required quests
 requiredQuest: {
@@ -74,12 +77,14 @@ if (depQuest) {
 **Observation:** During testing, quests API returned `progress: null` for all quests despite successful catch-up.
 
 **Analysis:**
+
 - Quests API calls `await auth()` to get userId
 - If userId is falsy, `progress: false` is set in Prisma query
 - This results in no progress data being loaded
 - The API returns all quests with `progress: null`
 
 **Investigation Results:**
+
 - ✅ Code correctly handles both authenticated and unauthenticated requests
 - ✅ `auth()` properly exported from NextAuth v5 configuration
 - ✅ Unit tests confirm progress loads correctly when auth returns valid userId
@@ -88,10 +93,12 @@ if (depQuest) {
 
 **Conclusion:**
 The behavior is by design:
+
 - Unauthenticated requests intentionally get no progress (quests API allows public access)
 - Authenticated requests should get progress (if auth() works correctly)
 
 If production users see `progress: null`, it indicates:
+
 1. NextAuth session wasn't established
 2. JWT cookie isn't being sent
 3. Browser cache issue
@@ -108,6 +115,7 @@ __tests__/integration/api/quests.test.ts (10 tests) ✓ 116ms
 ```
 
 Includes tests for:
+
 - Fetching quests without filters
 - Filtering by trader, kappa, map, search
 - Including user progress when authenticated
@@ -146,6 +154,7 @@ Includes tests for:
 ## Deployment Status
 
 ✅ **READY FOR PRODUCTION**
+
 - All tests passing
 - No breaking changes
 - Proper error handling

@@ -33,6 +33,7 @@ export function SearchQuests() {
 ```
 
 **Parameters:**
+
 - `value`: Value to debounce
 - `delayMs`: Delay in milliseconds (default: 300)
 
@@ -67,12 +68,14 @@ export function UserPreferences() {
 ```
 
 **Parameters:**
+
 - `key`: localStorage key
 - `initialValue`: Initial value if key doesn't exist
 
 **Returns:** `[value, setValue]` - Like useState but persisted
 
 **Features:**
+
 - Handles SSR (doesn't break on server)
 - JSON serialization for complex types
 - Error handling with fallback to initial value
@@ -105,16 +108,19 @@ export function QuestList() {
 ```
 
 **Parameters:**
+
 - `asyncFunction`: Async function that returns data
 - `immediate`: Run immediately on mount (default: true)
 
 **Returns:**
+
 - `data`: The resolved data or null
 - `loading`: Loading state
 - `error`: Error object or null
 - `execute`: Function to manually trigger the operation
 
 **Features:**
+
 - Automatic cleanup on unmount
 - Proper error handling
 - Controlled loading state

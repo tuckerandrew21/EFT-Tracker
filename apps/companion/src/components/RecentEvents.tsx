@@ -65,7 +65,11 @@ export function RecentEvents({ events }: RecentEventsProps) {
               <div className="flex-1 min-w-0">
                 <p
                   className="text-sm text-tarkov-text truncate"
-                  title={questInfo ? `${questName} (${questInfo.trader})` : event.questId}
+                  title={
+                    questInfo
+                      ? `${questName} (${questInfo.trader})`
+                      : event.questId
+                  }
                 >
                   {questName}
                 </p>

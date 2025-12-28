@@ -1,5 +1,5 @@
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 /**
  * Check for updates and install if available
@@ -14,7 +14,7 @@ export async function checkForUpdates(): Promise<void> {
       await relaunch();
     }
   } catch (error) {
-    console.error('Failed to check for updates:', error);
+    console.error("Failed to check for updates:", error);
     // Don't throw - allow app to continue even if update check fails
   }
 }

@@ -122,7 +122,11 @@ function App() {
 
   // Listen for auto-sync completion events from Rust backend
   useEffect(() => {
-    const unlistenComplete = listen<{ synced: number; errors: unknown[]; pendingCount: number }>("sync-complete", async (event) => {
+    const unlistenComplete = listen<{
+      synced: number;
+      errors: unknown[];
+      pendingCount: number;
+    }>("sync-complete", async (event) => {
       console.log("Auto-sync complete:", event.payload);
       // Refresh sync status immediately after auto-sync
       const status = await getSyncStatus();
@@ -193,7 +197,9 @@ function App() {
       if (result.errors.length > 0) {
         toast.error(`Synced ${result.synced}, ${result.errors.length} errors`);
       } else if (result.synced > 0) {
-        toast.success(`Synced ${result.synced} quest${result.synced !== 1 ? "s" : ""} successfully`);
+        toast.success(
+          `Synced ${result.synced} quest${result.synced !== 1 ? "s" : ""} successfully`
+        );
       } else {
         toast.info("No pending events to sync");
       }
@@ -278,15 +284,17 @@ function App() {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Update banner */}
-        {versionCheck.hasUpdate && versionCheck.latestVersion && versionCheck.downloadUrl && (
-          <UpdateBanner
-            currentVersion={versionCheck.currentVersion}
-            latestVersion={versionCheck.latestVersion}
-            downloadUrl={versionCheck.downloadUrl}
-            releaseNotes={versionCheck.releaseNotes}
-            onDismiss={versionCheck.dismissUpdate}
-          />
-        )}
+        {versionCheck.hasUpdate &&
+          versionCheck.latestVersion &&
+          versionCheck.downloadUrl && (
+            <UpdateBanner
+              currentVersion={versionCheck.currentVersion}
+              latestVersion={versionCheck.latestVersion}
+              downloadUrl={versionCheck.downloadUrl}
+              releaseNotes={versionCheck.releaseNotes}
+              onDismiss={versionCheck.dismissUpdate}
+            />
+          )}
 
         {/* Error banner */}
         {error && (
@@ -407,7 +415,9 @@ function App() {
                   1
                 </span>
                 <div>
-                  <p className="text-tarkov-text">Create an EFT Tracker account</p>
+                  <p className="text-tarkov-text">
+                    Create an EFT Tracker account
+                  </p>
                   <a
                     href="https://eft-tracker.vercel.app"
                     target="_blank"

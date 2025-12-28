@@ -59,19 +59,19 @@ type RequirementStatusType = "complete" | "active" | "failed";
 
 ## Traders
 
-| Trader | Specialty | Color |
-| ------ | --------- | ----- |
-| Prapor | Weapons, ammo | Red |
-| Therapist | Medical, food | Purple |
-| Fence | Scav items, reputation | Gray |
-| Skier | Western weapons | Blue |
-| Peacekeeper | NATO weapons, USD | Light Blue |
-| Mechanic | Weapon mods | Yellow |
-| Ragman | Armor, clothing | Orange |
-| Jaeger | Survival, hunting | Green |
-| Lightkeeper | Special endgame | Cyan |
-| BTR Driver | Convoy quests | Olive |
-| Ref | Arena quests | Pink |
+| Trader      | Specialty              | Color      |
+| ----------- | ---------------------- | ---------- |
+| Prapor      | Weapons, ammo          | Red        |
+| Therapist   | Medical, food          | Purple     |
+| Fence       | Scav items, reputation | Gray       |
+| Skier       | Western weapons        | Blue       |
+| Peacekeeper | NATO weapons, USD      | Light Blue |
+| Mechanic    | Weapon mods            | Yellow     |
+| Ragman      | Armor, clothing        | Orange     |
+| Jaeger      | Survival, hunting      | Green      |
+| Lightkeeper | Special endgame        | Cyan       |
+| BTR Driver  | Convoy quests          | Olive      |
+| Ref         | Arena quests           | Pink       |
 
 ## Kappa Container
 
@@ -227,22 +227,22 @@ EFT has periodic **wipes** that reset all player progress. The tracker supports:
 
 ## Terminology Reference
 
-| Term | Meaning |
-| ---- | ------- |
-| PMC | Private Military Contractor (main character) |
-| SCAV | Scavenger (alternate play mode) |
-| Wipe | Server reset of all progress |
-| Kappa | Best secure container (5x3 slots) |
-| Hideout | Player base for crafting |
-| Labs | High-tier locked map |
-| FIR | Found In Raid (item status) |
-| Fence rep | Scav karma system |
+| Term      | Meaning                                      |
+| --------- | -------------------------------------------- |
+| PMC       | Private Military Contractor (main character) |
+| SCAV      | Scavenger (alternate play mode)              |
+| Wipe      | Server reset of all progress                 |
+| Kappa     | Best secure container (5x3 slots)            |
+| Hideout   | Player base for crafting                     |
+| Labs      | High-tier locked map                         |
+| FIR       | Found In Raid (item status)                  |
+| Fence rep | Scav karma system                            |
 
 ## Files Reference
 
-| File | Purpose |
-| ---- | ------- |
-| `packages/types/src/quest.ts` | Quest type definitions |
-| `packages/types/src/api.ts` | API response types |
-| `apps/web/src/app/api/quests/` | Quest API routes |
+| File                                  | Purpose                 |
+| ------------------------------------- | ----------------------- |
+| `packages/types/src/quest.ts`         | Quest type definitions  |
+| `packages/types/src/api.ts`           | API response types      |
+| `apps/web/src/app/api/quests/`        | Quest API routes        |
 | `apps/web/src/components/quest-tree/` | ReactFlow visualization |

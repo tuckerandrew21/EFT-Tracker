@@ -1,5 +1,12 @@
-import type { Config } from 'tailwindcss';
-import { colors, spacing, typography, borderRadius, shadows, animation } from './src/index';
+import type { Config } from "tailwindcss";
+import {
+  colors,
+  spacing,
+  typography,
+  borderRadius,
+  shadows,
+  animation,
+} from "./src/index";
 
 export default {
   theme: {
@@ -14,22 +21,22 @@ export default {
     transitionTimingFunction: animation.easing,
     extend: {
       animation: {
-        fade: 'fadeInOut 0.3s ease-in-out',
-        slideIn: 'slideIn 0.2s ease-out',
-        slideOut: 'slideOut 0.2s ease-in',
+        fade: "fadeInOut 0.3s ease-in-out",
+        slideIn: "slideIn 0.2s ease-out",
+        slideOut: "slideOut 0.2s ease-in",
       },
       keyframes: {
         fadeInOut: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         slideIn: {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(0)' },
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
         },
         slideOut: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(100%)' },
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(100%)" },
         },
       },
     },

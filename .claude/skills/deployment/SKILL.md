@@ -132,13 +132,13 @@ Or let CI handle it - pre-push hook detects Windows and relies on CI.
 
 ## Files Reference
 
-| File | Purpose |
-| ---- | ------- |
-| `scripts/test-coolify-build.sh` | Main testing script |
-| `.husky/pre-push` | 3-tier validation hook |
-| `nixpacks.toml` | Coolify build configuration |
-| `.nixpacksignore` | Excludes test files from build |
-| `.coolify-build/` | Temp build artifacts (git-ignored) |
+| File                            | Purpose                            |
+| ------------------------------- | ---------------------------------- |
+| `scripts/test-coolify-build.sh` | Main testing script                |
+| `.husky/pre-push`               | 3-tier validation hook             |
+| `nixpacks.toml`                 | Coolify build configuration        |
+| `.nixpacksignore`               | Excludes test files from build     |
+| `.coolify-build/`               | Temp build artifacts (git-ignored) |
 
 ## Environment Variables
 

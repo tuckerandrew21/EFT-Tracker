@@ -43,11 +43,11 @@ npx prisma generate
 
 ### db push vs migrate
 
-| Command | Use When |
-| ------- | -------- |
-| `db push` | Development, prototyping, schema iteration |
-| `migrate dev` | Production-ready migrations with history |
-| `migrate deploy` | CI/CD production deployments |
+| Command          | Use When                                   |
+| ---------------- | ------------------------------------------ |
+| `db push`        | Development, prototyping, schema iteration |
+| `migrate dev`    | Production-ready migrations with history   |
+| `migrate deploy` | CI/CD production deployments               |
 
 **This project uses `db push`** for development simplicity with Neon branches.
 
@@ -55,11 +55,11 @@ npx prisma generate
 
 Use separate databases for different workflows:
 
-| Environment | Database | When to Use |
-| ----------- | -------- | ----------- |
-| Local dev | Personal dev database | Feature work |
+| Environment | Database               | When to Use            |
+| ----------- | ---------------------- | ---------------------- |
+| Local dev   | Personal dev database  | Feature work           |
 | Development | `DATABASE_URL_DEVELOP` | Testing develop branch |
-| Production | `DATABASE_URL` | Never use locally |
+| Production  | `DATABASE_URL`         | Never use locally      |
 
 **Critical:** Never connect to production database from local development.
 

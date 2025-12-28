@@ -80,9 +80,7 @@ describe("EFT Tracker Companion App", () => {
   describe("Link Account View", () => {
     it("should navigate to link account view when clicking Link Account", async () => {
       // Find and click the Link Account button in onboarding section
-      const linkButton = await $(
-        ".bg-tarkov-accent\\/10 button*=Link Account"
-      );
+      const linkButton = await $(".bg-tarkov-accent\\/10 button*=Link Account");
       if (await linkButton.isExisting()) {
         await linkButton.click();
       } else {

@@ -3,6 +3,7 @@
 Centralized design system tokens for EFT Tracker.
 
 This package exports:
+
 - **Color palette**: Primary, gray, status colors (success, warning, error)
 - **Spacing scale**: 0 to 64rem
 - **Typography**: Font families, sizes, and weights
@@ -18,7 +19,7 @@ This package exports:
 ### Import theme tokens
 
 ```typescript
-import { colors, spacing, typography, breakpoints } from '@eft-tracker/theme';
+import { colors, spacing, typography, breakpoints } from "@eft-tracker/theme";
 
 // Use in JavaScript
 const primaryColor = colors.primary[500];
@@ -30,7 +31,7 @@ const primaryColor = colors.primary[500];
 
 ```typescript
 // tailwind.config.ts
-import { config } from '@eft-tracker/theme/tailwind';
+import { config } from "@eft-tracker/theme/tailwind";
 
 export default config;
 ```

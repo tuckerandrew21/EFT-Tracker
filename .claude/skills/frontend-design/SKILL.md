@@ -136,20 +136,28 @@ Based on [Anthony Hobday's Visual Design Rules](https://anthonyhobday.com/sidepr
 
 ```css
 /* Mobile first */
-@media (min-width: 640px) { /* sm */ }
-@media (min-width: 768px) { /* md */ }
-@media (min-width: 1024px) { /* lg */ }
-@media (min-width: 1280px) { /* xl */ }
+@media (min-width: 640px) {
+  /* sm */
+}
+@media (min-width: 768px) {
+  /* md */
+}
+@media (min-width: 1024px) {
+  /* lg */
+}
+@media (min-width: 1280px) {
+  /* xl */
+}
 ```
 
 ### CSS Variables Setup
 
 ```css
 :root {
-  --color-primary: #43B6E7;
+  --color-primary: #43b6e7;
   --color-text: #393939;
-  --color-bg: #F5F5F5;
-  --font-family: 'Raleway', sans-serif;
+  --color-bg: #f5f5f5;
+  --font-family: "Raleway", sans-serif;
 }
 ```
 
@@ -157,9 +165,13 @@ Based on [Anthony Hobday's Visual Design Rules](https://anthonyhobday.com/sidepr
 
 ```css
 .element {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .element { transition: none; }
+  .element {
+    transition: none;
+  }
 }
 ```

@@ -123,7 +123,9 @@ export const config: Options.Testrunner = {
     // Take screenshot on failure
     if (!result.passed) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      await browser.saveScreenshot(`./tests/e2e/screenshots/failure-${timestamp}.png`);
+      await browser.saveScreenshot(
+        `./tests/e2e/screenshots/failure-${timestamp}.png`
+      );
     }
   },
 };

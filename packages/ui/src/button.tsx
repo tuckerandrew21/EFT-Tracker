@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonSize = "sm" | "md" | "lg";
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
@@ -14,29 +13,29 @@ export interface ButtonProps
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800 disabled:bg-gray-400',
+    "bg-sky-600 text-white hover:bg-sky-700 active:bg-sky-800 disabled:bg-gray-400",
   secondary:
-    'bg-gray-200 text-gray-900 hover:bg-gray-300 active:bg-gray-400 disabled:bg-gray-100',
+    "bg-gray-200 text-gray-900 hover:bg-gray-300 active:bg-gray-400 disabled:bg-gray-100",
   ghost:
-    'bg-transparent text-sky-600 hover:bg-sky-50 active:bg-sky-100 disabled:text-gray-400',
+    "bg-transparent text-sky-600 hover:bg-sky-50 active:bg-sky-100 disabled:text-gray-400",
   danger:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 disabled:bg-gray-400',
+    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 disabled:bg-gray-400",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-lg',
+  sm: "px-3 py-1.5 text-sm",
+  md: "px-4 py-2 text-base",
+  lg: "px-6 py-3 text-lg",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      variant = 'primary',
-      size = 'md',
+      variant = "primary",
+      size = "md",
       isLoading = false,
       icon,
-      className = '',
+      className = "",
       disabled,
       children,
       ...props
@@ -87,4 +86,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 
-Button.displayName = 'Button';
+Button.displayName = "Button";

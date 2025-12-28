@@ -92,16 +92,16 @@ Before every PR with UI changes, verify:
 
 ## Common Fixes
 
-| Problem | Solution |
-|---------|----------|
-| Everything looks the same | De-emphasize secondary content |
-| Labels too prominent | Make them smaller, lighter, uppercase |
-| Feels cramped | Add more space, start over with too much |
-| Borders everywhere | Use spacing or background colors instead |
-| Text hard to read on image | Add overlay or text shadow |
-| Elements don't group well | Increase space between groups |
-| Colors feel off | Check saturation at light/dark ends |
-| Shadows look wrong | Use two-part shadows, match elevation |
+| Problem                    | Solution                                 |
+| -------------------------- | ---------------------------------------- |
+| Everything looks the same  | De-emphasize secondary content           |
+| Labels too prominent       | Make them smaller, lighter, uppercase    |
+| Feels cramped              | Add more space, start over with too much |
+| Borders everywhere         | Use spacing or background colors instead |
+| Text hard to read on image | Add overlay or text shadow               |
+| Elements don't group well  | Increase space between groups            |
+| Colors feel off            | Check saturation at light/dark ends      |
+| Shadows look wrong         | Use two-part shadows, match elevation    |
 
 ---
 

@@ -17,6 +17,7 @@ Phase 6 is the final step of the monorepo migration. It involves:
 ## Phase 5 PR Status
 
 **PR #312:** docs: Phase 5 - Documentation & Final Polish
+
 - URL: https://github.com/andrew-tucker-razorvision/EFT-Tracker/pull/312
 - Base: master
 - Changes: Documentation only (QUICKSTART.md, CONTRIBUTING.md, docs/README.md, architecture docs)
@@ -24,6 +25,7 @@ Phase 6 is the final step of the monorepo migration. It involves:
 ### Current CI Status
 
 Monitoring checks:
+
 - ✅ Check Merge Conflicts - PASSED
 - ✅ Dependency Review - PASSED
 - ✅ Check Branch Name - PASSED
@@ -53,6 +55,7 @@ Since Phase 5 changes are **documentation only**:
 ### 1. Wait for CI to Complete
 
 Monitor PR #312:
+
 ```bash
 # Check status
 gh pr view 312
@@ -96,6 +99,7 @@ curl -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
 ```
 
 **Deployment timeline:**
+
 - Merge to master → 30 seconds
 - Docker build → 2 minutes
 - Healthcheck → 30 seconds
@@ -129,6 +133,7 @@ curl https://learntotarkov.com/api/health
 ## Monitoring Commands
 
 ### GitHub PR Status
+
 ```bash
 # Get status
 gh pr view 312 --json state
@@ -142,6 +147,7 @@ echo "CI complete!"
 ```
 
 ### Coolify Deployment
+
 ```bash
 # Get latest deployment
 COOLIFY_API_TOKEN=$(echo $CLAUDE_ENV_COOLIFY_API_TOKEN)
@@ -151,6 +157,7 @@ curl -s -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
 ```
 
 ### Production Health
+
 ```bash
 # Test API endpoint
 curl https://learntotarkov.com/api/health -v
@@ -183,6 +190,7 @@ If any CI check fails:
 If Coolify deployment fails:
 
 1. **Check logs:**
+
    ```bash
    ssh root@95.217.155.28
    docker logs <container-id> | tail -50
@@ -194,6 +202,7 @@ If Coolify deployment fails:
    - Health check failed: Check application startup
 
 3. **Rollback if needed:**
+
    ```bash
    git reset --hard pre-monorepo-20251217
    git push -f origin master
@@ -206,6 +215,7 @@ If Coolify deployment fails:
 If production is broken:
 
 1. **Immediate: Rollback**
+
    ```bash
    git reset --hard pre-monorepo-20251217
    git push -f origin master
@@ -239,12 +249,14 @@ Phase 6 is **complete** when:
 After successful deployment:
 
 1. **Delete feature branch** (after merge)
+
    ```bash
    git branch -d feature/fix-tauri-release-scripts
    git push origin --delete feature/fix-tauri-release-scripts
    ```
 
 2. **Keep rollback tag** for 30 days
+
    ```bash
    # Tag already created: pre-monorepo-20251217
    git tag -l | grep pre-monorepo
@@ -257,15 +269,15 @@ After successful deployment:
 
 ## Timeline
 
-| Step | Status | Time | Notes |
-|------|--------|------|-------|
-| PR #312 created | ✅ | 17:09:38 | CI started automatically |
-| CI running | ⏳ | ~5-10 min | Documentation changes only |
-| CI passes | ⏳ | Expected | All checks should pass |
-| Merge to master | ⏳ | After CI | One-click merge |
-| Coolify deployment | ⏳ | ~3-4 min | Automatic after merge |
-| Production validation | ⏳ | ~5 min | Manual testing |
-| **Total Phase 6** | **⏳** | **~15-20 min** | Mostly waiting on automation |
+| Step                  | Status | Time           | Notes                        |
+| --------------------- | ------ | -------------- | ---------------------------- |
+| PR #312 created       | ✅     | 17:09:38       | CI started automatically     |
+| CI running            | ⏳     | ~5-10 min      | Documentation changes only   |
+| CI passes             | ⏳     | Expected       | All checks should pass       |
+| Merge to master       | ⏳     | After CI       | One-click merge              |
+| Coolify deployment    | ⏳     | ~3-4 min       | Automatic after merge        |
+| Production validation | ⏳     | ~5 min         | Manual testing               |
+| **Total Phase 6**     | **⏳** | **~15-20 min** | Mostly waiting on automation |
 
 ## Rollback Plan
 
@@ -304,6 +316,7 @@ After successful deployment:
 Upon successful Phase 6 completion:
 
 ### What was accomplished:
+
 - ✅ Complete monorepo migration (Phases 0-5)
 - ✅ Comprehensive documentation
 - ✅ Deployed to production
@@ -312,6 +325,7 @@ Upon successful Phase 6 completion:
 - ✅ CI/CD optimized with pnpm
 
 ### Performance improvements:
+
 - 75% disk space reduction (1.2GB → 300MB)
 - 3x faster installation (90s → 30s)
 - 20-30% faster CI/CD
@@ -319,6 +333,7 @@ Upon successful Phase 6 completion:
 - Easier contribution process
 
 ### Next steps:
+
 - Continue feature development
 - Monitor production stability
 - Gather contributor feedback

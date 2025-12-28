@@ -6,44 +6,44 @@ A tactical/military-inspired dark theme for the Escape from Tarkov quest tracker
 
 ### Dark Theme Foundation
 
-| Token | Hex | Usage |
-| ----- | --- | ----- |
-| `--bg-dark` | `#0a0a0a` | Page background |
-| `--bg-panel` | `#111111` | Panel/section backgrounds |
-| `--bg-card` | `#161616` | Card backgrounds |
+| Token           | Hex       | Usage                     |
+| --------------- | --------- | ------------------------- |
+| `--bg-dark`     | `#0a0a0a` | Page background           |
+| `--bg-panel`    | `#111111` | Panel/section backgrounds |
+| `--bg-card`     | `#161616` | Card backgrounds          |
 | `--bg-elevated` | `#1a1a1a` | Elevated surfaces, modals |
 
 ### Text Colors
 
-| Token | Hex | Usage |
-| ----- | --- | ----- |
-| `--text-bright` | `#e8e6d4` | Primary text, headings (warm cream) |
-| `--text-secondary` | `#9a9a8a` | Body text, descriptions |
-| `--text-dim` | `#6a6a5a` | Labels, hints, disabled states |
+| Token              | Hex       | Usage                               |
+| ------------------ | --------- | ----------------------------------- |
+| `--text-bright`    | `#e8e6d4` | Primary text, headings (warm cream) |
+| `--text-secondary` | `#9a9a8a` | Body text, descriptions             |
+| `--text-dim`       | `#6a6a5a` | Labels, hints, disabled states      |
 
 ### Accent Colors
 
-| Token | Value | Usage |
-| ----- | ----- | ----- |
-| `--accent-gold` | `#c4aa6a` | Primary accent, CTAs, highlights |
-| `--accent-gold-dim` | `rgba(196,170,106,0.25)` | Hover backgrounds |
-| `--accent-gold-glow` | `rgba(196,170,106,0.08)` | Subtle outer borders/glows |
+| Token                | Value                    | Usage                            |
+| -------------------- | ------------------------ | -------------------------------- |
+| `--accent-gold`      | `#c4aa6a`                | Primary accent, CTAs, highlights |
+| `--accent-gold-dim`  | `rgba(196,170,106,0.25)` | Hover backgrounds                |
+| `--accent-gold-glow` | `rgba(196,170,106,0.08)` | Subtle outer borders/glows       |
 
 ### Status Colors
 
-| Token | Hex | Usage |
-| ----- | --- | ----- |
-| `--success` | `#4ade80` | Completed, success states |
-| `--available` | `#4db8ff` | Available, ready states |
-| `--kappa` | `#ffcc00` | Kappa tracking, warnings |
+| Token         | Hex       | Usage                     |
+| ------------- | --------- | ------------------------- |
+| `--success`   | `#4ade80` | Completed, success states |
+| `--available` | `#4db8ff` | Available, ready states   |
+| `--kappa`     | `#ffcc00` | Kappa tracking, warnings  |
 
 ### Borders
 
-| Token | Value | Usage |
-| ----- | ----- | ----- |
-| `--tactical-border` | `rgba(196,170,106,0.2)` | Default borders |
-| `--tactical-border-hover` | `rgba(196,170,106,0.4)` | Hover state borders |
-| `--grid-line` | `rgba(196,170,106,0.03)` | Background grid |
+| Token                     | Value                    | Usage               |
+| ------------------------- | ------------------------ | ------------------- |
+| `--tactical-border`       | `rgba(196,170,106,0.2)`  | Default borders     |
+| `--tactical-border-hover` | `rgba(196,170,106,0.4)`  | Hover state borders |
+| `--grid-line`             | `rgba(196,170,106,0.03)` | Background grid     |
 
 ---
 
@@ -57,20 +57,20 @@ A tactical/military-inspired dark theme for the Escape from Tarkov quest tracker
 
 ### Heading Hierarchy
 
-| Level | Size | Weight | Style |
-| ----- | ---- | ------ | ----- |
-| H1 | `text-4xl md:text-5xl lg:text-6xl` | Bold | Uppercase, Rajdhani, `leading-[1.05]` |
-| H2 | `text-3xl md:text-4xl` | Bold | Uppercase, Rajdhani |
-| H3 | `text-xl md:text-2xl` | Semibold | Uppercase, Rajdhani |
-| H4 | `text-lg` | Bold | Rajdhani |
+| Level | Size                               | Weight   | Style                                 |
+| ----- | ---------------------------------- | -------- | ------------------------------------- |
+| H1    | `text-4xl md:text-5xl lg:text-6xl` | Bold     | Uppercase, Rajdhani, `leading-[1.05]` |
+| H2    | `text-3xl md:text-4xl`             | Bold     | Uppercase, Rajdhani                   |
+| H3    | `text-xl md:text-2xl`              | Semibold | Uppercase, Rajdhani                   |
+| H4    | `text-lg`                          | Bold     | Rajdhani                              |
 
 ### Body Text
 
-| Type | Size | Color |
-| ---- | ---- | ----- |
-| Large body | `text-lg leading-relaxed` | `--text-secondary` |
-| Default body | `text-base` | `--text-secondary` |
-| Small/labels | `text-sm uppercase tracking-wide` | `--text-dim` |
+| Type         | Size                              | Color              |
+| ------------ | --------------------------------- | ------------------ |
+| Large body   | `text-lg leading-relaxed`         | `--text-secondary` |
+| Default body | `text-base`                       | `--text-secondary` |
+| Small/labels | `text-sm uppercase tracking-wide` | `--text-dim`       |
 
 ---
 
@@ -122,7 +122,7 @@ Optional outer glow effect:
   position: relative;
 }
 .card-glow::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -1px;
   border: 1px solid var(--accent-gold-glow);
@@ -157,39 +157,39 @@ shadow-[0_0_8px_var(--success)]
 
 Use these semantic spacing classes defined in `globals.css`:
 
-| Class | Value | Usage |
-| ----- | ----- | ----- |
-| `gap-form` | `1.5rem` (24px) | Between form field groups |
+| Class            | Value            | Usage                                  |
+| ---------------- | ---------------- | -------------------------------------- |
+| `gap-form`       | `1.5rem` (24px)  | Between form field groups              |
 | `gap-form-field` | `0.375rem` (6px) | Between label and input within a group |
-| `gap-component` | `1rem` (16px) | Between related components |
-| `p-card` | `1.5rem` (24px) | Card internal padding |
+| `gap-component`  | `1rem` (16px)    | Between related components             |
+| `p-card`         | `1.5rem` (24px)  | Card internal padding                  |
 
 **Why this matters:** More space between groups than within them creates clear visual hierarchy without relying on dividers.
 
 ### Container Widths
 
-| Context | Max Width |
-| ------- | --------- |
-| Hero sections | `max-w-[1200px]` |
+| Context          | Max Width        |
+| ---------------- | ---------------- |
+| Hero sections    | `max-w-[1200px]` |
 | Content sections | `max-w-[1100px]` |
-| Card containers | `max-w-[1024px]` |
+| Card containers  | `max-w-[1024px]` |
 
 ### Section Spacing
 
-| Context | Value |
-| ------- | ----- |
-| Hero padding | `py-16` |
-| Section padding | `py-24` |
-| Horizontal padding | `px-8` |
+| Context            | Value   |
+| ------------------ | ------- |
+| Hero padding       | `py-16` |
+| Section padding    | `py-24` |
+| Horizontal padding | `px-8`  |
 
 ### Component Spacing
 
-| Context | Value |
-| ------- | ----- |
-| Card padding | `p-card` (semantic, 24px) |
-| Compact card padding | `p-4` |
-| Gap between cards | `gap-6` |
-| Gap between list items | `gap-2` |
+| Context                | Value                     |
+| ---------------------- | ------------------------- |
+| Card padding           | `p-card` (semantic, 24px) |
+| Compact card padding   | `p-4`                     |
+| Gap between cards      | `gap-6`                   |
+| Gap between list items | `gap-2`                   |
 
 ---
 
@@ -199,22 +199,26 @@ Use these semantic spacing classes defined in `globals.css`:
 
 Shadows communicate depth and importance. Use consistent elevation levels:
 
-| Class | Usage | Components |
-| ----- | ----- | ---------- |
-| `shadow-sm` | Subtle elevation | Buttons at rest |
-| `shadow-elevation-sm` | Low elevation | Cards at rest |
-| `shadow-elevation-md` | Medium elevation | Cards on hover |
-| `shadow-elevation-lg` | High elevation | Dropdowns, popovers |
-| `shadow-elevation-xl` | Maximum elevation | Modals, dialogs |
-| `shadow-inset-input` | Inset shadow | Form inputs (emulates light source) |
+| Class                 | Usage             | Components                          |
+| --------------------- | ----------------- | ----------------------------------- |
+| `shadow-sm`           | Subtle elevation  | Buttons at rest                     |
+| `shadow-elevation-sm` | Low elevation     | Cards at rest                       |
+| `shadow-elevation-md` | Medium elevation  | Cards on hover                      |
+| `shadow-elevation-lg` | High elevation    | Dropdowns, popovers                 |
+| `shadow-elevation-xl` | Maximum elevation | Modals, dialogs                     |
+| `shadow-inset-input`  | Inset shadow      | Form inputs (emulates light source) |
 
 ### Shadow Definitions
 
 ```css
---shadow-elevation-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
---shadow-elevation-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
---shadow-elevation-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
---shadow-elevation-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+--shadow-elevation-sm:
+  0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+--shadow-elevation-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+--shadow-elevation-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
+--shadow-elevation-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
 --shadow-inset-input: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 ```
 
@@ -226,18 +230,19 @@ Shadows communicate depth and importance. Use consistent elevation levels:
 
 ### Three-Level System
 
-| Level | Class | Color | Usage |
-| ----- | ----- | ----- | ----- |
-| Primary | `text-primary` | `--text-bright` | Headlines, key data values |
-| Secondary | `text-secondary` | `--text-secondary` | Body text, supporting info |
-| Tertiary | `text-tertiary` / `text-label` | `--text-tertiary` | Labels, metadata, timestamps |
+| Level     | Class                          | Color              | Usage                        |
+| --------- | ------------------------------ | ------------------ | ---------------------------- |
+| Primary   | `text-primary`                 | `--text-bright`    | Headlines, key data values   |
+| Secondary | `text-secondary`               | `--text-secondary` | Body text, supporting info   |
+| Tertiary  | `text-tertiary` / `text-label` | `--text-tertiary`  | Labels, metadata, timestamps |
 
 ### Label/Value Pattern
 
 **Before (wrong):**
 
 ```html
-<span>Level: 15</span>  <!-- Both same weight/color -->
+<span>Level: 15</span>
+<!-- Both same weight/color -->
 ```
 
 **After (correct):**
@@ -254,8 +259,7 @@ The label is de-emphasized (smaller, dimmer) while the value is prominent.
 Use `text-label` class for form labels:
 
 ```html
-<Label className="text-label">Email</Label>
-<Input ... />
+<label className="text-label">Email</label> <input ... />
 ```
 
 ### Grid Patterns
@@ -305,8 +309,16 @@ For hero sections, adds depth with subtle warm glow:
 
 ```css
 background:
-  radial-gradient(ellipse at 30% 20%, rgba(196,170,106,0.06) 0%, transparent 50%),
-  radial-gradient(ellipse at 70% 80%, rgba(139,69,19,0.03) 0%, transparent 40%);
+  radial-gradient(
+    ellipse at 30% 20%,
+    rgba(196, 170, 106, 0.06) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    ellipse at 70% 80%,
+    rgba(139, 69, 19, 0.03) 0%,
+    transparent 40%
+  );
 ```
 
 ### Hover Effects
@@ -314,7 +326,7 @@ background:
 **Card lift:**
 
 ```css
-hover:-translate-y-0.5 transition-all
+hover: -translate-y-0.5 transition-all;
 ```
 
 **Border brighten:**
@@ -344,12 +356,12 @@ shadow-[0_0_12px_var(--accent-gold-glow)]
 
 ### Breakpoints
 
-| Name | Width | Usage |
-| ---- | ----- | ----- |
-| Default | 0px+ | Mobile-first base styles |
-| `md` | 768px | Tablet, 2-column layouts |
-| `lg` | 1024px | Desktop, full layouts |
-| `xl` | 1280px | Wide screens |
+| Name    | Width  | Usage                    |
+| ------- | ------ | ------------------------ |
+| Default | 0px+   | Mobile-first base styles |
+| `md`    | 768px  | Tablet, 2-column layouts |
+| `lg`    | 1024px | Desktop, full layouts    |
+| `xl`    | 1280px | Wide screens             |
 
 ### Common Patterns
 
@@ -419,10 +431,14 @@ All variables should be defined in your global CSS:
   --grid-line: rgba(196, 170, 106, 0.03);
 
   /* Shadow Elevation System (Refactoring UI) */
-  --shadow-elevation-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
-  --shadow-elevation-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-  --shadow-elevation-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
-  --shadow-elevation-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-elevation-sm:
+    0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  --shadow-elevation-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --shadow-elevation-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
+  --shadow-elevation-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   --shadow-inset-input: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 ```

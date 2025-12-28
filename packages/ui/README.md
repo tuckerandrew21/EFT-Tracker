@@ -3,6 +3,7 @@
 Shared React component library for EFT Tracker.
 
 Building blocks for consistent UIs across the web and companion apps. All components:
+
 - Use Tailwind CSS for styling
 - Follow the @eft-tracker/theme design system
 - Are fully typed with TypeScript
@@ -36,6 +37,7 @@ export function MyComponent() {
 ```
 
 **Props:**
+
 - `variant`: `'primary' | 'secondary' | 'ghost' | 'danger'`
 - `size`: `'sm' | 'md' | 'lg'`
 - `isLoading`: Show loading spinner
@@ -65,6 +67,7 @@ export function QuestCard({ quest }) {
 ```
 
 **Components:**
+
 - `Card`: Main container
 - `CardHeader`: Header section with optional bottom border
 - `CardTitle`: Heading text
@@ -72,6 +75,7 @@ export function QuestCard({ quest }) {
 - `CardFooter`: Footer section with top border
 
 **Props:**
+
 - `Card`: `hoverable` (optional) - adds hover shadow
 
 ### Badge
@@ -93,6 +97,7 @@ export function QuestStatus({ quest }) {
 ```
 
 **Props:**
+
 - `variant`: `'default' | 'success' | 'warning' | 'error' | 'info'`
 - All standard `<span>` attributes
 
@@ -109,7 +114,7 @@ All components use Tailwind CSS. Make sure your app has:
 
 ```typescript
 // tailwind.config.ts
-import { config } from '@eft-tracker/theme/tailwind';
+import { config } from "@eft-tracker/theme/tailwind";
 
 export default config;
 ```

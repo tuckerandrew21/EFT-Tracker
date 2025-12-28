@@ -7,6 +7,7 @@ Successfully implemented Coolify HTTP REST API integration to replace SSH-based 
 ### Implementation Details
 
 **Files Created:**
+
 - `packages/utils/src/coolify-api.ts` - TypeScript HTTP API client with Bearer token authentication
   - `CoolifyAPIClient` class with methods: `testConnection()`, `getDeployment()`, `listDeployments()`
   - Singleton pattern via `getCoolifyAPIClient()` function
@@ -26,6 +27,7 @@ Successfully implemented Coolify HTTP REST API integration to replace SSH-based 
   - API reference with status values and error codes
 
 **Files Modified:**
+
 - `.env.template` - Added HTTP API and deprecated SSH configuration examples
 - `packages/utils/src/index.ts` - Exported new API client
 - `CLAUDE.md` - Added pre-commit checklist and quick reference
@@ -33,6 +35,7 @@ Successfully implemented Coolify HTTP REST API integration to replace SSH-based 
 - `scripts/tools/coolify-ssh.sh` - Updated with deprecation notice
 
 **Environment Variables (in `.env.local`):**
+
 ```bash
 COOLIFY_API_URL=http://95.217.155.28:8000/api/v1
 COOLIFY_API_TOKEN=1|CWgPXdPwfIOsBmLy1gYhR4ZR8Z69RWjbFwH39Wj4c8d373ff
@@ -51,6 +54,7 @@ COOLIFY_API_TOKEN=1|CWgPXdPwfIOsBmLy1gYhR4ZR8Z69RWjbFwH39Wj4c8d373ff
 ### CI/CD Status
 
 All checks passed before merge:
+
 - ✅ Lint & Format (SUCCESS)
 - ✅ Tests (SUCCESS)
 - ✅ Security Audit (SUCCESS)
@@ -112,21 +116,24 @@ See `CLAUDE.md` section "Pre-Commit Checklist" for more details.
 ## API Usage Examples
 
 ### Get Deployment Status
+
 ```typescript
-import { getCoolifyAPIClient } from '@eft-tracker/utils';
+import { getCoolifyAPIClient } from "@eft-tracker/utils";
 
 const client = getCoolifyAPIClient();
-const deployment = await client.getDeployment('ogo0gkc8488sccwgocwkc8gw');
+const deployment = await client.getDeployment("ogo0gkc8488sccwgocwkc8gw");
 console.log(`Status: ${deployment.status}`);
 console.log(`URL: ${deployment.deployment_url}`);
 ```
 
 ### API Endpoint (Backend)
+
 ```bash
 GET /api/deployment/status?deploymentId=<uuid>
 ```
 
 Response:
+
 ```json
 {
   "deploymentId": "ogo0gkc8488sccwgocwkc8gw",
@@ -150,6 +157,7 @@ The SSH implementation is kept for backward compatibility but should NOT be used
 - **Reason:** SSH key management is complex, doesn't work well on Windows, and the HTTP API is more reliable
 
 If SSH access becomes necessary as a temporary fallback:
+
 1. See `docs/coolify-deployment.md` section "Alternative: SSH Access (Deprecated)"
 2. Generate ED25519 key in Coolify UI without passphrase
 3. Add to `.env.local` (never commit)
@@ -157,16 +165,19 @@ If SSH access becomes necessary as a temporary fallback:
 ## Troubleshooting
 
 **API Connection Failed:**
+
 - Verify `COOLIFY_API_URL=http://95.217.155.28:8000/api/v1`
 - Verify `COOLIFY_API_TOKEN` is in `.env.local`
 - Test with: `curl -H "Authorization: Bearer <token>" http://95.217.155.28:8000/api/v1/version`
 
 **Deployment Not Found (404):**
+
 - Verify you have the deployment UUID (not app ID)
 - Confirm deployment exists in Coolify UI
 - Check token permissions are "read-only" at minimum
 
 **Invalid Token (401):**
+
 - Regenerate token in Coolify UI
 - Copy new token to `.env.local`
 - Restart dev server
@@ -183,6 +194,7 @@ If SSH access becomes necessary as a temporary fallback:
 ## Future Enhancements
 
 Potential improvements for future implementation:
+
 - Cache deployment status to reduce API calls
 - Implement real-time deployment notifications (webhook from Coolify)
 - Add deployment history view in UI

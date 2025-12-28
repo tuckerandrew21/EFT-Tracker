@@ -37,12 +37,14 @@ MCP tool definitions are a one-time cost (~5,000 tokens). The real consumers are
 ## Cost-Aware Workflows
 
 **Bug fixes:**
+
 1. Grep for error first
 2. Read only affected sections
 3. Make targeted edits
 4. Run specific test
 
 **New features:**
+
 1. Plan in one message (use thinking)
 2. Implement in batches
 3. Compact between milestones

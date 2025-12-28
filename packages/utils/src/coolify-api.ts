@@ -12,7 +12,7 @@ export interface CoolifyDeployment {
   deployment_uuid: string;
   application_id: number;
   application_name: string;
-  status: 'queued' | 'in_progress' | 'finished' | 'failed' | 'cancelled';
+  status: "queued" | "in_progress" | "finished" | "failed" | "cancelled";
   commit: string;
   commit_message: string;
   logs: string;
@@ -43,7 +43,7 @@ export class CoolifyAPIClient {
 
     if (!apiUrl || !apiToken) {
       throw new Error(
-        'Missing Coolify API configuration. Set COOLIFY_API_URL and COOLIFY_API_TOKEN environment variables.'
+        "Missing Coolify API configuration. Set COOLIFY_API_URL and COOLIFY_API_TOKEN environment variables."
       );
     }
 
@@ -53,14 +53,17 @@ export class CoolifyAPIClient {
   /**
    * Make an HTTP request to Coolify API with proper authentication
    */
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options?: RequestInit
+  ): Promise<T> {
     const url = `${this.config.apiUrl}${endpoint}`;
 
     const response = await fetch(url, {
       ...options,
       headers: {
-        'Authorization': `Bearer ${this.config.apiToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.config.apiToken}`,
+        "Content-Type": "application/json",
         ...options?.headers,
       },
     });
@@ -82,12 +85,12 @@ export class CoolifyAPIClient {
       // Try to fetch API version as a simple connectivity test
       const response = await fetch(`${this.config.apiUrl}/version`, {
         headers: {
-          'Authorization': `Bearer ${this.config.apiToken}`,
+          Authorization: `Bearer ${this.config.apiToken}`,
         },
       });
       return response.ok;
     } catch (error) {
-      console.error('Coolify API connection test failed:', error);
+      console.error("Coolify API connection test failed:", error);
       return false;
     }
   }
@@ -96,7 +99,7 @@ export class CoolifyAPIClient {
    * List all deployments
    */
   async listDeployments(): Promise<CoolifyDeployment[]> {
-    return this.request<CoolifyDeployment[]>('/deployments');
+    return this.request<CoolifyDeployment[]>("/deployments");
   }
 
   /**

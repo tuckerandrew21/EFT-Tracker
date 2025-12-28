@@ -18,18 +18,16 @@ import { describe, it, expect } from "vitest";
 describe("Tauri v2 Auto-Updater Frontend Utility", () => {
   it("checkForUpdates function exists and is importable", async () => {
     // Import the function
-    const { checkForUpdates } = await import(
-      "../../../apps/companion/src/lib/updater"
-    );
+    const { checkForUpdates } =
+      await import("../../../apps/companion/src/lib/updater");
 
     // Verify it's a function
     expect(typeof checkForUpdates).toBe("function");
   });
 
   it("checkForUpdates has proper error handling structure", async () => {
-    const { checkForUpdates } = await import(
-      "../../../apps/companion/src/lib/updater"
-    );
+    const { checkForUpdates } =
+      await import("../../../apps/companion/src/lib/updater");
 
     // The function should be callable without throwing
     // In non-Tauri environment, it will fail gracefully
@@ -38,18 +36,16 @@ describe("Tauri v2 Auto-Updater Frontend Utility", () => {
   });
 
   it("updater module exports checkForUpdates", async () => {
-    const updaterModule = await import(
-      "../../../apps/companion/src/lib/updater"
-    );
+    const updaterModule =
+      await import("../../../apps/companion/src/lib/updater");
 
     expect(updaterModule).toHaveProperty("checkForUpdates");
     expect(typeof updaterModule.checkForUpdates).toBe("function");
   });
 
   it("checkForUpdates is an async function", async () => {
-    const { checkForUpdates } = await import(
-      "../../../apps/companion/src/lib/updater"
-    );
+    const { checkForUpdates } =
+      await import("../../../apps/companion/src/lib/updater");
 
     // Check if it returns a Promise
     const result = checkForUpdates();

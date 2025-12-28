@@ -68,6 +68,7 @@ pnpm build:companion
 Next.js web application for quest tracking.
 
 **Key directories:**
+
 - `src/app/` - Next.js App Router pages and API routes
 - `src/components/` - React components
 - `src/hooks/` - Custom React hooks
@@ -76,6 +77,7 @@ Next.js web application for quest tracking.
 - `prisma/` - Database schema and migrations
 
 **Scripts:**
+
 ```bash
 pnpm --filter @eft-tracker/web dev          # Start dev server
 pnpm --filter @eft-tracker/web build        # Build production bundle
@@ -85,6 +87,7 @@ pnpm --filter @eft-tracker/web test         # Run tests
 ```
 
 **Environment:**
+
 - `NEXTAUTH_URL` - Authentication URL (default: http://localhost:3000)
 - `DATABASE_URL` - PostgreSQL connection string
 - `AUTH_SECRET` - NextAuth secret for session encryption
@@ -94,11 +97,13 @@ pnpm --filter @eft-tracker/web test         # Run tests
 Tauri v2 desktop application for automatic quest sync.
 
 **Key directories:**
+
 - `src/` - React source code
 - `src-tauri/` - Tauri Rust backend
 - `tests/` - E2E tests
 
 **Scripts:**
+
 ```bash
 pnpm --filter @eft-tracker/companion dev           # Start dev (Tauri + Vite)
 pnpm --filter @eft-tracker/companion tauri:build   # Build production app
@@ -121,6 +126,7 @@ import type { SyncRequest, SyncResponse } from "@eft-tracker/types";
 ```
 
 **Exports:**
+
 - `./` - All types and schemas
 - `./quest` - Quest domain types
 - `./api` - API contract types and Zod schemas
@@ -136,6 +142,7 @@ import { TRADERS, QUEST_STATUSES } from "@eft-tracker/utils";
 ```
 
 **Modules:**
+
 - `formatters.ts` - Date/string formatting
 - `validators.ts` - Zod schemas and validation
 - `constants.ts` - Domain constants
@@ -145,11 +152,13 @@ import { TRADERS, QUEST_STATUSES } from "@eft-tracker/utils";
 **@eft-tracker/tsconfig** - Centralized TypeScript configurations
 
 Shared TypeScript configs for consistency:
+
 - `base.json` - Base compiler options
 - `nextjs.json` - Next.js-specific settings
 - `react.json` - React/Vite settings
 
 **Usage:**
+
 ```json
 // apps/web/tsconfig.json
 {
@@ -181,8 +190,8 @@ Centralized design tokens for consistent styling:
 - Tailwind CSS configuration
 
 ```typescript
-import { colors, spacing } from '@eft-tracker/theme';
-import config from '@eft-tracker/theme/tailwind';
+import { colors, spacing } from "@eft-tracker/theme";
+import config from "@eft-tracker/theme/tailwind";
 ```
 
 ### packages/ui
@@ -198,7 +207,7 @@ Building blocks for consistent UIs:
 All components use Tailwind CSS and follow the theme design system.
 
 ```typescript
-import { Button, Card, Badge } from '@eft-tracker/ui';
+import { Button, Card, Badge } from "@eft-tracker/ui";
 ```
 
 ### packages/hooks
@@ -212,7 +221,7 @@ Common patterns and utilities:
 - `useAsync` - Manage async operations with loading/error states
 
 ```typescript
-import { useDebounce, useLocalStorage, useAsync } from '@eft-tracker/hooks';
+import { useDebounce, useLocalStorage, useAsync } from "@eft-tracker/hooks";
 ```
 
 ## Common Workflows
@@ -242,6 +251,7 @@ gh pr create --base master
 
 1. **Extract to shared package** (packages/types/ or packages/utils/)
 2. **Import in apps:**
+
    ```typescript
    // In apps/web/src/
    import { MyType } from "@eft-tracker/types";
@@ -307,13 +317,14 @@ The web app's `src/types/index.ts` re-exports from the shared package for backwa
 
 ### Path Aliases
 
-| Alias | Resolves to |
-|-------|------------|
-| `@/` | `apps/web/src/` |
+| Alias                | Resolves to           |
+| -------------------- | --------------------- |
+| `@/`                 | `apps/web/src/`       |
 | `@eft-tracker/types` | `packages/types/src/` |
 | `@eft-tracker/utils` | `packages/utils/src/` |
 
 Configured in:
+
 - `vitest.config.ts` (test resolution)
 - `apps/web/tsconfig.json` (web app)
 - `apps/companion/tsconfig.json` (companion app)

@@ -13,11 +13,11 @@
  * - COOLIFY_SSH_KEY: SSH private key (multiline)
  */
 
-import { exec, execSync } from 'child_process';
-import { promisify } from 'util';
-import { writeFileSync, unlinkSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { exec, execSync } from "child_process";
+import { promisify } from "util";
+import { writeFileSync, unlinkSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 
 const execAsync = promisify(exec);
 
@@ -29,7 +29,7 @@ export interface CoolifySSHConfig {
 
 export interface DeploymentStatus {
   id: string;
-  status: 'in_progress' | 'success' | 'failed' | 'unknown';
+  status: "in_progress" | "success" | "failed" | "unknown";
   buildTime?: number;
   logs?: string;
 }
@@ -47,12 +47,12 @@ export class CoolifySSHClient {
    */
   private loadFromEnv(): CoolifySSHConfig {
     const host = process.env.COOLIFY_SSH_HOST;
-    const user = process.env.COOLIFY_SSH_USER || 'root';
+    const user = process.env.COOLIFY_SSH_USER || "root";
     const key = process.env.COOLIFY_SSH_KEY;
 
     if (!host || !key) {
       throw new Error(
-        'Missing Coolify SSH configuration. Set COOLIFY_SSH_HOST and COOLIFY_SSH_KEY environment variables.'
+        "Missing Coolify SSH configuration. Set COOLIFY_SSH_HOST and COOLIFY_SSH_KEY environment variables."
       );
     }
 
@@ -67,11 +67,14 @@ export class CoolifySSHClient {
       return this.keyFile;
     }
 
-    const keyFile = join(tmpdir(), `coolify-key-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+    const keyFile = join(
+      tmpdir(),
+      `coolify-key-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    );
     writeFileSync(keyFile, this.config.key);
 
     // Make key readable only by owner
-    if (process.platform !== 'win32') {
+    if (process.platform !== "win32") {
       execSync(`chmod 600 "${keyFile}"`);
     }
 
@@ -102,9 +105,9 @@ export class CoolifySSHClient {
       const cmd = `ssh -i "${keyFile}" -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${this.config.user}@${this.config.host} "echo 'SSH connection successful'"`;
 
       const { stdout } = await execAsync(cmd, { timeout: 10000 });
-      return stdout.includes('SSH connection successful');
+      return stdout.includes("SSH connection successful");
     } catch (error) {
-      console.error('SSH connection test failed:', error);
+      console.error("SSH connection test failed:", error);
       return false;
     }
   }
@@ -121,10 +124,10 @@ export class CoolifySSHClient {
       const cmd = `ssh -i "${keyFile}" -o StrictHostKeyChecking=no ${this.config.user}@${this.config.host} "docker logs coolify_app_1 2>&1 | grep -A 50 '${deploymentId}' | head -100"`;
 
       const { stdout } = await execAsync(cmd, { timeout: 30000 });
-      return stdout || 'No logs found for deployment';
+      return stdout || "No logs found for deployment";
     } catch (error) {
-      console.error('Failed to get deployment logs:', error);
-      return 'Error retrieving logs';
+      console.error("Failed to get deployment logs:", error);
+      return "Error retrieving logs";
     }
   }
 
@@ -141,13 +144,13 @@ export class CoolifySSHClient {
       const { stdout } = await execAsync(cmd, { timeout: 30000 });
 
       // Parse deployment status from output
-      let status: DeploymentStatus['status'] = 'unknown';
-      if (stdout.includes('success') || stdout.includes('completed')) {
-        status = 'success';
-      } else if (stdout.includes('failed') || stdout.includes('error')) {
-        status = 'failed';
-      } else if (stdout.includes('running') || stdout.includes('in progress')) {
-        status = 'in_progress';
+      let status: DeploymentStatus["status"] = "unknown";
+      if (stdout.includes("success") || stdout.includes("completed")) {
+        status = "success";
+      } else if (stdout.includes("failed") || stdout.includes("error")) {
+        status = "failed";
+      } else if (stdout.includes("running") || stdout.includes("in progress")) {
+        status = "in_progress";
       }
 
       return {
@@ -156,10 +159,10 @@ export class CoolifySSHClient {
         logs: stdout,
       };
     } catch (error) {
-      console.error('Failed to get deployment status:', error);
+      console.error("Failed to get deployment status:", error);
       return {
         id: deploymentId,
-        status: 'unknown',
+        status: "unknown",
       };
     }
   }
@@ -167,7 +170,9 @@ export class CoolifySSHClient {
   /**
    * List recent deployments
    */
-  async listDeployments(limit: number = 10): Promise<Array<{ id: string; status: string; createdAt: string }>> {
+  async listDeployments(
+    limit: number = 10
+  ): Promise<Array<{ id: string; status: string; createdAt: string }>> {
     try {
       const keyFile = this.createKeyFile();
 
@@ -177,7 +182,7 @@ export class CoolifySSHClient {
       const { stdout } = await execAsync(cmd, { timeout: 30000 });
       return [];
     } catch (error) {
-      console.error('Failed to list deployments:', error);
+      console.error("Failed to list deployments:", error);
       return [];
     }
   }
@@ -186,7 +191,10 @@ export class CoolifySSHClient {
    * Get raw SSH command output
    * Useful for custom queries
    */
-  async executeCommand(command: string, timeout: number = 30000): Promise<string> {
+  async executeCommand(
+    command: string,
+    timeout: number = 30000
+  ): Promise<string> {
     try {
       const keyFile = this.createKeyFile();
       const sshCmd = `ssh -i "${keyFile}" -o StrictHostKeyChecking=no ${this.config.user}@${this.config.host} "${command}"`;
@@ -194,7 +202,9 @@ export class CoolifySSHClient {
       const { stdout } = await execAsync(sshCmd, { timeout });
       return stdout;
     } catch (error) {
-      throw new Error(`SSH command failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `SSH command failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 }
@@ -204,7 +214,9 @@ export class CoolifySSHClient {
  */
 let coolifyClient: CoolifySSHClient | null = null;
 
-export function getCoolifySSHClient(config?: CoolifySSHConfig): CoolifySSHClient {
+export function getCoolifySSHClient(
+  config?: CoolifySSHConfig
+): CoolifySSHClient {
   if (!coolifyClient) {
     coolifyClient = new CoolifySSHClient(config);
   }

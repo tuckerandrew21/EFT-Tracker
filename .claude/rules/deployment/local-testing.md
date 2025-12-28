@@ -5,6 +5,7 @@ paths: scripts/test-coolify-build.sh
 # Deployment Testing Rules
 
 When modifying this script:
+
 - Test all 3 tiers (quick, full, Docker)
 - Ensure Windows compatibility (EPERM handling)
 - Update error messages to be actionable

@@ -21,6 +21,7 @@ gh run list --workflow=smoke-tests.yml --limit 1
 Smoke tests are lightweight, quick tests that verify critical user journeys work correctly in production. They run AFTER deployment completes and take approximately 1-2 minutes.
 
 **Key characteristics:**
+
 - Fast execution (<2 minutes total)
 - Read-only operations (no data mutations)
 - Focus on critical paths only
@@ -48,16 +49,19 @@ gh workflow run smoke-tests.yml
 ```
 
 View results:
+
 ```bash
 gh run list --workflow=smoke-tests.yml --limit 5
 ```
 
 View specific run details:
+
 ```bash
 gh run view <run-id>
 ```
 
 Download test results:
+
 ```bash
 gh run download <run-id> -n smoke-test-results
 ```
@@ -124,6 +128,7 @@ The `/api/health` endpoint provides real-time health status of the application a
 **Method:** GET
 
 **Response Format:**
+
 ```json
 {
   "status": "healthy",
@@ -141,11 +146,13 @@ The `/api/health` endpoint provides real-time health status of the application a
 ```
 
 **Status Values:**
+
 - `healthy` - All systems operational
 - `degraded` - Systems working but with performance issues (DB >1000ms)
 - `unhealthy` - Critical systems failing (DB timeout or error)
 
 **HTTP Status Codes:**
+
 - `200 OK` - Application is healthy
 - `503 Service Unavailable` - Application is unhealthy
 
@@ -205,6 +212,7 @@ gh workflow run smoke-tests.yml
 **Issue:** Workflow file exists but tests don't run
 
 **Solution:**
+
 1. Verify test files exist:
    ```bash
    ls -la __tests__/smoke/
@@ -220,11 +228,13 @@ gh workflow run smoke-tests.yml
 **Issue:** Tests can't connect to production
 
 **Possible causes:**
+
 - Deployment not yet complete
 - DNS propagation delay
 - Firewall/network issue
 
 **Solution:**
+
 - Wait 30 seconds and retry
 - Verify site loads manually: https://learntotarkov.com
 - Check Coolify deployment logs
@@ -234,11 +244,13 @@ gh workflow run smoke-tests.yml
 **Issue:** Specific test assertion fails
 
 **Possible causes:**
+
 - UI changes between test and deployment
 - Page load timeout
 - Selector changed
 
 **Solution:**
+
 1. Review test output for specific failure
 2. Manually test the page
 3. Check code changes in deployment
@@ -249,11 +261,13 @@ gh workflow run smoke-tests.yml
 **Issue:** API endpoint fails or returns unexpected data
 
 **Possible causes:**
+
 - Database connection issue
 - API route not deployed
 - Data validation change
 
 **Solution:**
+
 1. Check health endpoint: `curl https://learntotarkov.com/api/health`
 2. Review Coolify deployment logs
 3. Check application error logs
