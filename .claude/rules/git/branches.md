@@ -63,11 +63,38 @@ feature/* → master → production (Coolify auto-deploy)
    - Manual testing of critical paths
    - Verify no breaking changes
 
-6. **Merge triggers automatic deployment**
+6. **Merge triggers automatic deployment and branch cleanup**
    - GitHub webhook to Coolify
    - Docker build (~2 min)
    - Rolling update with healthcheck
    - Production live (~3 min total)
+   - **Branch automatically deleted** (no cleanup needed)
+
+## Automatic Branch Deletion
+
+**Best Practice: Branches are automatically deleted after merge** ✅
+
+When your PR is merged to master:
+
+- The auto-merge workflow (`MERGE_DELETE_BRANCH: true`) automatically deletes the branch
+- This keeps the repository clean and prevents accidental work on merged branches
+- No manual cleanup is needed
+
+**What this means for you:**
+
+- Don't worry about deleting branches after merge - it's automatic
+- Each branch is a fresh start from the latest master
+- Repository stays organized (no accumulation of old branches)
+
+**To clean up local branches after pulling:**
+
+```bash
+# Clean up deleted remote tracking branches
+git fetch --prune
+
+# List remaining local branches
+git branch -l
+```
 
 ## E2E Test Status
 
