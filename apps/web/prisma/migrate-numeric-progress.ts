@@ -1,7 +1,21 @@
 import "dotenv/config";
+import * as fs from "fs";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+
+// Load .env.local (for local development)
+try {
+  const envContent = fs.readFileSync(".env.local", "utf8");
+  envContent.split("\n").forEach((line) => {
+    const match = line.match(/^([^#=]+)=(.*)$/);
+    if (match) {
+      process.env[match[1].trim()] = match[2].trim();
+    }
+  });
+} catch {
+  // .env.local not found, use existing env
+}
 
 /**
  * Backfill numeric progress fields (current, target) for existing ObjectiveProgress records.
