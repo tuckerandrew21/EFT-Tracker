@@ -107,6 +107,11 @@ export function QuestTreeClient() {
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
+  // Check if detail quest is currently saving
+  const isDetailQuestSaving = useMemo(() => {
+    return detailQuest ? savingQuestIds.has(detailQuest.id) : false;
+  }, [detailQuest, savingQuestIds]);
+
   // Refs for stable callback references (prevents re-renders from invalidating memoization)
   const questsWithProgressRef = useRef<QuestWithProgress[]>([]);
   const sessionStatusRef = useRef(sessionStatus);
@@ -330,6 +335,11 @@ export function QuestTreeClient() {
     }
   }, []);
 
+  // Wrapper for modal - reuses parent's handleStatusChange logic
+  const handleModalStatusChange = useCallback(async (questId: string) => {
+    await handleStatusChange(questId);
+  }, [handleStatusChange]);
+
   // Calculate progress stats
   const stats = useMemo(
     () => ({
@@ -403,6 +413,8 @@ export function QuestTreeClient() {
         quest={detailQuest}
         open={detailModalOpen}
         onOpenChange={setDetailModalOpen}
+        onStatusChange={handleModalStatusChange}
+        isSaving={isDetailQuestSaving}
       />
       <QuestFilters
         traders={traders}
