@@ -30,8 +30,23 @@ export interface Trader {
 export interface Objective {
   id: string;
   description: string;
-  map: string | null;
+  map: string | null; // Deprecated: Use maps[] instead
+  maps: string[]; // Array of map names where this objective applies
+  optional: boolean; // Whether objective is optional for quest completion
+  type: string | null; // Objective type from tarkov.dev API
+  count: number | null; // Target count for countable objectives
   questId: string;
+  progress?: ObjectiveProgress[]; // User's progress on this objective
+}
+
+// Objective progress from database
+export interface ObjectiveProgress {
+  id: string;
+  userId: string;
+  objectiveId: string;
+  completed: boolean;
+  syncSource: "WEB" | "COMPANION";
+  updatedAt: Date;
 }
 
 // Requirement status types from tarkov.dev API
