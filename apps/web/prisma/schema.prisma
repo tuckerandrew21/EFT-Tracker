@@ -7,16 +7,17 @@ datasource db {
 }
 
 model User {
-  id                     String           @id @default(cuid())
-  email                  String           @unique
+  id                     String              @id @default(cuid())
+  email                  String              @unique
   password               String
   name                   String?
   playerLevel            Int?
-  questsPerTree          Int?             @default(5) // null = show all
-  bypassLevelRequirement Boolean          @default(false)
-  createdAt              DateTime         @default(now())
-  updatedAt              DateTime         @updatedAt
+  questsPerTree          Int?                @default(5) // null = show all
+  bypassLevelRequirement Boolean             @default(false)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
   questProgress          QuestProgress[]
+  objectiveProgress      ObjectiveProgress[]
   companionTokens        CompanionToken[]
   securityEvents         SecurityEvent[]
 }
@@ -60,11 +61,31 @@ model QuestDependency {
 }
 
 model Objective {
-  id          String  @id @default(cuid())
+  id          String              @id @default(cuid())
   description String
-  map         String?
+  map         String? // Deprecated: Use maps[] instead. Kept for backward compat.
+  maps        String[]            @default([])
+  optional    Boolean             @default(false)
+  type        String?
+  count       Int?
   questId     String
-  quest       Quest   @relation(fields: [questId], references: [id], onDelete: Cascade)
+  quest       Quest               @relation(fields: [questId], references: [id], onDelete: Cascade)
+  progress    ObjectiveProgress[]
+}
+
+model ObjectiveProgress {
+  id          String     @id @default(cuid())
+  userId      String
+  objectiveId String
+  completed   Boolean    @default(false)
+  syncSource  SyncSource @default(WEB)
+  updatedAt   DateTime   @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objective Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, objectiveId])
+  @@index([userId, completed])
 }
 
 model QuestProgress {

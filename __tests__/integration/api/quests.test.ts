@@ -48,6 +48,8 @@ const mockQuests = [
         target: "scav",
         count: 5,
         map: null,
+        optional: false,
+        progress: [],
       },
     ],
     dependsOn: [],
@@ -76,6 +78,8 @@ const mockQuests = [
         target: "watch",
         count: 1,
         map: "customs",
+        optional: false,
+        progress: [],
       },
     ],
     dependsOn: [
@@ -114,6 +118,8 @@ const mockQuests = [
         target: "salewa",
         count: 3,
         map: null,
+        optional: false,
+        progress: [],
       },
     ],
     dependsOn: [],
@@ -308,6 +314,175 @@ describe("/api/quests", () => {
           orderBy: [{ levelRequired: "asc" }, { title: "asc" }],
         })
       );
+    });
+
+    it("should include objectivesSummary with all zeros for unauthenticated users", async () => {
+      vi.mocked(auth).mockResolvedValue(null as any);
+      vi.mocked(prisma.quest.findMany).mockResolvedValue(mockQuests as never);
+
+      const request = new Request("http://localhost:3000/api/quests");
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // Each quest should have objectivesSummary
+      expect(data.quests[0].objectivesSummary).toBeDefined();
+      // No progress for unauthenticated - all counts should reflect 0 completed
+      expect(data.quests[0].objectivesSummary.total).toBe(1);
+      expect(data.quests[0].objectivesSummary.completed).toBe(0);
+    });
+
+    it("should include objectivesSummary with correct counts for authenticated users", async () => {
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user-123", email: "test@example.com" },
+        expires: new Date(Date.now() + 86400000).toISOString(),
+      } as any);
+
+      // Mock quest with objective progress - 1 of 2 objectives complete
+      const questsWithObjectiveProgress = [
+        {
+          ...mockQuests[0],
+          objectives: [
+            {
+              id: "obj-1a",
+              questId: "quest-1",
+              description: "Kill 3 Scavs",
+              type: "kill",
+              target: "scav",
+              count: 3,
+              map: null,
+              optional: false,
+              progress: [{ completed: true }], // Completed
+            },
+            {
+              id: "obj-1b",
+              questId: "quest-1",
+              description: "Kill 2 more Scavs",
+              type: "kill",
+              target: "scav",
+              count: 2,
+              map: null,
+              optional: false,
+              progress: [], // Not completed
+            },
+          ],
+          progress: [{ status: "IN_PROGRESS" }],
+        },
+      ];
+
+      vi.mocked(prisma.quest.findMany).mockResolvedValue(
+        questsWithObjectiveProgress as never
+      );
+
+      const request = new Request("http://localhost:3000/api/quests");
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.quests[0].objectivesSummary).toEqual({
+        total: 2,
+        completed: 1,
+        requiredTotal: 2,
+        requiredCompleted: 1,
+      });
+      expect(data.quests[0].computedStatus).toBe("in_progress");
+    });
+
+    it("should return COMPLETED status when all required objectives are done", async () => {
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user-123", email: "test@example.com" },
+        expires: new Date(Date.now() + 86400000).toISOString(),
+      } as any);
+
+      // All objectives complete
+      const questsAllComplete = [
+        {
+          ...mockQuests[0],
+          objectives: [
+            {
+              id: "obj-1a",
+              questId: "quest-1",
+              description: "Kill 5 Scavs",
+              type: "kill",
+              target: "scav",
+              count: 5,
+              map: null,
+              optional: false,
+              progress: [{ completed: true }],
+            },
+          ],
+          progress: [{ status: "IN_PROGRESS" }], // Stored as IN_PROGRESS but computed as COMPLETED
+        },
+      ];
+
+      vi.mocked(prisma.quest.findMany).mockResolvedValue(
+        questsAllComplete as never
+      );
+
+      const request = new Request("http://localhost:3000/api/quests");
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.quests[0].objectivesSummary).toEqual({
+        total: 1,
+        completed: 1,
+        requiredTotal: 1,
+        requiredCompleted: 1,
+      });
+      expect(data.quests[0].computedStatus).toBe("completed");
+    });
+
+    it("should handle optional objectives correctly in objectivesSummary", async () => {
+      vi.mocked(auth).mockResolvedValue({
+        user: { id: "user-123", email: "test@example.com" },
+        expires: new Date(Date.now() + 86400000).toISOString(),
+      } as any);
+
+      // Quest with mix of required and optional objectives
+      const questsWithOptional = [
+        {
+          ...mockQuests[0],
+          objectives: [
+            {
+              id: "obj-1a",
+              questId: "quest-1",
+              description: "Kill 5 Scavs (required)",
+              type: "kill",
+              optional: false,
+              progress: [{ completed: true }], // Required, complete
+            },
+            {
+              id: "obj-1b",
+              questId: "quest-1",
+              description: "Kill 10 more Scavs (optional)",
+              type: "kill",
+              optional: true,
+              progress: [], // Optional, incomplete
+            },
+          ],
+          progress: [],
+        },
+      ];
+
+      vi.mocked(prisma.quest.findMany).mockResolvedValue(
+        questsWithOptional as never
+      );
+
+      const request = new Request("http://localhost:3000/api/quests");
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      // Summary should include total (all objectives) and required counts
+      expect(data.quests[0].objectivesSummary).toEqual({
+        total: 2,
+        completed: 1,
+        requiredTotal: 1,
+        requiredCompleted: 1,
+      });
+      // Quest should be COMPLETED since all REQUIRED objectives are done
+      expect(data.quests[0].computedStatus).toBe("completed");
     });
   });
 });
