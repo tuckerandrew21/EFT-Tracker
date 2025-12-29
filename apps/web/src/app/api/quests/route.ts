@@ -3,13 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
-import { withRateLimit } from "@/lib/middleware/rate-limit-middleware";
-import { RATE_LIMITS } from "@/lib/rate-limit";
+import {
+  computeQuestStatus,
+  computeObjectiveProgress,
+  type ObjectiveWithProgress,
+} from "@/lib/quest-status";
 
 type QuestWithRelations = Prisma.QuestGetPayload<{
   include: {
     trader: true;
-    objectives: true;
+    objectives: {
+      include: {
+        progress: true;
+      };
+    };
     dependsOn: {
       include: {
         requiredQuest: {
@@ -163,12 +170,20 @@ async function handleGET(request: Request) {
       };
     }
 
-    // Fetch quests with related data
+    // Fetch quests with related data including objective progress
     const quests = await prisma.quest.findMany({
       where,
       include: {
         trader: true,
-        objectives: true,
+        objectives: {
+          include: {
+            progress: userId
+              ? {
+                  where: { userId },
+                }
+              : false,
+          },
+        },
         dependsOn: {
           include: {
             requiredQuest: {
@@ -204,12 +219,9 @@ async function handleGET(request: Request) {
     // Memoization map for recursive dependency checking
     const lockMemo = new Map<string, boolean>();
 
-    // Transform to include computed status
+    // Transform to include computed status and objective progress summary
     const questsWithStatus = quests.map((quest: QuestWithRelations) => {
       const progress = quest.progress?.[0] || null;
-
-      // Compute status based on dependencies (recursive check)
-      let computedStatus = "available";
 
       // Use recursive function to check if quest should be locked
       // This properly handles chains where a prerequisite has "COMPLETED" stored
@@ -220,25 +232,37 @@ async function handleGET(request: Request) {
         lockMemo
       );
 
-      if (progress) {
-        const storedStatus = progress.status.toLowerCase();
-        // If dependencies are no longer met, show as locked regardless of stored status
-        // This handles the case when prerequisites are unchecked after quest was completed/available
-        if (shouldBeLocked) {
-          computedStatus = "locked";
-        } else {
-          computedStatus = storedStatus;
-        }
-      } else {
-        if (shouldBeLocked) {
-          computedStatus = "locked";
-        }
+      // Convert objectives to ObjectiveWithProgress format
+      const objectivesWithProgress: ObjectiveWithProgress[] =
+        quest.objectives.map((obj) => ({
+          id: obj.id,
+          optional: obj.optional,
+          progress: obj.progress || [],
+        }));
+
+      // Compute objective progress summary
+      const objectivesSummary = computeObjectiveProgress(
+        objectivesWithProgress
+      );
+
+      // Determine base status considering dependencies
+      let baseStatus = progress?.status ?? null;
+      if (shouldBeLocked) {
+        baseStatus = "LOCKED";
       }
+
+      // Compute final status considering objective progress
+      const computedStatus = computeQuestStatus(
+        baseStatus,
+        objectivesWithProgress,
+        shouldBeLocked ? "LOCKED" : "AVAILABLE"
+      ).toLowerCase();
 
       return {
         ...quest,
         progress,
         computedStatus,
+        objectivesSummary,
       };
     });
 

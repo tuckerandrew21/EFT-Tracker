@@ -138,8 +138,11 @@ export async function PATCH(
     let unlockedQuests: string[] = [];
     let lockedQuests: string[] = [];
 
-    // If quest was completed, check for quests requiring "complete" or "complete/failed"
+    // If quest was completed, mark all objectives as complete and unlock dependent quests
     if (newStatus === "COMPLETED") {
+      // Mark all objectives for this quest as complete
+      await markAllObjectivesComplete(session.user.id, questId);
+
       unlockedQuests = await autoUnlockDependentQuests(
         session.user.id,
         questId,
@@ -154,12 +157,16 @@ export async function PATCH(
         "IN_PROGRESS"
       );
     }
-    // If quest was reset to AVAILABLE from COMPLETED, re-lock dependent quests
+    // If quest was reset to AVAILABLE from COMPLETED, reset objectives and re-lock dependents
     else if (newStatus === "AVAILABLE" && currentStatus === "COMPLETED") {
       logger.debug(
         { questId },
         `Transition from COMPLETED to AVAILABLE for quest ${questId}`
       );
+
+      // Reset all objective progress for this quest
+      await resetObjectiveProgress(session.user.id, questId);
+
       lockedQuests = await autoLockDependentQuests(session.user.id, questId);
       logger.debug(
         { lockedQuests },
@@ -504,4 +511,76 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+/**
+ * Mark all objectives for a quest as complete.
+ * Used when the "Complete Quest" button is clicked to cascade completion to all objectives.
+ */
+async function markAllObjectivesComplete(
+  userId: string,
+  questId: string
+): Promise<void> {
+  // Get all objectives for this quest
+  const objectives = await prisma.objective.findMany({
+    where: { questId },
+    select: { id: true },
+  });
+
+  // Upsert all objective progress records to completed
+  for (const objective of objectives) {
+    await prisma.objectiveProgress.upsert({
+      where: {
+        userId_objectiveId: {
+          userId,
+          objectiveId: objective.id,
+        },
+      },
+      update: {
+        completed: true,
+        syncSource: "WEB",
+      },
+      create: {
+        userId,
+        objectiveId: objective.id,
+        completed: true,
+        syncSource: "WEB",
+      },
+    });
+  }
+
+  logger.debug(
+    { questId, objectiveCount: objectives.length },
+    "Marked all objectives complete for quest"
+  );
+}
+
+/**
+ * Reset objective progress for a quest.
+ * Used when a completed quest is reset to available.
+ */
+async function resetObjectiveProgress(
+  userId: string,
+  questId: string
+): Promise<void> {
+  // Get all objectives for this quest
+  const objectives = await prisma.objective.findMany({
+    where: { questId },
+    select: { id: true },
+  });
+
+  // Delete all objective progress records for this quest
+  await prisma.objectiveProgress.deleteMany({
+    where: {
+      userId,
+      objectiveId: {
+        in: objectives.map((o) => o.id),
+      },
+    },
+  });
+
+  logger.debug(
+    { questId, objectiveCount: objectives.length },
+    "Reset objective progress for quest"
+  );
 }
