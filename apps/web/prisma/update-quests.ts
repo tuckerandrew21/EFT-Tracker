@@ -260,7 +260,10 @@ async function main() {
           data: {
             questId,
             description: obj.description,
-            map: obj.maps?.[0]?.name || null,
+            map: obj.maps?.[0]?.name || null, // Deprecated, kept for backward compat
+            maps: obj.maps?.map((m) => m.name) || [], // Store ALL maps
+            optional: obj.optional || false,
+            type: obj.type || null,
           },
         });
       }
@@ -281,7 +284,10 @@ async function main() {
           objectives: {
             create: (task.objectives || []).map((obj) => ({
               description: obj.description,
-              map: obj.maps?.[0]?.name || null,
+              map: obj.maps?.[0]?.name || null, // Deprecated, kept for backward compat
+              maps: obj.maps?.map((m) => m.name) || [], // Store ALL maps
+              optional: obj.optional || false,
+              type: obj.type || null,
             })),
           },
         },
