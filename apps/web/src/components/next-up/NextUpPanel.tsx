@@ -95,8 +95,11 @@ export function NextUpPanel({
     }
 
     // 5. Chain completion momentum - quests in nearly-done chains
-    const chainProgress = calculateChainCompletionProgress(quests, availableQuests);
-    const momentumQuests = availableQuests.filter(q => {
+    const chainProgress = calculateChainCompletionProgress(
+      quests,
+      availableQuests
+    );
+    const momentumQuests = availableQuests.filter((q) => {
       const progress = chainProgress.get(q.id);
       return progress && progress.completionRate >= 0.6;
     });
@@ -107,7 +110,7 @@ export function NextUpPanel({
         results.push({
           quest,
           reason: `${progress.completed}/${progress.total} in chain - finish it!`,
-          priority: 85 + (progress.completionRate * 10),
+          priority: 85 + progress.completionRate * 10,
           icon: "momentum",
         });
       }
@@ -116,23 +119,42 @@ export function NextUpPanel({
     // 6. Map synergy - boost quests on the same map as other available quests
     const mapSynergyCounts = calculateMapSynergy(availableQuests);
     const synergyQuests = availableQuests
-      .filter(q => {
-        const maps = (q.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        return maps.some(m => (mapSynergyCounts.get(m) || 0) >= 3);
+      .filter((q) => {
+        const maps = (q.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        return maps.some((m) => (mapSynergyCounts.get(m) || 0) >= 3);
       })
       .sort((a, b) => {
-        const aMaps = (a.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const bMaps = (b.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const aMax = aMaps.length > 0 ? Math.max(...aMaps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
-        const bMax = bMaps.length > 0 ? Math.max(...bMaps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
+        const aMaps = (a.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const bMaps = (b.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const aMax =
+          aMaps.length > 0
+            ? Math.max(...aMaps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
+        const bMax =
+          bMaps.length > 0
+            ? Math.max(...bMaps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
         return bMax - aMax;
       });
 
     for (const quest of synergyQuests.slice(0, 2)) {
       if (!results.find((r) => r.quest.id === quest.id)) {
-        const maps = (quest.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const maxSynergy = maps.length > 0 ? Math.max(...maps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
-        const primaryMap = maps.find(m => mapSynergyCounts.get(m) === maxSynergy);
+        const maps = (quest.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const maxSynergy =
+          maps.length > 0
+            ? Math.max(...maps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
+        const primaryMap = maps.find(
+          (m) => mapSynergyCounts.get(m) === maxSynergy
+        );
         results.push({
           quest,
           reason: `${maxSynergy} quests on ${primaryMap} - efficient!`,
@@ -145,9 +167,11 @@ export function NextUpPanel({
     // 7. Trader completion progress
     const traderProgress = calculateTraderProgress(quests);
     const traderQuests = availableQuests
-      .filter(q => (traderProgress.get(q.traderId) || 0) >= 0.7)
-      .sort((a, b) =>
-        (traderProgress.get(b.traderId) || 0) - (traderProgress.get(a.traderId) || 0)
+      .filter((q) => (traderProgress.get(q.traderId) || 0) >= 0.7)
+      .sort(
+        (a, b) =>
+          (traderProgress.get(b.traderId) || 0) -
+          (traderProgress.get(a.traderId) || 0)
       );
 
     for (const quest of traderQuests.slice(0, 1)) {
@@ -156,7 +180,7 @@ export function NextUpPanel({
         results.push({
           quest,
           reason: `${Math.round(progress * 100)}% ${quest.trader.name} done`,
-          priority: 70 + (progress * 5),
+          priority: 70 + progress * 5,
           icon: "trader",
         });
       }
@@ -291,8 +315,17 @@ export function NextUpPanel({
 function InfoTooltip() {
   return (
     <div className="group relative">
-      <button type="button" title="How Next Up Works" className="text-muted-foreground hover:text-foreground transition-colors">
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button
+        type="button"
+        title="How Next Up Works"
+        className="text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <circle cx="12" cy="12" r="10" strokeWidth="2" />
           <path d="M12 16v-4M12 8h.01" strokeWidth="2" strokeLinecap="round" />
         </svg>
@@ -319,7 +352,9 @@ function calculateChainCompletionProgress(
 
   for (const quest of availableQuests) {
     const chain = findQuestChain(quest, allQuests);
-    const completed = chain.filter(q => q.computedStatus === "completed").length;
+    const completed = chain.filter(
+      (q) => q.computedStatus === "completed"
+    ).length;
     const total = chain.length;
     const completionRate = total > 0 ? completed / total : 0;
 
@@ -339,7 +374,7 @@ function findQuestChain(
     for (const dep of q.dependsOn || []) {
       if (!chain.has(dep.requiredQuest.id)) {
         chain.add(dep.requiredQuest.id);
-        const prereq = allQuests.find(aq => aq.id === dep.requiredQuest.id);
+        const prereq = allQuests.find((aq) => aq.id === dep.requiredQuest.id);
         if (prereq) addPrerequisites(prereq);
       }
     }
@@ -347,7 +382,7 @@ function findQuestChain(
 
   addPrerequisites(quest);
 
-  return allQuests.filter(q => chain.has(q.id));
+  return allQuests.filter((q) => chain.has(q.id));
 }
 
 function calculateMapSynergy(
