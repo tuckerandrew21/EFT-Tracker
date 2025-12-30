@@ -235,8 +235,10 @@ export function calculateCatchUp(
   quests: QuestWithProgress[]
 ): CatchUpCalculation {
   return {
-    prerequisites: getPrerequisitesForSelection(targetQuestIds, quests),
-    completedBranches: getCompletedBranches(targetQuestIds, quests),
+    targetQuests: [], // TODO: Calculate target quests with their status
+    siblingBranches: getCompletedBranches(targetQuestIds, quests),
+    ancestors: getPrerequisitesForSelection(targetQuestIds, quests),
+    blockedQuests: [], // TODO: Calculate blocked quests
   };
 }
 
@@ -262,9 +264,10 @@ export function groupByTrader(
   const groups = new Map<string, CatchUpSelection[]>();
 
   for (const selection of selections) {
-    const existing = groups.get(selection.traderId) || [];
+    const traderId = selection.traderId ?? "unknown";
+    const existing = groups.get(traderId) || [];
     existing.push(selection);
-    groups.set(selection.traderId, existing);
+    groups.set(traderId, existing);
   }
 
   return groups;
