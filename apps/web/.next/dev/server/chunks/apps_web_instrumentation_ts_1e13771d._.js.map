@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/tucke/Repositories/EFT-Tracker/apps/web/instrumentation.ts"],"sourcesContent":["/**\n * Next.js Instrumentation File\n *\n * This file is automatically loaded by Next.js to register instrumentation.\n * Currently empty as Sentry has been removed.\n *\n * See: https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation\n */\n\nexport async function register() {\n  // Instrumentation hook for future use\n}\n"],"names":[],"mappings":"AAAA;;;;;;;CAOC;;;;AAEM,eAAe;AACpB,sCAAsC;AACxC"}}]
-}
