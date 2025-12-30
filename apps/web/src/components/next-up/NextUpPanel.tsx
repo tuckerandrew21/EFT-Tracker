@@ -21,7 +21,14 @@ interface QuestSuggestion {
   quest: QuestWithProgress;
   reason: string;
   priority: number;
-  icon: "level" | "chain" | "map" | "kappa" | "momentum" | "trader";
+  icon:
+    | "level"
+    | "chain"
+    | "map"
+    | "kappa"
+    | "momentum"
+    | "trader"
+    | "difficulty";
 }
 
 export function NextUpPanel({
@@ -95,8 +102,11 @@ export function NextUpPanel({
     }
 
     // 5. Chain completion momentum - quests in nearly-done chains
-    const chainProgress = calculateChainCompletionProgress(quests, availableQuests);
-    const momentumQuests = availableQuests.filter(q => {
+    const chainProgress = calculateChainCompletionProgress(
+      quests,
+      availableQuests
+    );
+    const momentumQuests = availableQuests.filter((q) => {
       const progress = chainProgress.get(q.id);
       return progress && progress.completionRate >= 0.6;
     });
@@ -107,7 +117,7 @@ export function NextUpPanel({
         results.push({
           quest,
           reason: `${progress.completed}/${progress.total} in chain - finish it!`,
-          priority: 85 + (progress.completionRate * 10),
+          priority: 85 + progress.completionRate * 10,
           icon: "momentum",
         });
       }
@@ -116,23 +126,42 @@ export function NextUpPanel({
     // 6. Map synergy - boost quests on the same map as other available quests
     const mapSynergyCounts = calculateMapSynergy(availableQuests);
     const synergyQuests = availableQuests
-      .filter(q => {
-        const maps = (q.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        return maps.some(m => (mapSynergyCounts.get(m) || 0) >= 3);
+      .filter((q) => {
+        const maps = (q.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        return maps.some((m) => (mapSynergyCounts.get(m) || 0) >= 3);
       })
       .sort((a, b) => {
-        const aMaps = (a.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const bMaps = (b.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const aMax = aMaps.length > 0 ? Math.max(...aMaps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
-        const bMax = bMaps.length > 0 ? Math.max(...bMaps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
+        const aMaps = (a.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const bMaps = (b.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const aMax =
+          aMaps.length > 0
+            ? Math.max(...aMaps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
+        const bMax =
+          bMaps.length > 0
+            ? Math.max(...bMaps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
         return bMax - aMax;
       });
 
     for (const quest of synergyQuests.slice(0, 2)) {
       if (!results.find((r) => r.quest.id === quest.id)) {
-        const maps = (quest.objectives || []).map(o => o.map).filter((m): m is string => Boolean(m));
-        const maxSynergy = maps.length > 0 ? Math.max(...maps.map(m => mapSynergyCounts.get(m) || 0)) : 0;
-        const primaryMap = maps.find(m => mapSynergyCounts.get(m) === maxSynergy);
+        const maps = (quest.objectives || [])
+          .map((o) => o.map)
+          .filter((m): m is string => Boolean(m));
+        const maxSynergy =
+          maps.length > 0
+            ? Math.max(...maps.map((m) => mapSynergyCounts.get(m) || 0))
+            : 0;
+        const primaryMap = maps.find(
+          (m) => mapSynergyCounts.get(m) === maxSynergy
+        );
         results.push({
           quest,
           reason: `${maxSynergy} quests on ${primaryMap} - efficient!`,
@@ -145,9 +174,11 @@ export function NextUpPanel({
     // 7. Trader completion progress
     const traderProgress = calculateTraderProgress(quests);
     const traderQuests = availableQuests
-      .filter(q => (traderProgress.get(q.traderId) || 0) >= 0.7)
-      .sort((a, b) =>
-        (traderProgress.get(b.traderId) || 0) - (traderProgress.get(a.traderId) || 0)
+      .filter((q) => (traderProgress.get(q.traderId) || 0) >= 0.7)
+      .sort(
+        (a, b) =>
+          (traderProgress.get(b.traderId) || 0) -
+          (traderProgress.get(a.traderId) || 0)
       );
 
     for (const quest of traderQuests.slice(0, 1)) {
@@ -156,9 +187,50 @@ export function NextUpPanel({
         results.push({
           quest,
           reason: `${Math.round(progress * 100)}% ${quest.trader.name} done`,
-          priority: 70 + (progress * 5),
+          priority: 70 + progress * 5,
           icon: "trader",
         });
+      }
+    }
+
+    // 8. Difficulty-matched suggestions based on player level
+    if (playerLevel) {
+      const difficultyQuests = availableQuests
+        .filter((q) => {
+          const difficulty = getDifficultyScore(q.experience);
+          // Boost easy quests for new players (level 1-20)
+          if (playerLevel <= 20) return difficulty < 5;
+          // Boost hard quests for veterans (level 41+)
+          if (playerLevel >= 41) return difficulty > 20;
+          // Mid-level players get mixed difficulty
+          return difficulty >= 5 && difficulty <= 30;
+        })
+        .sort((a, b) => {
+          const diffA = getDifficultyScore(a.experience);
+          const diffB = getDifficultyScore(b.experience);
+          // For new players, prefer easier quests
+          if (playerLevel && playerLevel <= 20) return diffA - diffB;
+          // For veterans, prefer harder quests
+          if (playerLevel && playerLevel >= 41) return diffB - diffA;
+          // Mid-level: neutral
+          return 0;
+        });
+
+      for (const quest of difficultyQuests.slice(0, 1)) {
+        if (!results.find((r) => r.quest.id === quest.id)) {
+          const difficulty = getDifficultyScore(quest.experience);
+          const difficultyLabel = getDifficultyLabel(difficulty);
+          results.push({
+            quest,
+            reason: `${difficultyLabel} - ${quest.experience.toLocaleString()} XP`,
+            priority: adjustPriorityByDifficulty(
+              60,
+              playerLevel,
+              quest.experience
+            ),
+            icon: "difficulty",
+          });
+        }
       }
     }
 
@@ -211,6 +283,8 @@ export function NextUpPanel({
         return <Zap className="w-3 h-3 text-orange-400" />;
       case "trader":
         return <Star className="w-3 h-3 text-cyan-400" />;
+      case "difficulty":
+        return <Lightbulb className="w-3 h-3 text-yellow-500" />;
     }
   };
 
@@ -291,8 +365,17 @@ export function NextUpPanel({
 function InfoTooltip() {
   return (
     <div className="group relative">
-      <button type="button" title="How Next Up Works" className="text-muted-foreground hover:text-foreground transition-colors">
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <button
+        type="button"
+        title="How Next Up Works"
+        className="text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <circle cx="12" cy="12" r="10" strokeWidth="2" />
           <path d="M12 16v-4M12 8h.01" strokeWidth="2" strokeLinecap="round" />
         </svg>
@@ -305,6 +388,7 @@ function InfoTooltip() {
           <li>• Quest chains and dependencies</li>
           <li>• Map efficiency and synergy</li>
           <li>• Your trader progress</li>
+          <li>• Quest difficulty based on XP rewards</li>
         </ul>
       </div>
     </div>
@@ -319,7 +403,9 @@ function calculateChainCompletionProgress(
 
   for (const quest of availableQuests) {
     const chain = findQuestChain(quest, allQuests);
-    const completed = chain.filter(q => q.computedStatus === "completed").length;
+    const completed = chain.filter(
+      (q) => q.computedStatus === "completed"
+    ).length;
     const total = chain.length;
     const completionRate = total > 0 ? completed / total : 0;
 
@@ -339,7 +425,7 @@ function findQuestChain(
     for (const dep of q.dependsOn || []) {
       if (!chain.has(dep.requiredQuest.id)) {
         chain.add(dep.requiredQuest.id);
-        const prereq = allQuests.find(aq => aq.id === dep.requiredQuest.id);
+        const prereq = allQuests.find((aq) => aq.id === dep.requiredQuest.id);
         if (prereq) addPrerequisites(prereq);
       }
     }
@@ -347,7 +433,7 @@ function findQuestChain(
 
   addPrerequisites(quest);
 
-  return allQuests.filter(q => chain.has(q.id));
+  return allQuests.filter((q) => chain.has(q.id));
 }
 
 function calculateMapSynergy(
@@ -406,6 +492,40 @@ function applyTypeDiversityFilter(
   }
 
   return diverse;
+}
+
+function getDifficultyScore(xp: number): number {
+  // Normalize XP to a 0-50 scale based on observed range (800-43,000 XP)
+  // Score = XP / 1000 gives us 0.8 to 43 range
+  return xp / 1000;
+}
+
+function getDifficultyLabel(score: number): string {
+  // Categorize difficulty based on normalized score
+  if (score < 3) return "Quick win";
+  if (score < 10) return "Easy";
+  if (score < 20) return "Medium";
+  if (score < 30) return "Hard";
+  return "Challenge";
+}
+
+function adjustPriorityByDifficulty(
+  basePriority: number,
+  playerLevel: number | null,
+  xp: number
+): number {
+  if (!playerLevel) return basePriority;
+
+  const difficulty = getDifficultyScore(xp);
+  // Boost easy quests for new players (level 1-20)
+  if (playerLevel <= 20 && difficulty < 5) {
+    return basePriority + 10;
+  }
+  // Boost hard quests for veterans (level 41+)
+  if (playerLevel >= 41 && difficulty > 20) {
+    return basePriority + 10;
+  }
+  return basePriority;
 }
 
 export default NextUpPanel;

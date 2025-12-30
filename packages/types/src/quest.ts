@@ -30,23 +30,8 @@ export interface Trader {
 export interface Objective {
   id: string;
   description: string;
-  map: string | null; // Deprecated: Use maps[] instead
-  maps: string[]; // Array of map names where this objective applies
-  optional: boolean; // Whether objective is optional for quest completion
-  type: string | null; // Objective type from tarkov.dev API
-  count: number | null; // Target count for countable objectives
+  map: string | null;
   questId: string;
-  progress?: ObjectiveProgress[]; // User's progress on this objective
-}
-
-// Objective progress from database
-export interface ObjectiveProgress {
-  id: string;
-  userId: string;
-  objectiveId: string;
-  completed: boolean;
-  syncSource: "WEB" | "COMPANION";
-  updatedAt: Date;
 }
 
 // Requirement status types from tarkov.dev API
@@ -75,7 +60,7 @@ export interface Quest {
   kappaRequired: boolean;
   questType: QuestType;
   factionName: string | null;
-  location: string | null; // null = "any map", otherwise specific map name
+  experience: number; // XP reward from tarkov.dev
   traderId: string;
   trader: Trader;
   objectives: Objective[];
@@ -92,17 +77,10 @@ export interface QuestProgress {
   questId: string;
 }
 
-// Objective progress summary for UI display
-export interface ObjectivesSummary {
-  total: number;
-  completed: number;
-}
-
 // Quest with progress for frontend
 export interface QuestWithProgress extends Quest {
   progress: QuestProgress | null;
   computedStatus: QuestStatus;
-  objectivesSummary?: ObjectivesSummary;
 }
 
 // Level range filter options
@@ -119,7 +97,11 @@ export interface QuestFilters {
   search: string;
   kappaOnly: boolean;
   map: string | null;
-  playerLevel: number | null; // For display only, no filtering
+  playerLevel: number | null;
+  questsPerTree: number | null; // null = show all
+  bypassLevelRequirement: boolean; // Show all quests regardless of level
+  questType: QuestType | null; // null = all quest types
+  hideReputationQuests: boolean; // Hide Fence reputation quests by default
 }
 
 // View mode for quest display
@@ -193,26 +175,4 @@ export interface TraderQuestGroup {
     targetQuestId: string;
     targetTraderId: string;
   }>;
-}
-
-// Catch-up feature types
-export interface CatchUpSelection {
-  questId: string;
-  questTitle: string;
-  traderId: string;
-  traderName: string;
-  traderColor: string;
-  levelRequired: number;
-  chainLength: number;
-}
-
-export interface CatchUpCalculation {
-  prerequisites: CatchUpSelection[];
-  completedBranches: CatchUpSelection[];
-}
-
-export interface CatchUpRequest {
-  targetQuests: string[];
-  playerLevel: number;
-  confirmedBranches: string[];
 }
