@@ -32,19 +32,6 @@ export interface Objective {
   description: string;
   map: string | null;
   questId: string;
-  progress?: ObjectiveProgress[]; // User's progress on this objective
-}
-
-// Objective progress from database
-export interface ObjectiveProgress {
-  id: string;
-  userId: string;
-  objectiveId: string;
-  completed: boolean;
-  current: number | null; // Current progress (e.g., 1 of 2 PMC kills) - null for binary objectives
-  target: number | null; // Target count (copy of Objective.count) - null for binary objectives
-  syncSource: "WEB" | "COMPANION";
-  updatedAt: Date;
 }
 
 // Requirement status types from tarkov.dev API
@@ -73,7 +60,6 @@ export interface Quest {
   kappaRequired: boolean;
   questType: QuestType;
   factionName: string | null;
-  experience: number; // XP reward from tarkov.dev
   traderId: string;
   trader: Trader;
   objectives: Objective[];
@@ -188,4 +174,18 @@ export interface TraderQuestGroup {
     targetQuestId: string;
     targetTraderId: string;
   }>;
+}
+
+// Catch-up algorithm types
+export interface CatchUpSelection {
+  questId: string;
+  quest: QuestWithProgress;
+  reason: "target" | "sibling" | "ancestor" | "blocked";
+}
+
+export interface CatchUpCalculation {
+  targetQuests: CatchUpSelection[];
+  siblingBranches: CatchUpSelection[];
+  ancestors: CatchUpSelection[];
+  blockedQuests: CatchUpSelection[];
 }
