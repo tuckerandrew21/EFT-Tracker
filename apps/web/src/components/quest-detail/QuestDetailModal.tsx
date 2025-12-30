@@ -340,7 +340,11 @@ function QuestDetailContent({
                       : 0;
 
                     // For numeric objectives, render counter instead of checkbox
-                    if (isNumeric && objProgress && objProgress.target !== null) {
+                    if (
+                      isNumeric &&
+                      objProgress &&
+                      objProgress.target !== null
+                    ) {
                       return (
                         <li
                           key={obj.id}
