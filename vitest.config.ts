@@ -26,8 +26,9 @@ export default defineConfig({
       "next-auth": path.resolve(__dirname, "./apps/web/node_modules/next-auth"),
       "@xyflow/react": path.resolve(__dirname, "./apps/web/node_modules/@xyflow/react"),
       "bcryptjs": path.resolve(__dirname, "./apps/web/node_modules/bcryptjs"),
+      "@tanstack/react-query": path.resolve(__dirname, "./apps/web/node_modules/@tanstack/react-query"),
     },
-    dedupe: ["react", "react-dom", "next-auth", "@xyflow/react"],
+    dedupe: ["react", "react-dom", "next-auth", "@xyflow/react", "@tanstack/react-query"],
   },
   test: {
     globals: true,
