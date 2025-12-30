@@ -43,7 +43,7 @@ export function MapsClient() {
   // Compute initial filters using user preferences
   const initialFilters = useMemo(
     (): Partial<Filters> => ({
-      statuses: ["available"],
+      statuses: ["available", "in_progress"],
       playerLevel: prefs?.playerLevel ?? 1,
     }),
     [prefs]
