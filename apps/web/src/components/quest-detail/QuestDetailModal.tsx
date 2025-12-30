@@ -94,7 +94,10 @@ function isObjectiveCompleted(
   numericObjectiveStates: NumericObjectiveStates
 ): boolean {
   const progress = objective.progress?.[0];
-  const isNumeric = progress?.target !== null && progress?.target !== undefined && progress.target > 0;
+  const isNumeric =
+    progress?.target !== null &&
+    progress?.target !== undefined &&
+    progress.target > 0;
 
   if (isNumeric && progress) {
     const target = progress.target; // Already validated non-null by isNumeric check
@@ -328,7 +331,10 @@ function QuestDetailContent({
                     );
                     const isSavingThis = savingObjectives.has(obj.id);
                     const objProgress = obj.progress?.[0];
-                    const isNumeric = objProgress?.target !== null && objProgress?.target !== undefined && objProgress.target > 0;
+                    const isNumeric =
+                      objProgress?.target !== null &&
+                      objProgress?.target !== undefined &&
+                      objProgress.target > 0;
                     const currentProgress = isNumeric
                       ? getNumericProgress(obj, numericObjectiveStates)
                       : 0;
@@ -357,7 +363,12 @@ function QuestDetailContent({
                             disabled={!canToggleObjectives}
                             isLoading={isSavingThis}
                             onIncrement={() => {
-                              if (!canToggleObjectives || isSavingThis || !objProgress) return;
+                              if (
+                                !canToggleObjectives ||
+                                isSavingThis ||
+                                !objProgress
+                              )
+                                return;
                               const newValue = Math.min(
                                 currentProgress + 1,
                                 objProgress.target
