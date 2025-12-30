@@ -1,0 +1,3 @@
+module.exports=[93695,(a,b,c)=>{b.exports=a.x("next/dist/shared/lib/no-fallback-error.external.js",()=>require("next/dist/shared/lib/no-fallback-error.external.js"))},95289,a=>{a.n(a.i(20044))},34005,a=>{a.n(a.i(77930))},99079,a=>{a.n(a.i(52691))},88688,a=>{a.n(a.i(70007))},51078,a=>{a.n(a.i(24529))},38517,a=>{"use strict";a.i(11723);var b=a.i(69271);function c(){(0,b.redirect)("/quest-tree")}a.s(["default",()=>c])}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__c6d72e41._.js.map

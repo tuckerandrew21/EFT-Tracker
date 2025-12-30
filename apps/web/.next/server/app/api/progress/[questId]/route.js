@@ -1,0 +1,12 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/progress/[questId]/route.js")
+R.c("server/chunks/[root-of-the-server]__dfcb9279._.js")
+R.c("server/chunks/_00d3407e._.js")
+R.c("server/chunks/2f573_bcryptjs_index_6869504d.js")
+R.c("server/chunks/_502b4cca._.js")
+R.c("server/chunks/[root-of-the-server]__d48fe5ca._.js")
+R.c("server/chunks/_5015a6f6._.js")
+R.c("server/chunks/efb33_zod_v4_classic_external_bac7329f.js")
+R.c("server/chunks/[root-of-the-server]__03df79de._.js")
+R.c("server/chunks/apps_web__next-internal_server_app_api_progress_[questId]_route_actions_ffc8ef77.js")
+R.m(79396)
+module.exports=R.m(79396).exports

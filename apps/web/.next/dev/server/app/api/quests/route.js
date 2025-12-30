@@ -1,0 +1,11 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/quests/route.js")
+R.c("server/chunks/924d9_next_623d6492._.js")
+R.c("server/chunks/4b6e4_@opentelemetry_api_build_esm_9cee443b._.js")
+R.c("server/chunks/efb33_zod_v4_0b95a79a._.js")
+R.c("server/chunks/691c0_@auth_core_843d8dff._.js")
+R.c("server/chunks/407f6_jose_dist_webapi_29844b7f._.js")
+R.c("server/chunks/node_modules__pnpm_75792a5d._.js")
+R.c("server/chunks/[root-of-the-server]__09a77bc2._.js")
+R.c("server/chunks/apps_web__next-internal_server_app_api_quests_route_actions_3cafbd9d.js")
+R.m("[project]/node_modules/.pnpm/next@16.0.10_@babel+core@7._c4e04f434dd039bd14bd0d6fc5425190/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/apps/web/src/app/api/quests/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/.pnpm/next@16.0.10_@babel+core@7._c4e04f434dd039bd14bd0d6fc5425190/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/apps/web/src/app/api/quests/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

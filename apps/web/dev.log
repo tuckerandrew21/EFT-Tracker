@@ -1,0 +1,21 @@
+
+> @eft-tracker/web@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3001
+   - Network:       http://172.19.0.1:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+ ⨯ Unable to acquire lock at C:\Users\tucke\Repositories\EFT-Tracker\apps\web\.next\dev\lock, is another instance of next dev running?
+   Suggestion: If you intended to restart next dev, terminate the other process, and then try again.
+[?25h
+npm error Lifecycle script `dev` failed with error:
+npm error code 1
+npm error path C:\Users\tucke\Repositories\EFT-Tracker\apps\web
+npm error workspace @eft-tracker/web@0.1.0
+npm error location C:\Users\tucke\Repositories\EFT-Tracker\apps\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next dev
