@@ -32,6 +32,7 @@ export default defineConfig({
     exclude: [
       "node_modules/**/*",
       "__tests__/e2e/**/*",
+      "__tests__/smoke/**/*",
     ],
     coverage: {
       provider: "v8",

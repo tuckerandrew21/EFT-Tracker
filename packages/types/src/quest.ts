@@ -193,8 +193,13 @@ export interface TraderQuestGroup {
 // Catch-up algorithm types
 export interface CatchUpSelection {
   questId: string;
-  quest: QuestWithProgress;
-  reason: "target" | "sibling" | "ancestor" | "blocked";
+  questTitle?: string;
+  traderId?: string;
+  traderName?: string;
+  traderColor?: string;
+  levelRequired?: number;
+  chainLength?: number;
+  reason?: "target" | "sibling" | "ancestor" | "blocked";
 }
 
 export interface CatchUpCalculation {

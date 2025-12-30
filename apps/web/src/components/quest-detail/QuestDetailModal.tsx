@@ -93,24 +93,17 @@ function isObjectiveCompleted(
   objectiveStates: Record<string, boolean>,
   numericObjectiveStates: NumericObjectiveStates
 ): boolean {
-  const isNumeric = objective.count !== null && objective.count > 0;
+  const progress = objective.progress?.[0];
+  const isNumeric = progress?.target !== null && progress?.target !== undefined && progress.target > 0;
 
   if (isNumeric) {
-    const target = objective.count!; // Already validated non-null by isNumeric check
+    const target = progress?.target!; // Already validated non-null by isNumeric check
     // Check local numeric state first
     if (numericObjectiveStates[objective.id] !== undefined) {
       return numericObjectiveStates[objective.id] >= target;
     }
     // Fall back to server state
-    const progress = objective.progress?.[0];
-    if (
-      progress?.target !== null &&
-      progress?.target !== undefined &&
-      progress.target > 0
-    ) {
-      return (progress.current ?? 0) >= progress.target;
-    }
-    return progress?.completed ?? false;
+    return (progress?.current ?? 0) >= target;
   }
 
   // Binary objective: check local state first
@@ -118,7 +111,7 @@ function isObjectiveCompleted(
     return objectiveStates[objective.id];
   }
   // Fall back to server state
-  return objective.progress?.[0]?.completed ?? false;
+  return progress?.completed ?? false;
 }
 
 // Helper to get current numeric progress
@@ -334,7 +327,8 @@ function QuestDetailContent({
                       numericObjectiveStates
                     );
                     const isSavingThis = savingObjectives.has(obj.id);
-                    const isNumeric = obj.count !== null && obj.count > 0;
+                    const objProgress = obj.progress?.[0];
+                    const isNumeric = objProgress?.target !== null && objProgress?.target !== undefined && objProgress.target > 0;
                     const currentProgress = isNumeric
                       ? getNumericProgress(obj, numericObjectiveStates)
                       : 0;
@@ -355,26 +349,18 @@ function QuestDetailContent({
                             className={`flex-1 ${isCompleted ? "line-through" : ""}`}
                           >
                             {obj.description}
-                            {obj.optional && (
-                              <Badge
-                                variant="outline"
-                                className="ml-2 text-xs py-0"
-                              >
-                                Optional
-                              </Badge>
-                            )}
                           </span>
                           {/* Counter */}
                           <ObjectiveCounter
                             current={currentProgress}
-                            target={obj.count!}
+                            target={objProgress?.target!}
                             disabled={!canToggleObjectives}
                             isLoading={isSavingThis}
                             onIncrement={() => {
                               if (!canToggleObjectives || isSavingThis) return;
                               const newValue = Math.min(
                                 currentProgress + 1,
-                                obj.count!
+                                objProgress?.target!
                               );
                               onLocalNumericUpdate(obj.id, newValue);
                               onObjectiveToggle?.(obj.id, {
