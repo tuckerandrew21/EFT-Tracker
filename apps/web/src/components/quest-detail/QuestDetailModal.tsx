@@ -99,8 +99,8 @@ function isObjectiveCompleted(
     progress?.target !== undefined &&
     progress.target > 0;
 
-  if (isNumeric && progress) {
-    const target = progress.target; // Already validated non-null by isNumeric check
+  if (isNumeric && progress && progress.target !== null) {
+    const target = progress.target; // Narrowed to number by the checks above
     // Check local numeric state first
     if (numericObjectiveStates[objective.id] !== undefined) {
       return numericObjectiveStates[objective.id] >= target;
@@ -340,7 +340,7 @@ function QuestDetailContent({
                       : 0;
 
                     // For numeric objectives, render counter instead of checkbox
-                    if (isNumeric && objProgress) {
+                    if (isNumeric && objProgress && objProgress.target !== null) {
                       return (
                         <li
                           key={obj.id}
@@ -366,7 +366,8 @@ function QuestDetailContent({
                               if (
                                 !canToggleObjectives ||
                                 isSavingThis ||
-                                !objProgress
+                                !objProgress ||
+                                objProgress.target === null
                               )
                                 return;
                               const newValue = Math.min(
