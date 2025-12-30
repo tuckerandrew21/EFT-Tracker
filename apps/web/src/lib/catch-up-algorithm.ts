@@ -142,7 +142,7 @@ export function getPrerequisitesForSelection(
   }
 
   // Sort by chain length (shorter chains first)
-  return selections.sort((a, b) => a.chainLength - b.chainLength);
+  return selections.sort((a, b) => (a.chainLength ?? 0) - (b.chainLength ?? 0));
 }
 
 /**
@@ -216,10 +216,14 @@ export function getCompletedBranches(
 
   // Sort by level required, then by trader name
   return completedBranches.sort((a, b) => {
-    if (a.levelRequired !== b.levelRequired) {
-      return a.levelRequired - b.levelRequired;
+    const aLevel = a.levelRequired ?? 0;
+    const bLevel = b.levelRequired ?? 0;
+    if (aLevel !== bLevel) {
+      return aLevel - bLevel;
     }
-    return a.traderName.localeCompare(b.traderName);
+    const aName = a.traderName ?? "";
+    const bName = b.traderName ?? "";
+    return aName.localeCompare(bName);
   });
 }
 
@@ -231,8 +235,10 @@ export function calculateCatchUp(
   quests: QuestWithProgress[]
 ): CatchUpCalculation {
   return {
-    prerequisites: getPrerequisitesForSelection(targetQuestIds, quests),
-    completedBranches: getCompletedBranches(targetQuestIds, quests),
+    targetQuests: [], // TODO: Calculate target quests with their status
+    siblingBranches: getCompletedBranches(targetQuestIds, quests),
+    ancestors: getPrerequisitesForSelection(targetQuestIds, quests),
+    blockedQuests: [], // TODO: Calculate blocked quests
   };
 }
 
@@ -258,9 +264,10 @@ export function groupByTrader(
   const groups = new Map<string, CatchUpSelection[]>();
 
   for (const selection of selections) {
-    const existing = groups.get(selection.traderId) || [];
+    const traderId = selection.traderId ?? "unknown";
+    const existing = groups.get(traderId) || [];
     existing.push(selection);
-    groups.set(selection.traderId, existing);
+    groups.set(traderId, existing);
   }
 
   return groups;

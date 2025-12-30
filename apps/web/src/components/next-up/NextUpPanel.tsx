@@ -21,7 +21,14 @@ interface QuestSuggestion {
   quest: QuestWithProgress;
   reason: string;
   priority: number;
-  icon: "level" | "chain" | "map" | "kappa" | "momentum" | "trader";
+  icon:
+    | "level"
+    | "chain"
+    | "map"
+    | "kappa"
+    | "momentum"
+    | "trader"
+    | "difficulty";
 }
 
 export function NextUpPanel({
@@ -186,6 +193,47 @@ export function NextUpPanel({
       }
     }
 
+    // 8. Difficulty-matched suggestions based on player level
+    if (playerLevel) {
+      const difficultyQuests = availableQuests
+        .filter((q) => {
+          const difficulty = getDifficultyScore(q.experience);
+          // Boost easy quests for new players (level 1-20)
+          if (playerLevel <= 20) return difficulty < 5;
+          // Boost hard quests for veterans (level 41+)
+          if (playerLevel >= 41) return difficulty > 20;
+          // Mid-level players get mixed difficulty
+          return difficulty >= 5 && difficulty <= 30;
+        })
+        .sort((a, b) => {
+          const diffA = getDifficultyScore(a.experience);
+          const diffB = getDifficultyScore(b.experience);
+          // For new players, prefer easier quests
+          if (playerLevel && playerLevel <= 20) return diffA - diffB;
+          // For veterans, prefer harder quests
+          if (playerLevel && playerLevel >= 41) return diffB - diffA;
+          // Mid-level: neutral
+          return 0;
+        });
+
+      for (const quest of difficultyQuests.slice(0, 1)) {
+        if (!results.find((r) => r.quest.id === quest.id)) {
+          const difficulty = getDifficultyScore(quest.experience);
+          const difficultyLabel = getDifficultyLabel(difficulty);
+          results.push({
+            quest,
+            reason: `${difficultyLabel} - ${quest.experience.toLocaleString()} XP`,
+            priority: adjustPriorityByDifficulty(
+              60,
+              playerLevel,
+              quest.experience
+            ),
+            icon: "difficulty",
+          });
+        }
+      }
+    }
+
     // 4. Map efficiency - find map with most available objectives
     const mapCounts = new Map<string, number>();
     for (const quest of availableQuests) {
@@ -235,6 +283,8 @@ export function NextUpPanel({
         return <Zap className="w-3 h-3 text-orange-400" />;
       case "trader":
         return <Star className="w-3 h-3 text-cyan-400" />;
+      case "difficulty":
+        return <Lightbulb className="w-3 h-3 text-yellow-500" />;
     }
   };
 
@@ -338,6 +388,7 @@ function InfoTooltip() {
           <li>• Quest chains and dependencies</li>
           <li>• Map efficiency and synergy</li>
           <li>• Your trader progress</li>
+          <li>• Quest difficulty based on XP rewards</li>
         </ul>
       </div>
     </div>
@@ -441,6 +492,40 @@ function applyTypeDiversityFilter(
   }
 
   return diverse;
+}
+
+function getDifficultyScore(xp: number): number {
+  // Normalize XP to a 0-50 scale based on observed range (800-43,000 XP)
+  // Score = XP / 1000 gives us 0.8 to 43 range
+  return xp / 1000;
+}
+
+function getDifficultyLabel(score: number): string {
+  // Categorize difficulty based on normalized score
+  if (score < 3) return "Quick win";
+  if (score < 10) return "Easy";
+  if (score < 20) return "Medium";
+  if (score < 30) return "Hard";
+  return "Challenge";
+}
+
+function adjustPriorityByDifficulty(
+  basePriority: number,
+  playerLevel: number | null,
+  xp: number
+): number {
+  if (!playerLevel) return basePriority;
+
+  const difficulty = getDifficultyScore(xp);
+  // Boost easy quests for new players (level 1-20)
+  if (playerLevel <= 20 && difficulty < 5) {
+    return basePriority + 10;
+  }
+  // Boost hard quests for veterans (level 41+)
+  if (playerLevel >= 41 && difficulty > 20) {
+    return basePriority + 10;
+  }
+  return basePriority;
 }
 
 export default NextUpPanel;

@@ -53,6 +53,10 @@ const defaultFilters: QuestFilters = {
   kappaOnly: false,
   map: null,
   playerLevel: 1, // Default to level 1 for all users (display only, no filtering)
+  questsPerTree: null,
+  bypassLevelRequirement: false,
+  questType: null,
+  hideReputationQuests: false,
 };
 
 interface UseQuestsOptions {

@@ -42,12 +42,10 @@ function getQuestIncompleteMaps(quest: QuestWithProgress): string[] {
     // Skip completed objectives
     if (isObjectiveCompleted(objective)) continue;
 
-    // Check objective maps
-    if (objective.maps && objective.maps.length > 0) {
+    // Check objective map
+    if (objective.map) {
       hasMapSpecificObjectives = true;
-      for (const map of objective.maps) {
-        incompleteMapSet.add(map);
-      }
+      incompleteMapSet.add(objective.map);
     }
   }
 
@@ -59,10 +57,7 @@ function getQuestIncompleteMaps(quest: QuestWithProgress): string[] {
     );
 
     if (hasIncompleteObjectives || quest.computedStatus !== "completed") {
-      // Use quest.location if available, otherwise it's "any map"
-      if (quest.location) {
-        return [quest.location];
-      }
+      // No location specified for quest, return empty (Any Location)
       return []; // Empty = "Any Location"
     }
   }
