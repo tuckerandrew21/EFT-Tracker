@@ -73,6 +73,7 @@ export interface Quest {
   kappaRequired: boolean;
   questType: QuestType;
   factionName: string | null;
+  experience: number; // XP reward from tarkov.dev
   traderId: string;
   trader: Trader;
   objectives: Objective[];
