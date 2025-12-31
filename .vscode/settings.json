@@ -1,0 +1,5 @@
+{
+  // Disable Edge Tools inline styles warning
+  // React often requires inline styles for dynamic values (progress bars, animations, etc.)
+  "edge-devtools.style.no-inline-styles": "off"
+}
