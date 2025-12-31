@@ -417,19 +417,6 @@ function QuestTreeInner({
     }
   }, [focusedQuestId]);
 
-  // Handle node click for opening quest details modal
-  const handleNodeClick = useCallback(
-    (_event: React.MouseEvent, node: { data?: unknown }) => {
-      // Only handle quest nodes, not trader nodes
-      const data = node.data as QuestNodeData | undefined;
-      if (data?.quest && onQuestDetails) {
-        // Left-click opens quest details modal
-        onQuestDetails(data.quest.id);
-      }
-    },
-    [onQuestDetails]
-  );
-
   // Handle node double-click for focus mode
   const handleNodeDoubleClick = useCallback(
     (_event: React.MouseEvent, node: { data?: unknown }) => {
@@ -553,7 +540,6 @@ function QuestTreeInner({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onPaneClick={handlePaneClick}
-        onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleNodeDoubleClick}
         onInit={onInit}
         nodeTypes={nodeTypes}
