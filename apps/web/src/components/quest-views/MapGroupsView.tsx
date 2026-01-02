@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { LevelQuestCard } from "./LevelQuestCard";
-import { NextUpPanel } from "@/components/next-up";
 import type { QuestWithProgress, QuestStatus, Objective } from "@/types";
 
 // Maps in standard order (matching QuestFilters.tsx)
@@ -67,7 +66,6 @@ function getQuestIncompleteMaps(quest: QuestWithProgress): string[] {
 
 interface MapGroupsViewProps {
   quests: QuestWithProgress[];
-  allQuests?: QuestWithProgress[];
   playerLevel?: number | null;
   onStatusChange: (questId: string, status: QuestStatus) => void;
   onQuestDetails?: (questId: string) => void;
@@ -75,7 +73,6 @@ interface MapGroupsViewProps {
 
 export function MapGroupsView({
   quests,
-  allQuests,
   playerLevel,
   onStatusChange,
   onQuestDetails,
@@ -162,25 +159,64 @@ export function MapGroupsView({
     });
   }, [mapStats]);
 
-  // Quests for NextUpPanel
-  const nextUpQuests = allQuests ?? [];
-
-  // Handler for clicking a quest in the NextUpPanel
-  const handleNextUpQuestClick = (questId: string) => {
-    onQuestDetails?.(questId);
-  };
+  // Ranked maps for "Which map to run?" panel - sorted by available quests
+  const rankedMaps = useMemo(() => {
+    return orderedMaps
+      .map((map) => ({
+        map,
+        available: mapStats.get(map)?.available || 0,
+      }))
+      .filter((item) => item.available > 0)
+      .sort((a, b) => b.available - a.available);
+  }, [orderedMaps, mapStats]);
 
   return (
     <div className="h-full overflow-auto">
       <div className="flex gap-2 p-4 min-w-max">
-        {/* Next Up Panel - sticky first column */}
-        {nextUpQuests && nextUpQuests.length > 0 && (
+        {/* Map Priority Panel - sticky first column */}
+        {rankedMaps.length > 0 && (
           <div className="flex-shrink-0 w-48 sticky left-4 z-20">
-            <NextUpPanel
-              quests={nextUpQuests}
-              playerLevel={playerLevel}
-              onQuestClick={handleNextUpQuestClick}
-            />
+            <div
+              className="p-3 rounded-lg border"
+              style={{
+                backgroundColor: "var(--bg-panel)",
+                borderColor: "var(--tactical-border)",
+              }}
+            >
+              <h3
+                className="text-sm font-semibold mb-2"
+                style={{ color: "var(--text-bright)" }}
+              >
+                Which map to run?
+              </h3>
+              <div className="space-y-1">
+                {rankedMaps.slice(0, 3).map((item, idx) => (
+                  <div key={item.map} className="flex justify-between text-xs">
+                    <span
+                      style={{
+                        color:
+                          idx === 0
+                            ? "var(--accent-gold)"
+                            : "var(--text-secondary)",
+                      }}
+                    >
+                      #{idx + 1} {item.map}
+                    </span>
+                    <span style={{ color: "var(--text-dim)" }}>
+                      {item.available}
+                    </span>
+                  </div>
+                ))}
+                {rankedMaps.length > 3 && (
+                  <div
+                    className="text-xs pt-1"
+                    style={{ color: "var(--text-dim)" }}
+                  >
+                    + {rankedMaps.length - 3} more maps
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
         {orderedMaps.map((map) => {

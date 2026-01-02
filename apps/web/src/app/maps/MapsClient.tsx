@@ -481,7 +481,6 @@ export function MapsClient() {
         {questsWithProgress.length > 0 ? (
           <MapGroupsView
             quests={questsWithProgress}
-            allQuests={allQuestsWithProgress}
             playerLevel={filters.playerLevel}
             onStatusChange={handleStatusChange}
             onQuestDetails={handleQuestDetails}
