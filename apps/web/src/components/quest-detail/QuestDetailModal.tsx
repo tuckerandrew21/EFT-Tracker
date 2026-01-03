@@ -374,11 +374,9 @@ function QuestDetailContent({
                             disabled={!canToggleObjectives}
                             isLoading={isSavingThis}
                             onIncrement={() => {
-                              if (
-                                !canToggleObjectives ||
-                                isSavingThis ||
-                                target === null
-                              )
+                              // Note: Don't check isSavingThis - debouncing batches rapid clicks,
+                              // and optimistic updates show correct value immediately
+                              if (!canToggleObjectives || target === null)
                                 return;
                               const newValue = Math.min(
                                 currentProgress + 1,
@@ -388,17 +386,13 @@ function QuestDetailContent({
                               debouncedNumericUpdate(obj.id, newValue);
                             }}
                             onDecrement={() => {
-                              if (!canToggleObjectives || isSavingThis) return;
+                              if (!canToggleObjectives) return;
                               const newValue = Math.max(currentProgress - 1, 0);
                               onLocalNumericUpdate(obj.id, newValue);
                               debouncedNumericUpdate(obj.id, newValue);
                             }}
                             onComplete={() => {
-                              if (
-                                !canToggleObjectives ||
-                                isSavingThis ||
-                                target === null
-                              )
+                              if (!canToggleObjectives || target === null)
                                 return;
                               onLocalNumericUpdate(obj.id, target);
                               debouncedNumericUpdate(obj.id, target);
@@ -725,18 +719,25 @@ export function QuestDetailModal({
     async (objectiveId: string, update: ObjectiveUpdate) => {
       if (!onObjectiveToggle) return { questStatusChanged: false };
 
-      // Show spinner when API call actually starts (after debounce for numeric objectives)
-      setSavingObjectives((prev) => new Set(prev).add(objectiveId));
+      // Only track saving state for binary objectives (checkboxes)
+      // Numeric objectives use debouncing + optimistic updates, so blocking clicks is unnecessary
+      const isBinaryObjective = typeof update === "boolean";
+
+      if (isBinaryObjective) {
+        setSavingObjectives((prev) => new Set(prev).add(objectiveId));
+      }
 
       try {
         const result = await onObjectiveToggle(objectiveId, update);
         return result;
       } finally {
-        setSavingObjectives((prev) => {
-          const next = new Set(prev);
-          next.delete(objectiveId);
-          return next;
-        });
+        if (isBinaryObjective) {
+          setSavingObjectives((prev) => {
+            const next = new Set(prev);
+            next.delete(objectiveId);
+            return next;
+          });
+        }
       }
     },
     [onObjectiveToggle]
