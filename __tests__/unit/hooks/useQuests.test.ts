@@ -36,11 +36,7 @@ const setupDefaultHandlers = () => {
   );
 };
 
-// NOTE: Tests skipped due to React context initialization issues in vitest+jsdom.
-// The wrapper provides QueryClientProvider but React hooks still fail with
-// "Cannot read properties of null (reading 'useState')". Root cause needs investigation.
-// See Epic #439 for tracking.
-describe.skip("useQuests", () => {
+describe("useQuests", () => {
   describe("initial state", () => {
     it("should start with loading true", () => {
       const { result } = renderHook(() => useQuests(), { wrapper: createWrapper() });
@@ -194,8 +190,7 @@ describe.skip("useQuests", () => {
   });
 });
 
-// NOTE: Tests skipped due to React context initialization issues. See Epic #439.
-describe.skip("useQuestProgress", () => {
+describe("useQuestProgress", () => {
   beforeEach(() => {
     server.resetHandlers();
   });
