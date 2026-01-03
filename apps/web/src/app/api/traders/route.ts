@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
-import { withRateLimit } from "@/lib/middleware/rate-limit-middleware";
-import { RATE_LIMITS } from "@/lib/rate-limit";
 
 type TraderWithCount = Prisma.TraderGetPayload<{
   include: {
