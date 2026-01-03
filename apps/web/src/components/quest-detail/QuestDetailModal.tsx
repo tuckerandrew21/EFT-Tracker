@@ -427,11 +427,9 @@ function QuestDetailContent({
                             : undefined
                         }
                       >
-                        {/* Checkbox */}
+                        {/* Checkbox - no loading spinner, optimistic update handles state */}
                         <span className="shrink-0 mt-0.5">
-                          {isSavingThis ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                          ) : isCompleted ? (
+                          {isCompleted ? (
                             <CheckSquare
                               className={`w-4 h-4 ${canToggleObjectives ? "text-primary" : "text-muted-foreground"}`}
                             />
