@@ -66,7 +66,7 @@ export function MapFilters({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [filters.playerLevel, prefsLoaded]); // mutation.mutate() is stable and doesn't need to be in deps
+  }, [filters.playerLevel, prefsLoaded, updatePrefsMutation]);
 
   // Auto-apply filter change
   const handleFilterChange = useCallback(

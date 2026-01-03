@@ -83,7 +83,7 @@ export function QuestFilters({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [filters.playerLevel, prefsLoaded]); // mutation.mutate() is stable and doesn't need to be in deps
+  }, [filters.playerLevel, prefsLoaded, updatePrefsMutation]);
 
   // Debounce search input and auto-apply
   useEffect(() => {
