@@ -43,11 +43,10 @@ describe("ObjectiveCounter", () => {
       expect(screen.getByLabelText("Mark as complete")).toBeInTheDocument();
     });
 
-    it("shows loading spinner when isLoading", () => {
-      render(<ObjectiveCounter {...defaultProps} isLoading={true} />);
-      // Progress display should show spinner instead of text
-      const spinbutton = screen.getByRole("spinbutton");
-      expect(spinbutton.querySelector(".animate-spin")).toBeInTheDocument();
+    it("shows progress even when isLoading (optimistic updates)", () => {
+      // isLoading no longer shows a spinner - optimistic updates show the correct value immediately
+      render(<ObjectiveCounter {...defaultProps} isLoading={true} current={3} target={5} />);
+      expect(screen.getByText("3/5")).toBeInTheDocument();
     });
   });
 
@@ -79,12 +78,14 @@ describe("ObjectiveCounter", () => {
       expect(button).toBeDisabled();
     });
 
-    it("disables + button when isLoading", () => {
+    it("does NOT disable + button when isLoading (allows rapid clicks)", () => {
+      // isLoading no longer disables buttons - debouncing handles rapid clicks,
+      // and blocking clicks creates a "frozen" UI experience
       const onIncrement = vi.fn();
       render(<ObjectiveCounter {...defaultProps} onIncrement={onIncrement} isLoading={true} />);
 
       const button = screen.getByLabelText("Increment progress");
-      expect(button).toBeDisabled();
+      expect(button).not.toBeDisabled();
     });
   });
 

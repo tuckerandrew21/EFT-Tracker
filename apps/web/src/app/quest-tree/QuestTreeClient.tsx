@@ -413,8 +413,11 @@ export function QuestTreeClient() {
 
         const data = await response.json();
 
-        // Refetch quests to get updated objective progress
-        await refetchRef.current();
+        // Only refetch if quest status changed (e.g., quest completed or started)
+        // This prevents unnecessary flickering for simple objective count updates
+        if (data.quest?.statusChanged) {
+          await refetchRef.current();
+        }
 
         // Show toast if quest status changed
         if (data.quest?.statusChanged) {
