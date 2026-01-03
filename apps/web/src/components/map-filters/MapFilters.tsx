@@ -44,6 +44,13 @@ export function MapFilters({
     onApplyFiltersRef.current = onApplyFilters;
   });
 
+  // Stable ref for mutate function to avoid infinite loops in useEffect
+  // (useMutation returns new object reference on every render)
+  const updatePrefsRef = useRef(updatePrefsMutation.mutate);
+  useEffect(() => {
+    updatePrefsRef.current = updatePrefsMutation.mutate;
+  });
+
   // Track if initial prefs have been applied (to prevent overwriting saved prefs on load)
   const prefsApplied = useRef(false);
 
@@ -61,12 +68,12 @@ export function MapFilters({
 
     const timer = setTimeout(() => {
       if (filters.playerLevel !== undefined && filters.playerLevel !== null) {
-        updatePrefsMutation.mutate({ playerLevel: filters.playerLevel });
+        updatePrefsRef.current({ playerLevel: filters.playerLevel });
       }
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [filters.playerLevel, prefsLoaded, updatePrefsMutation]);
+  }, [filters.playerLevel, prefsLoaded]);
 
   // Auto-apply filter change
   const handleFilterChange = useCallback(
