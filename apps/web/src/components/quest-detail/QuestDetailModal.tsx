@@ -376,7 +376,8 @@ function QuestDetailContent({
                             onIncrement={() => {
                               // Note: Don't check isSavingThis - debouncing batches rapid clicks,
                               // and optimistic updates show correct value immediately
-                              if (!canToggleObjectives || target === null) return;
+                              if (!canToggleObjectives || target === null)
+                                return;
                               const newValue = Math.min(
                                 currentProgress + 1,
                                 target
@@ -391,7 +392,8 @@ function QuestDetailContent({
                               debouncedNumericUpdate(obj.id, newValue);
                             }}
                             onComplete={() => {
-                              if (!canToggleObjectives || target === null) return;
+                              if (!canToggleObjectives || target === null)
+                                return;
                               onLocalNumericUpdate(obj.id, target);
                               debouncedNumericUpdate(obj.id, target);
                             }}
